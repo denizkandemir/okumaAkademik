@@ -7,3 +7,4 @@ android/
 package-lock.json
 expo-env.d.ts
 assets/
+server/
