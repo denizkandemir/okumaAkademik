@@ -1,46 +1,22 @@
-/**
- * SAHTE (mock) kimlik doğrulama servisi. Herhangi bir kullanıcı adı ve şifreyi kabul eder;
- * kayıtlı kullanıcılar yalnızca bellekte tutulur.
- *
- * Task 2: Fonksiyon imzaları korunarak gövdeler `api` istemcisiyle değiştirilecek, ör.
- *   return api.post<AuthResponse>('/auth/login', input, { auth: false });
- */
 import type { AuthResponse, SignInInput, SignUpInput, User } from './types';
 
-const MOCK_DELAY_MS = 400;
-const users = new Map<string, User>();
+import { api } from '@/lib/api';
 
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-const normalize = (username: string) => username.trim().toLowerCase();
-
-function createToken(user: User) {
-  return `mock-token.${user.id}.${Date.now()}`;
+export function signIn(input: SignInInput): Promise<AuthResponse> {
+  return api.post<AuthResponse>('/auth/login', input, { auth: false });
 }
 
-export async function signIn({ username }: SignInInput): Promise<AuthResponse> {
-  await wait(MOCK_DELAY_MS);
-  const key = normalize(username);
-  const user = users.get(key) ?? {
-    id: `mock-${key}`,
-    username: username.trim(),
-    name: username.trim(),
-    grade: null,
-  };
-  return { token: createToken(user), user };
+export function signUp(input: SignUpInput): Promise<AuthResponse> {
+  return api.post<AuthResponse>('/auth/register', input, { auth: false });
 }
 
-export async function signUp({ username, name, grade }: SignUpInput): Promise<AuthResponse> {
-  await wait(MOCK_DELAY_MS);
-  const key = normalize(username);
-  if (users.has(key)) {
-    throw new Error('Bu kullanıcı adı alınmış. Başka bir tane dene.');
-  }
-  const user: User = { id: `mock-${key}`, username: username.trim(), name: name.trim(), grade };
-  users.set(key, user);
-  return { token: createToken(user), user };
-}
-
+/** Sunucudaki oturumu siler. Kayıtlı token ile çağrılmalıdır. */
 export async function signOut(): Promise<void> {
-  // Task 2: Sunucu tarafında token geçersiz kılınacaksa burada çağrılacak.
+  await api.post<void>('/auth/logout', undefined, { timeoutMs: 5_000 });
+}
+
+/** Kayıtlı token'ın hâlâ geçerli olduğunu doğrular ve güncel kullanıcıyı döner. */
+export async function fetchCurrentUser(options?: { timeoutMs?: number }): Promise<User> {
+  const { user } = await api.get<{ user: User }>('/me', options);
+  return user;
 }

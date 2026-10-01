@@ -8,8 +8,7 @@ export type User = {
   id: string;
   username: string;
   name: string;
-  /** Kayıt olmadan (mock) giriş yapan kullanıcılarda bilinmeyebilir. */
-  grade: Grade | null;
+  grade: Grade;
 };
 
 export type SignInInput = {

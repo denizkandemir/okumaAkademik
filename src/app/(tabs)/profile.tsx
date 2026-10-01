@@ -36,7 +36,7 @@ export default function ProfileScreen() {
 
       <Card>
         <InfoRow label="Kullanıcı adı" value={user.username} />
-        <InfoRow label="Sınıf" value={user.grade ? `${user.grade}. sınıf` : 'Belirtilmedi'} />
+        <InfoRow label="Sınıf" value={`${user.grade}. sınıf`} />
       </Card>
 
       <Button

@@ -10,8 +10,17 @@ import { MinTouchSize, Spacing } from '@/constants/theme';
 import { useAuth } from '@/features/auth/auth-context';
 import { GradePicker } from '@/features/auth/grade-picker';
 import type { Grade } from '@/features/auth/types';
-import { hasErrors, validateSignUp, type FieldErrors } from '@/features/auth/validation';
+import {
+  hasErrors,
+  pickFieldErrors,
+  validateSignUp,
+  type FieldErrors,
+} from '@/features/auth/validation';
+import { ApiError } from '@/lib/api';
 import { getErrorMessage } from '@/lib/errors';
+
+const FIELDS = ['name', 'username', 'password', 'grade'] as const;
+type Field = (typeof FIELDS)[number];
 
 export default function RegisterScreen() {
   const { signUp } = useAuth();
@@ -19,7 +28,7 @@ export default function RegisterScreen() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [grade, setGrade] = useState<Grade | null>(null);
-  const [errors, setErrors] = useState<FieldErrors<'name' | 'username' | 'password' | 'grade'>>({});
+  const [errors, setErrors] = useState<FieldErrors<Field>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -33,7 +42,13 @@ export default function RegisterScreen() {
     try {
       await signUp({ name: name.trim(), username: username.trim(), password, grade });
     } catch (error) {
-      setFormError(getErrorMessage(error));
+      // Sunucu alan hatası döndürdüyse (ör. "Bu kullanıcı adı alınmış") ilgili alanın altında göster.
+      const serverErrors = pickFieldErrors(
+        error instanceof ApiError ? error.fieldErrors : undefined,
+        FIELDS,
+      );
+      if (serverErrors) setErrors(serverErrors);
+      else setFormError(getErrorMessage(error));
       setSubmitting(false);
     }
   };
@@ -53,6 +68,7 @@ export default function RegisterScreen() {
         <View style={styles.form}>
           <TextField
             label="Adın"
+            maxLength={40}
             value={name}
             onChangeText={setName}
             error={errors.name}
@@ -63,6 +79,7 @@ export default function RegisterScreen() {
           />
           <TextField
             label="Kullanıcı adı"
+            maxLength={20}
             value={username}
             onChangeText={setUsername}
             error={errors.username}
@@ -74,6 +91,7 @@ export default function RegisterScreen() {
           />
           <TextField
             label="Şifre"
+            maxLength={128}
             value={password}
             onChangeText={setPassword}
             error={errors.password}
