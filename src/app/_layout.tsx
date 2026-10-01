@@ -16,9 +16,13 @@ export default function RootLayout() {
 }
 
 function RootNavigator() {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
   const scheme = useColorScheme();
   const colors = useTheme();
+
+  // Oturum okunmadan guard'lar değerlendirilirse açılan derin bağlantı (ör. /reading/x)
+  // login'e yönlendirilip kaybolur. Bu sürede açılış ekranı görünür kalır.
+  if (isLoading) return null;
 
   const baseTheme = scheme === 'dark' ? DarkTheme : DefaultTheme;
   const navigationTheme = {

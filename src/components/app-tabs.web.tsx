@@ -6,12 +6,13 @@ import {
   TabTriggerSlotProps,
   TabListProps,
 } from 'expo-router/ui';
-import { Pressable, View, StyleSheet } from 'react-native';
+import { Pressable, View, StyleSheet, useWindowDimensions } from 'react-native';
 
 import { ThemedText } from './themed-text';
 import { ThemedView } from './themed-view';
 
 import { MaxContentWidth, MinTouchSize, Radius, Spacing } from '@/constants/theme';
+import { useHasHydrated } from '@/hooks/use-has-hydrated';
 
 export default function AppTabs() {
   return (
@@ -48,13 +49,21 @@ export function TabButton({ children, isFocused, ...props }: TabTriggerSlotProps
   );
 }
 
+/** Bu genişliğin altında marka adı gizlenir ki sekmeler sığsın. */
+const BRAND_MIN_WIDTH = 600;
+
 export function CustomTabList(props: TabListProps) {
+  const { width } = useWindowDimensions();
+  const showBrand = useHasHydrated() && width >= BRAND_MIN_WIDTH;
+
   return (
     <View {...props} style={styles.tabListContainer}>
       <ThemedView type="backgroundElement" style={styles.innerContainer}>
-        <ThemedText type="subtitle" style={styles.brandText}>
-          Okumatik
-        </ThemedText>
+        {showBrand ? (
+          <ThemedText type="subtitle" style={styles.brandText}>
+            Okumatik
+          </ThemedText>
+        ) : null}
 
         {props.children}
       </ThemedView>
@@ -77,6 +86,7 @@ const styles = StyleSheet.create({
     borderRadius: Radius.large,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     flexGrow: 1,
     gap: Spacing.two,
     maxWidth: MaxContentWidth,
