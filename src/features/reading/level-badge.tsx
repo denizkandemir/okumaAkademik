@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-import { LevelLabels, type ReadingLevel } from './mock-data';
+import { LevelLabels, type ReadingLevel } from './types';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
