@@ -1,16 +1,18 @@
 {
   "expo": {
-    "name": "okuma-app",
-    "slug": "okuma-app",
+    "name": "Okumatik",
+    "slug": "okumatik",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "okumaapp",
+    "scheme": "okumatik",
     "userInterfaceStyle": "automatic",
     "ios": {
+      "bundleIdentifier": "com.okumaakademik.okumatik",
       "icon": "./assets/expo.icon"
     },
     "android": {
+      "package": "com.okumaakademik.okumatik",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
