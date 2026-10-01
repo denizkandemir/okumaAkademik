@@ -1,6 +1,6 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
+ * Uygulamanın tüm renkleri ve ölçüleri burada tanımlanır. Açık ve koyu temada metin/zemin
+ * kontrastı en az WCAG AA (4.5:1) olacak şekilde seçilmiştir.
  */
 
 import '@/global.css';
@@ -9,18 +9,30 @@ import { Platform } from 'react-native';
 
 export const Colors = {
   light: {
-    text: '#000000',
-    background: '#ffffff',
-    backgroundElement: '#F0F0F3',
-    backgroundSelected: '#E0E1E6',
-    textSecondary: '#60646C',
+    text: '#111318',
+    textSecondary: '#4A4F5C',
+    background: '#FFFFFF',
+    backgroundElement: '#F1F3F8',
+    backgroundSelected: '#DDE3F0',
+    border: '#C9CED8',
+    primary: '#1F5FD6',
+    onPrimary: '#FFFFFF',
+    success: '#1E7B34',
+    danger: '#B42318',
+    onDanger: '#FFFFFF',
   },
   dark: {
-    text: '#ffffff',
-    background: '#000000',
-    backgroundElement: '#212225',
-    backgroundSelected: '#2E3135',
-    textSecondary: '#B0B4BA',
+    text: '#F5F7FA',
+    textSecondary: '#B8BDC8',
+    background: '#0E1014',
+    backgroundElement: '#1C1F26',
+    backgroundSelected: '#2A2F3A',
+    border: '#3A404C',
+    primary: '#7AA7FF',
+    onPrimary: '#0B1220',
+    success: '#6FD08C',
+    danger: '#FF8A80',
+    onDanger: '#2B0B08',
   },
 } as const;
 
@@ -61,5 +73,28 @@ export const Spacing = {
   six: 64,
 } as const;
 
+export const Radius = {
+  small: 12,
+  medium: 16,
+  large: 24,
+  full: 999,
+} as const;
+
+/** Çocuklar için en küçük dokunma alanı (px). */
+export const MinTouchSize = 48;
+/** Birincil butonlar ve form alanları için yükseklik. */
+export const ControlHeight = 56;
+
+/** Okuma ekranındaki yazı boyutu sınırları. */
+export const ReadingFont = {
+  min: 18,
+  max: 36,
+  default: 22,
+  step: 2,
+  lineHeightRatio: 1.6,
+} as const;
+
 export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;
-export const MaxContentWidth = 800;
+/** Web'de sekme çubuğu üstte yer alır. */
+export const TopTabInset = Platform.select({ web: 96 }) ?? 0;
+export const MaxContentWidth = 720;
