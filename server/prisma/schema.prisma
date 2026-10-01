@@ -1,0 +1,69 @@
+// Kullanıcılar 7-14 yaş arası çocuklar: kişisel veri en aza indirilir.
+// E-posta, doğum tarihi, telefon vb. alanlar bilinçli olarak YOKTUR.
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id               String           @id @default(cuid())
+  /// Her zaman küçük harfe normalize edilmiş olarak saklanır.
+  username         String           @unique
+  passwordHash     String
+  name             String
+  /// 1-8 arası sınıf
+  grade            Int
+  dailyGoalMinutes Int              @default(10)
+  createdAt        DateTime         @default(now())
+  sessions         Session[]
+  readingSessions  ReadingSession[]
+}
+
+/// Opak oturum token'ı. İstemciye giden token saklanmaz, yalnızca SHA-256 hash'i tutulur.
+model Session {
+  id         String   @id @default(cuid())
+  tokenHash  String   @unique
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  lastUsedAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Text {
+  /// Okunabilir kimlik (slug), ör. "minik-serce"
+  id               String           @id
+  title            String
+  /// 1: Başlangıç, 2: Orta, 3: İleri
+  level            Int
+  estimatedMinutes Int
+  paragraphs       String[]
+  minGrade         Int
+  maxGrade         Int
+  createdAt        DateTime         @default(now())
+  readingSessions  ReadingSession[]
+}
+
+model ReadingSession {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  textId          String
+  text            Text      @relation(fields: [textId], references: [id], onDelete: Cascade)
+  startedAt       DateTime  @default(now())
+  endedAt         DateTime?
+  durationSeconds Int       @default(0)
+  /// 0 ile 1 arası okuma ilerlemesi
+  progress        Float     @default(0)
+  completed       Boolean   @default(false)
+
+  @@index([userId, startedAt])
+}
