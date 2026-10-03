@@ -7,7 +7,7 @@ import { gradeSchema, parse, passwordSchema, usernameSchema } from '../../lib/va
 import { requireAuth } from '../../plugins/auth.js';
 import { AUTH_RATE_LIMIT, ipAndUsernameKey } from '../../plugins/rate-limit.js';
 import { hashPassword, verifyAgainstDummy, verifyPassword } from './password.js';
-import { createSession, deleteSession } from './session.js';
+import { createAuthSession, deleteAuthSession } from './auth-session.js';
 import { publicUserSelect, toPublicUser } from './user.js';
 
 const registerSchema = z.object({
@@ -54,7 +54,7 @@ export async function authRoutes(app: FastifyInstance) {
         },
         select: publicUserSelect,
       });
-      const token = await createSession(prisma, user.id, config.SESSION_TTL_DAYS);
+      const token = await createAuthSession(prisma, user.id, config.SESSION_TTL_DAYS);
       return reply.status(201).send({ token, user: toPublicUser(user) });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
@@ -76,12 +76,12 @@ export async function authRoutes(app: FastifyInstance) {
       : await verifyAgainstDummy(input.password);
     if (!user || !valid) throw Errors.invalidCredentials();
 
-    const token = await createSession(prisma, user.id, config.SESSION_TTL_DAYS);
+    const token = await createAuthSession(prisma, user.id, config.SESSION_TTL_DAYS);
     return { token, user: toPublicUser(user) };
   });
 
   app.post('/auth/logout', { preHandler: app.authenticate }, async (request, reply) => {
-    await deleteSession(prisma, requireAuth(request).sessionId);
+    await deleteAuthSession(prisma, requireAuth(request).sessionId);
     return reply.status(204).send();
   });
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { hashToken } from '../src/modules/auth/session.js';
+import { hashToken } from '../src/modules/auth/auth-session.js';
 import { bearer, registerUser, useTestContext } from './helpers.js';
 
 const ctx = useTestContext();
@@ -31,7 +31,7 @@ describe('POST /auth/register', () => {
 
   it('veritabanında token yerine yalnızca SHA-256 hash saklar', async () => {
     const { token } = await registerUser(ctx.app);
-    const sessions = await ctx.prisma.session.findMany();
+    const sessions = await ctx.prisma.authSession.findMany();
     expect(sessions).toHaveLength(1);
     expect(sessions[0]?.tokenHash).toBe(hashToken(token));
     expect(sessions[0]?.tokenHash).not.toBe(token);
@@ -178,7 +178,7 @@ describe('GET /me ve oturum', () => {
       headers: bearer(token),
     });
     expect(logout.statusCode).toBe(204);
-    expect(await ctx.prisma.session.count()).toBe(0);
+    expect(await ctx.prisma.authSession.count()).toBe(0);
 
     const me = await ctx.app.inject({ method: 'GET', url: '/me', headers: bearer(token) });
     expect(me.statusCode).toBe(401);
@@ -187,25 +187,25 @@ describe('GET /me ve oturum', () => {
   it('kullanıldıkça oturum süresi 30 güne uzar', async () => {
     const { token } = await registerUser(ctx.app);
     const soon = new Date(Date.now() + 24 * 60 * 60 * 1000);
-    await ctx.prisma.session.updateMany({
+    await ctx.prisma.authSession.updateMany({
       data: { expiresAt: soon, lastUsedAt: new Date(Date.now() - 60 * 60 * 1000) },
     });
 
     const me = await ctx.app.inject({ method: 'GET', url: '/me', headers: bearer(token) });
     expect(me.statusCode).toBe(200);
 
-    const session = await ctx.prisma.session.findFirstOrThrow();
+    const session = await ctx.prisma.authSession.findFirstOrThrow();
     const daysLeft = (session.expiresAt.getTime() - Date.now()) / (24 * 60 * 60 * 1000);
     expect(daysLeft).toBeGreaterThan(29.9);
   });
 
   it('süresi dolmuş oturum 401 döner ve silinir', async () => {
     const { token } = await registerUser(ctx.app);
-    await ctx.prisma.session.updateMany({ data: { expiresAt: new Date(Date.now() - 1000) } });
+    await ctx.prisma.authSession.updateMany({ data: { expiresAt: new Date(Date.now() - 1000) } });
 
     const me = await ctx.app.inject({ method: 'GET', url: '/me', headers: bearer(token) });
     expect(me.statusCode).toBe(401);
-    expect(await ctx.prisma.session.count()).toBe(0);
+    expect(await ctx.prisma.authSession.count()).toBe(0);
   });
 });
 

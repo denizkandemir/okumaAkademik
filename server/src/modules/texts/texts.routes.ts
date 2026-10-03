@@ -2,6 +2,7 @@ import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 
 import { Errors } from '../../lib/errors.js';
+import { withApiLevel } from '../../lib/reading-level.js';
 import { parse } from '../../lib/validation.js';
 import { requireAuth } from '../../plugins/auth.js';
 
@@ -27,7 +28,7 @@ export async function textsRoutes(app: FastifyInstance) {
       select: textSummarySelect,
       orderBy: [{ level: 'asc' }, { estimatedMinutes: 'asc' }, { title: 'asc' }],
     });
-    return { texts };
+    return { texts: texts.map(withApiLevel) };
   });
 
   app.get('/texts/:id', async (request) => {
@@ -37,6 +38,6 @@ export async function textsRoutes(app: FastifyInstance) {
       select: { ...textSummarySelect, paragraphs: true },
     });
     if (!text) throw Errors.notFound('Bu metni bulamadık.');
-    return { text };
+    return { text: withApiLevel(text) };
   });
 }

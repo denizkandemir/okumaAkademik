@@ -35,7 +35,7 @@ export function useTestContext(): TestContext {
 
   beforeEach(async () => {
     await prisma.$executeRawUnsafe(
-      'TRUNCATE TABLE "ReadingSession", "Session", "User", "Text" CASCADE',
+      'TRUNCATE TABLE reading_sessions, auth_sessions, users, texts CASCADE',
     );
     await prisma.text.createMany({ data: seedTexts });
     await context.app?.close();

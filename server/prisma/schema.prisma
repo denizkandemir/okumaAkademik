@@ -1,5 +1,12 @@
 // Kullanıcılar 7-14 yaş arası çocuklar: kişisel veri en aza indirilir.
 // E-posta, doğum tarihi, telefon vb. alanlar bilinçli olarak YOKTUR.
+//
+// İsimlendirme: Prisma model/alan adları kodda camelCase, PostgreSQL'de tablo/kolon adları
+// snake_case'tir (@@map / @map). Tüm zamanlar saat dilimli (timestamptz) saklanır.
+// Buradaki `///` açıklamaları veritabanına da COMMENT olarak yazılır
+// (prisma/migrations/*_table_comments); birini değiştirirsen diğerini de güncelle.
+// CHECK kısıtları ve rapor görünümleri (v_*) Prisma şemasında ifade edilemediği için
+// yalnızca migration SQL'lerinde bulunur. Ayrıntılar: docs/veritabani.md
 
 generator client {
   provider     = "prisma-client"
@@ -11,59 +18,119 @@ datasource db {
   provider = "postgresql"
 }
 
-model User {
-  id               String           @id @default(cuid())
-  /// Her zaman küçük harfe normalize edilmiş olarak saklanır.
-  username         String           @unique
-  passwordHash     String
-  name             String
-  /// 1-8 arası sınıf
-  grade            Int
-  dailyGoalMinutes Int              @default(10)
-  createdAt        DateTime         @default(now())
-  sessions         Session[]
-  readingSessions  ReadingSession[]
+/// Metin zorluk seviyesi. API'de sayı olarak döner: BASLANGIC=1, ORTA=2, ILERI=3
+/// (bkz. src/lib/reading-level.ts).
+enum ReadingLevel {
+  /// Başlangıç (1): kısa cümleler, temel kelimeler
+  BASLANGIC
+  /// Orta (2)
+  ORTA
+  /// İleri (3): uzun paragraflar, zengin kelime dağarcığı
+  ILERI
+
+  @@map("reading_level")
 }
 
-/// Opak oturum token'ı. İstemciye giden token saklanmaz, yalnızca SHA-256 hash'i tutulur.
-model Session {
+/// Uygulamaya kayıtlı öğrenci. Kişisel veri en aza indirilmiştir (e-posta, doğum tarihi yok).
+model User {
+  /// Birincil anahtar (cuid), ör. "cmg8x1k2p0000abcd1234efgh"
+  id               String           @id @default(cuid())
+  /// Giriş için kullanıcı adı; her zaman küçük harfe normalize edilir, ör. "ayse.k"
+  username         String           @unique
+  /// Şifrenin argon2id hash'i. Şifrenin kendisi hiçbir yerde saklanmaz.
+  passwordHash     String           @map("password_hash")
+  /// Ekranda gösterilen ad, ör. "Ayşe"
+  name             String
+  /// Okuduğu sınıf, 1-8 arası, ör. 3
+  grade            Int
+  /// Günlük okuma hedefi (dakika), ör. 10
+  dailyGoalMinutes Int              @default(10) @map("daily_goal_minutes")
+  /// Kaydın oluşturulma zamanı
+  createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+  /// Kaydın son güncellenme zamanı (uygulama tarafından otomatik)
+  updatedAt        DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
+  /// Kullanıcının giriş oturumları
+  authSessions     AuthSession[]
+  /// Kullanıcının okuma kayıtları
+  readingSessions  ReadingSession[]
+
+  @@map("users")
+}
+
+/// Giriş (kimlik doğrulama) oturumu; okuma oturumu ile karıştırılmamalı. İstemciye giden opak
+/// token saklanmaz, yalnızca SHA-256 hash'i tutulur. Çıkışta veya süresi dolunca silinir.
+model AuthSession {
+  /// Birincil anahtar (cuid)
   id         String   @id @default(cuid())
-  tokenHash  String   @unique
-  userId     String
+  /// Token'ın SHA-256 hash'i (64 karakter hex). Token'ın kendisi saklanmaz.
+  tokenHash  String   @unique @map("token_hash")
+  /// Oturumun sahibi olan kullanıcı (users.id)
+  userId     String   @map("user_id")
+  /// Oturumun sahibi olan kullanıcı
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  expiresAt  DateTime
-  createdAt  DateTime @default(now())
-  lastUsedAt DateTime @default(now())
+  /// Oturumun geçersiz olacağı zaman; kullanıldıkça 30 gün ileri kayar
+  expiresAt  DateTime @map("expires_at") @db.Timestamptz(3)
+  /// Girişin yapıldığı zaman
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  /// Oturumun son kullanıldığı zaman (en fazla 5 dakikada bir güncellenir)
+  lastUsedAt DateTime @default(now()) @map("last_used_at") @db.Timestamptz(3)
 
   @@index([userId])
+  @@map("auth_sessions")
 }
 
+/// Okuma metni (hikâye). Kullanıcılara sınıflarına uygun olanlar listelenir.
 model Text {
   /// Okunabilir kimlik (slug), ör. "minik-serce"
   id               String           @id
+  /// Metnin başlığı, ör. "Minik Serçe"
   title            String
-  /// 1: Başlangıç, 2: Orta, 3: İleri
-  level            Int
-  estimatedMinutes Int
+  /// Zorluk seviyesi, ör. BASLANGIC
+  level            ReadingLevel
+  /// Tahmini okuma süresi (dakika), ör. 3
+  estimatedMinutes Int              @map("estimated_minutes")
+  /// Metnin paragrafları, sırasıyla
   paragraphs       String[]
-  minGrade         Int
-  maxGrade         Int
-  createdAt        DateTime         @default(now())
+  /// Metnin uygun olduğu en küçük sınıf (1-8), ör. 1
+  minGrade         Int              @map("min_grade")
+  /// Metnin uygun olduğu en büyük sınıf (1-8), ör. 4
+  maxGrade         Int              @map("max_grade")
+  /// Kaydın oluşturulma zamanı
+  createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+  /// Kaydın son güncellenme zamanı (uygulama tarafından otomatik)
+  updatedAt        DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
+  /// Bu metne ait okuma kayıtları
   readingSessions  ReadingSession[]
+
+  @@map("texts")
 }
 
+/// Bir kullanıcının bir metni bir kez okuması. Metin her açılışta yeni bir kayıt oluşur;
+/// okuma sırasında ilerleme ve süre güncellenir.
 model ReadingSession {
+  /// Birincil anahtar (cuid)
   id              String    @id @default(cuid())
-  userId          String
+  /// Okuyan kullanıcı (users.id)
+  userId          String    @map("user_id")
+  /// Okuyan kullanıcı
   user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  textId          String
+  /// Okunan metin (texts.id), ör. "minik-serce"
+  textId          String    @map("text_id")
+  /// Okunan metin
   text            Text      @relation(fields: [textId], references: [id], onDelete: Cascade)
-  startedAt       DateTime  @default(now())
-  endedAt         DateTime?
-  durationSeconds Int       @default(0)
-  /// 0 ile 1 arası okuma ilerlemesi
+  /// Okumanın başladığı zaman; günlük hedef bu zamanın günüyle (Türkiye saati) hesaplanır
+  startedAt       DateTime  @default(now()) @map("started_at") @db.Timestamptz(3)
+  /// Son ilerleme kaydının zamanı; hiç kaydedilmediyse boş
+  endedAt         DateTime? @map("ended_at") @db.Timestamptz(3)
+  /// Toplam okuma süresi (saniye), ör. 185
+  durationSeconds Int       @default(0) @map("duration_seconds")
+  /// Okuma ilerlemesi, 0 ile 1 arası oran, ör. 0.6 (= %60)
   progress        Float     @default(0)
+  /// Metin sonuna kadar okundu mu
   completed       Boolean   @default(false)
+  /// Kaydın son güncellenme zamanı (uygulama tarafından otomatik)
+  updatedAt       DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   @@index([userId, startedAt])
+  @@map("reading_sessions")
 }

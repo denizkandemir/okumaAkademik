@@ -1,8 +1,10 @@
+import { ReadingLevel } from '../src/generated/prisma/enums.js';
+
 /** Başlangıç metinleri. Sınıf aralıkları (minGrade-maxGrade) metnin zorluğuna göre seçildi. */
 export type SeedText = {
   id: string;
   title: string;
-  level: 1 | 2 | 3;
+  level: ReadingLevel;
   estimatedMinutes: number;
   minGrade: number;
   maxGrade: number;
@@ -13,7 +15,7 @@ export const seedTexts: SeedText[] = [
   {
     id: 'minik-serce',
     title: 'Minik Serçe',
-    level: 1,
+    level: ReadingLevel.BASLANGIC,
     estimatedMinutes: 2,
     minGrade: 1,
     maxGrade: 4,
@@ -28,7 +30,7 @@ export const seedTexts: SeedText[] = [
   {
     id: 'bahcedeki-domatesler',
     title: 'Bahçedeki Domatesler',
-    level: 1,
+    level: ReadingLevel.BASLANGIC,
     estimatedMinutes: 2,
     minGrade: 1,
     maxGrade: 4,
@@ -43,7 +45,7 @@ export const seedTexts: SeedText[] = [
   {
     id: 'kayip-anahtar',
     title: 'Kayıp Anahtar',
-    level: 2,
+    level: ReadingLevel.ORTA,
     estimatedMinutes: 3,
     minGrade: 2,
     maxGrade: 6,
@@ -58,7 +60,7 @@ export const seedTexts: SeedText[] = [
   {
     id: 'deniz-feneri',
     title: 'Deniz Feneri Bekçisi',
-    level: 2,
+    level: ReadingLevel.ORTA,
     estimatedMinutes: 4,
     minGrade: 3,
     maxGrade: 8,
@@ -73,7 +75,7 @@ export const seedTexts: SeedText[] = [
   {
     id: 'gokyuzundeki-haritalar',
     title: 'Gökyüzündeki Haritalar',
-    level: 3,
+    level: ReadingLevel.ILERI,
     estimatedMinutes: 5,
     minGrade: 4,
     maxGrade: 8,

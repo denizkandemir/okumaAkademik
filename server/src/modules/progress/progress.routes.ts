@@ -2,6 +2,7 @@ import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 
 import { Errors } from '../../lib/errors.js';
+import { toApiLevel } from '../../lib/reading-level.js';
 import { startOfDayInTimeZone } from '../../lib/time.js';
 import { parse } from '../../lib/validation.js';
 import { requireAuth } from '../../plugins/auth.js';
@@ -105,7 +106,7 @@ export async function progressRoutes(app: FastifyInstance) {
         continueReading = {
           textId: session.textId,
           title: session.text.title,
-          level: session.text.level,
+          level: toApiLevel(session.text.level),
           progress: session.progress,
         };
         break;

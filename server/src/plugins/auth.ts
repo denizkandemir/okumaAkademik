@@ -2,7 +2,7 @@ import type { FastifyInstance, FastifyRequest } from 'fastify';
 import fp from 'fastify-plugin';
 
 import { Errors } from '../lib/errors.js';
-import { findValidSession, type AuthenticatedSession } from '../modules/auth/session.js';
+import { findValidAuthSession, type AuthenticatedSession } from '../modules/auth/auth-session.js';
 
 declare module 'fastify' {
   interface FastifyRequest {
@@ -35,7 +35,7 @@ export default fp(async function authPlugin(app: FastifyInstance) {
     const token = readBearerToken(request);
     if (!token) throw Errors.unauthorized();
 
-    const session = await findValidSession(app.prisma, token, app.config.SESSION_TTL_DAYS);
+    const session = await findValidAuthSession(app.prisma, token, app.config.SESSION_TTL_DAYS);
     if (!session) throw Errors.unauthorized();
 
     request.auth = session;

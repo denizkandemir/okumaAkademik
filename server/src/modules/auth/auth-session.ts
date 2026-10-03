@@ -30,49 +30,49 @@ function expiresFrom(now: Date, ttlDays: number) {
   return new Date(now.getTime() + ttlDays * DAY_MS);
 }
 
-export async function createSession(
+export async function createAuthSession(
   prisma: PrismaClient,
   userId: string,
   ttlDays: number,
 ): Promise<string> {
   const token = generateToken();
   const now = new Date();
-  await prisma.session.create({
+  await prisma.authSession.create({
     data: { tokenHash: hashToken(token), userId, expiresAt: expiresFrom(now, ttlDays) },
   });
   // Süresi dolmuş eski oturumları temizle.
-  await prisma.session.deleteMany({ where: { userId, expiresAt: { lte: now } } });
+  await prisma.authSession.deleteMany({ where: { userId, expiresAt: { lte: now } } });
   return token;
 }
 
-export async function findValidSession(
+export async function findValidAuthSession(
   prisma: PrismaClient,
   token: string,
   ttlDays: number,
 ): Promise<AuthenticatedSession | null> {
-  const session = await prisma.session.findUnique({
+  const authSession = await prisma.authSession.findUnique({
     where: { tokenHash: hashToken(token) },
     include: { user: { select: { ...publicUserSelect, dailyGoalMinutes: true } } },
   });
-  if (!session) return null;
+  if (!authSession) return null;
 
   const now = new Date();
-  if (session.expiresAt <= now) {
-    await prisma.session.deleteMany({ where: { id: session.id } });
+  if (authSession.expiresAt <= now) {
+    await prisma.authSession.deleteMany({ where: { id: authSession.id } });
     return null;
   }
 
   // Kayan süre: kullanıldıkça 30 gün daha uzar.
-  if (now.getTime() - session.lastUsedAt.getTime() >= TOUCH_INTERVAL_MS) {
-    await prisma.session.updateMany({
-      where: { id: session.id },
+  if (now.getTime() - authSession.lastUsedAt.getTime() >= TOUCH_INTERVAL_MS) {
+    await prisma.authSession.updateMany({
+      where: { id: authSession.id },
       data: { lastUsedAt: now, expiresAt: expiresFrom(now, ttlDays) },
     });
   }
 
-  return { sessionId: session.id, user: session.user };
+  return { sessionId: authSession.id, user: authSession.user };
 }
 
-export async function deleteSession(prisma: PrismaClient, sessionId: string): Promise<void> {
-  await prisma.session.deleteMany({ where: { id: sessionId } });
+export async function deleteAuthSession(prisma: PrismaClient, sessionId: string): Promise<void> {
+  await prisma.authSession.deleteMany({ where: { id: sessionId } });
 }
