@@ -8,31 +8,56 @@
 
 ## Geliştirme ortamı
 
-Gerekenler: Node.js 22.12+, Docker (PostgreSQL için).
+Gerekenler:
 
-### 1. Backend
+- **Node.js 22.12+**
+- **Docker Desktop** (PostgreSQL veritabanı Docker'da çalışır). Komutları çalıştırmadan önce
+  Docker Desktop'ın açık olduğundan emin olun.
+
+### İlk kurulum (bir kez)
+
+**Backend** — `server/` klasöründe:
 
 ```bash
 cd server
-npm install                  # Prisma istemcisini de üretir
-cp .env.example .env
+npm install                  # bağımlılıklar + Prisma istemcisi
+cp .env.example .env         # varsayılan değerler docker-compose.yml ile uyumludur
 npm run db:up                # PostgreSQL'i Docker'da başlatır (okumatik + okumatik_test)
-npm run db:migrate           # migration'ları uygular
-npm run db:seed              # 5 metin + test kullanıcısı: deneme / 1234
-npm run dev                  # http://localhost:3000 (değişikliklerde yeniden başlar)
+npm run db:migrate           # tabloları oluşturur (migration'ları uygular)
+npm run db:seed              # 5 metin + test kullanıcıları (aşağıya bakın)
 ```
 
-Kontrol: `curl http://localhost:3000/health` → `{"ok":true}`
-
-### 2. Uygulama
-
-Ayrı bir terminalde, kök klasörde:
+**Uygulama** — kök klasörde:
 
 ```bash
 npm install
 cp .env.example .env         # EXPO_PUBLIC_API_URL
-npx expo start               # w: web, a: Android, i: iOS
 ```
+
+Seed'in oluşturduğu kullanıcılar (hepsinin şifresi `1234`):
+
+| Kullanıcı adı | Sınıf | Açıklama                                              |
+| ------------- | ----- | ----------------------------------------------------- |
+| `deneme`      | 3     | Uygulamayı elle denemek için; okuma geçmişi yok       |
+| `elif`        | 2     | Son 7 güne yayılmış okuma geçmişi; günlük hedef 10 dk |
+| `kerem`       | 5     | Okuma geçmişi; günlük hedef 15 dk                     |
+| `zeynep`      | 7     | Okuma geçmişi; günlük hedef 20 dk                     |
+
+`npm run db:seed` tekrar çalıştırılabilir: kullanıcılar ve metinler güncellenir, örnek okuma
+geçmişi bugüne göre yeniden yazılır; uygulamada oluşturduğunuz kayıtlara dokunulmaz.
+
+### Günlük çalıştırma
+
+İki ayrı terminal açın:
+
+| Terminal | Klasör    | Komut                            | Ne yapar                                |
+| -------- | --------- | -------------------------------- | --------------------------------------- |
+| 1        | `server/` | `npm run db:up` ve `npm run dev` | Veritabanı + API: http://localhost:3000 |
+| 2        | kök       | `npx expo start`                 | Uygulama (w: web, a: Android, i: iOS)   |
+
+`npm run db:up` veritabanı zaten çalışıyorsa bir şey yapmaz; Docker Desktop açıksa
+veritabanı genelde kendiliğinden başlar. API değişikliklerde kendini yeniden başlatır.
+Kontrol: `curl http://localhost:3000/health` → `{"ok":true}`
 
 `EXPO_PUBLIC_API_URL` cihaza göre değişir:
 
@@ -45,6 +70,43 @@ npx expo start               # w: web, a: Android, i: iOS
 Fiziksel cihazda telefon ve bilgisayar aynı ağda olmalı. Web'den erişilecekse Expo web
 adresi `server/.env` içindeki `CORS_ORIGINS`'te bulunmalı (varsayılan `http://localhost:8081`).
 `.env` değişikliğinden sonra Expo'yu yeniden başlatın.
+
+### Veritabanını görüntüleme
+
+Tabloların, kolonların ve görünümlerin (view) açıklaması: [server/docs/veritabani.md](server/docs/veritabani.md)
+
+**Prisma Studio** (en kolayı) — `server/` içinde:
+
+```bash
+npm run db:studio            # tarayıcıda açılır; tabloları gezip düzenleyebilirsiniz
+```
+
+**DBeaver / TablePlus / pgAdmin** — yeni bir PostgreSQL bağlantısı ekleyin:
+
+| Ayar       | Değer       |
+| ---------- | ----------- |
+| Host       | `localhost` |
+| Port       | `5432`      |
+| Kullanıcı  | `okumatik`  |
+| Şifre      | `okumatik`  |
+| Veritabanı | `okumatik`  |
+
+(`okumatik_test` testler içindir ve her testte silinir; orada veri aramayın.)
+
+Tablolar `public` şemasındadır: `users`, `auth_sessions`, `texts`, `reading_sessions`. Kolon
+açıklamaları araçların "Comment" alanında görünür. Hazır rapor görünümleri:
+
+```sql
+SELECT * FROM v_user_summary;                    -- kullanıcı başına toplam dakika, bitirilen metin
+SELECT * FROM v_daily_reading;                   -- gün gün okunan dakika ve hedefe ulaşıldı mı
+SELECT * FROM v_reading_history LIMIT 20;        -- son okumalar (metin, seviye, süre, ilerleme)
+SELECT * FROM v_daily_reading WHERE username = 'elif';
+```
+
+Görünümlerdeki zamanlar Türkiye saatidir. Tablolardaki zaman kolonları saat dilimlidir
+(`timestamptz`) ve araç oturumunun saat diliminde gösterilir (varsayılan UTC, `+00`). Türkiye
+saatiyle görmek için oturumda `SET TIME ZONE 'Europe/Istanbul';` çalıştırın. Veritabanının
+varsayılan saat dilimini değiştirmeyin; ayrıntı için [server/docs/veritabani.md](server/docs/veritabani.md).
 
 ### Testler ve kontroller
 
@@ -66,11 +128,16 @@ npx expo-doctor
 ### Sık kullanılan backend komutları
 
 ```bash
-npm run db:reset             # veritabanını sıfırlar, migration + seed yeniden çalışır
-npx prisma migrate dev --name <ad>   # şema değişikliğinden sonra yeni migration
-npx prisma studio            # veritabanını tarayıcıda incele
+npm run db:reset             # veritabanını siler (onay ister), migration + seed yeniden çalışır
+npx prisma migrate dev --create-only --name <ad>   # şema değişikliğinden sonra yeni migration
+npm run db:migrate           # bekleyen migration'ları uygular
+npm run db:studio            # veritabanını tarayıcıda incele
 npm run build && npm start   # derlenmiş sürümü çalıştır
 ```
+
+Yeni migration oluştururken üretilen SQL'i uygulamadan önce kontrol edin: Prisma yeniden
+adlandırmaları DROP + ADD olarak üretir ve veri kaybettirir; bu durumda `ALTER ... RENAME`
+ile elle düzeltin.
 
 ## API özeti
 
