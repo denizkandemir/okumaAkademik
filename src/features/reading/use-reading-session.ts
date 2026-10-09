@@ -23,7 +23,7 @@ export function useReadingSession(textId: string | undefined) {
     reportProgress: (progress: number) => controllerRef.current?.reportProgress(progress),
     finish: async () => {
       if (!controllerRef.current) throw new Error('Okuma oturumu henüz başlamadı.');
-      await controllerRef.current.finish();
+      return controllerRef.current.finish();
     },
   };
 }

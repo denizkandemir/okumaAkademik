@@ -1,5 +1,7 @@
 import { AppState, type AppStateStatus } from 'react-native';
 
+import type { ReadingSessionResult } from './types';
+
 import { api } from '@/lib/api';
 
 type SaveBody = { progress: number; durationSeconds: number; completed: boolean };
@@ -8,7 +10,7 @@ export type ReadingSessionController = {
   /** Kaydırma oranından hesaplanan ilerlemeyi bildirir (0-1). Yalnızca en yüksek değer tutulur. */
   reportProgress: (progress: number) => void;
   /** "Bitirdim": metni tamamlandı olarak kaydeder. Kaydedilemezse hata fırlatır. */
-  finish: () => Promise<void>;
+  finish: () => Promise<ReadingSessionResult>;
   /** Ekrandan çıkarken çağrılır; bitirilmediyse ilerlemeyi ve süreyi kaydeder. */
   dispose: () => void;
 };
@@ -45,7 +47,7 @@ export function startReadingSession(textId: string): ReadingSessionController {
       completed,
     };
     // keepalive: web'de sekme kapanırken de istek tamamlansın.
-    await api.patch(`/reading-sessions/${id}`, body, { keepalive: true });
+    return api.patch<ReadingSessionResult>(`/reading-sessions/${id}`, body, { keepalive: true });
   };
 
   const saveQuietly = () => {
@@ -73,7 +75,7 @@ export function startReadingSession(textId: string): ReadingSessionController {
     finish: async () => {
       finished = true;
       try {
-        await save(true);
+        return await save(true);
       } catch (error) {
         finished = false;
         throw error;

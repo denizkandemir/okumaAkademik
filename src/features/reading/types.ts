@@ -20,6 +20,16 @@ export type ReadingText = TextSummary & {
   paragraphs: string[];
 };
 
+/** PATCH /reading-sessions/:id yanıtı. */
+export type ReadingSessionResult = {
+  id: string;
+  progress: number;
+  durationSeconds: number;
+  completed: boolean;
+  /** Kazanılan lokum. Backend henüz göndermiyor; gönderdiğinde bitiş ekranında gösterilir. */
+  lokum?: number;
+};
+
 /** GET /me/progress */
 export type ProgressSummary = {
   dailyGoal: {

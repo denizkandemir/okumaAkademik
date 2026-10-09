@@ -16,18 +16,15 @@ import { QueryState } from '@/components/query-state';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { MaxContentWidth, MinTouchSize, Radius, ReadingFont, Spacing } from '@/constants/theme';
+import { Mascot } from '@/features/mascot/mascot';
 import { LevelBadge } from '@/features/reading/level-badge';
-import type { ReadingText } from '@/features/reading/types';
+import { ReadingComplete } from '@/features/reading/reading-complete';
+import type { ReadingSessionResult, ReadingText } from '@/features/reading/types';
 import { useReadingSession } from '@/features/reading/use-reading-session';
 import { useApiQuery } from '@/hooks/use-api-query';
 import { useTheme } from '@/hooks/use-theme';
 import { ApiError } from '@/lib/api';
 import { getErrorMessage } from '@/lib/errors';
-
-function leaveReading() {
-  if (router.canGoBack()) router.back();
-  else router.replace('/');
-}
 
 export default function ReadingScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -50,12 +47,7 @@ export default function ReadingScreen() {
     return (
       <ThemedView style={styles.centered}>
         <Stack.Screen options={{ title: '' }} />
-        <QueryState
-          isLoading={isLoading}
-          error={error}
-          onRetry={refetch}
-          loadingLabel="Metin yükleniyor…"
-        />
+        <QueryState isLoading={isLoading} error={error} onRetry={refetch} />
       </ThemedView>
     );
   }
@@ -69,6 +61,7 @@ function ReadingView({ text }: { text: ReadingText }) {
   const [fontSize, setFontSize] = useState<number>(ReadingFont.default);
   const [finishing, setFinishing] = useState(false);
   const [finishError, setFinishError] = useState<string | null>(null);
+  const [result, setResult] = useState<ReadingSessionResult | null>(null);
   const session = useReadingSession(text.id);
 
   // İlerleme = ekranın alt kenarının metin içindeki konumu / metnin toplam yüksekliği.
@@ -100,8 +93,7 @@ function ReadingView({ text }: { text: ReadingText }) {
     setFinishing(true);
     setFinishError(null);
     try {
-      await session.finish();
-      leaveReading();
+      setResult(await session.finish());
     } catch (error) {
       setFinishError(getErrorMessage(error));
       setFinishing(false);
@@ -115,12 +107,16 @@ function ReadingView({ text }: { text: ReadingText }) {
 
   return (
     <ThemedView style={styles.container}>
-      <Stack.Screen options={{ title: text.title }} />
+      {/* Bitiş ekranı tüm ekranı kaplar; başlık çubuğu da gizlenir. */}
+      <Stack.Screen options={{ title: text.title, headerShown: !result }} />
 
       <View style={[styles.toolbar, { borderColor: theme.border }]}>
-        <ThemedText type="smallBold" themeColor="textSecondary">
-          Yazı boyutu
-        </ThemedText>
+        <View style={styles.toolbarStart}>
+          <Mascot pose="read" size={72} animated={!result} />
+          <ThemedText type="smallBold" themeColor="textSecondary">
+            Yazı boyutu
+          </ThemedText>
+        </View>
         <View style={styles.fontControls}>
           <FontSizeButton
             label="A−"
@@ -178,6 +174,14 @@ function ReadingView({ text }: { text: ReadingText }) {
           </View>
         </View>
       </ScrollView>
+
+      {result ? (
+        <ReadingComplete
+          durationSeconds={result.durationSeconds}
+          lokum={result.lokum}
+          onContinue={() => router.dismissTo('/')}
+        />
+      ) : null}
     </ThemedView>
   );
 }
@@ -226,8 +230,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.two,
+    paddingVertical: Spacing.one,
     borderBottomWidth: 1,
+  },
+  toolbarStart: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.two,
   },
   fontControls: {
     flexDirection: 'row',
