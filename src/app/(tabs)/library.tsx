@@ -25,7 +25,7 @@ export default function LibraryScreen() {
         isLoading={isLoading}
         error={error}
         onRetry={refetch}
-        loadingLabel="Metinler yükleniyor…"
+        loadingLabel="Kitaplığını hazırlıyorum…"
       />
 
       {data && data.texts.length === 0 ? (

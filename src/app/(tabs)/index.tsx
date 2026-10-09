@@ -9,6 +9,9 @@ import { Screen } from '@/components/screen';
 import { ThemedText } from '@/components/themed-text';
 import { Spacing } from '@/constants/theme';
 import { useAuth } from '@/features/auth/auth-context';
+import { Mascot } from '@/features/mascot/mascot';
+import { MascotBubble } from '@/features/mascot/mascot-bubble';
+import type { MascotPose } from '@/features/mascot/types';
 import { LevelBadge } from '@/features/reading/level-badge';
 import type { ProgressSummary } from '@/features/reading/types';
 import { useApiQuery } from '@/hooks/use-api-query';
@@ -20,14 +23,33 @@ export default function HomeScreen() {
     refetchOnFocus: true,
   });
 
+  const name = user?.name.trim() ?? '';
+  const goal = data && !error ? data.dailyGoal : null;
+  const goalReached = !!goal && goal.goalMinutes > 0 && goal.readMinutes >= goal.goalMinutes;
+  const mascotPose: MascotPose = error ? 'think' : goalReached ? 'sittingHappy' : 'idle';
+  const mascotText = goalReached
+    ? `Bravo ${name}! Bugünkü hedefini tamamladın.`
+    : `Hoş geldin ${name}! Hadi birlikte okuyalım.`;
+
   return (
     <Screen withTabBar>
       <View style={styles.greeting}>
         <ThemedText type="title">Merhaba, {user?.name}!</ThemedText>
         <ThemedText themeColor="textSecondary">Bugün ne okumak istersin?</ThemedText>
+        <View style={styles.mascotRow}>
+          <Mascot pose={mascotPose} size={120} />
+          <MascotBubble text={mascotText} side="right" />
+        </View>
       </View>
 
-      <QueryState isLoading={isLoading} error={error} onRetry={refetch} />
+      {/* Selamlama alanında Pırıl zaten var; burada yalnızca yükleniyor göstergesi çizilir. */}
+      <QueryState
+        isLoading={isLoading}
+        error={error}
+        onRetry={refetch}
+        loadingLabel="Bugünkü hedefine bakıyorum…"
+        mascot={false}
+      />
 
       {data && !error ? (
         <>
@@ -100,6 +122,12 @@ function ContinueReadingCard({
 const styles = StyleSheet.create({
   greeting: {
     gap: Spacing.one,
+  },
+  mascotRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.two,
+    marginTop: Spacing.three,
   },
   continueInfo: {
     gap: Spacing.two,

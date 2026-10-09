@@ -9,6 +9,8 @@ import { ThemedText } from '@/components/themed-text';
 import { MinTouchSize, Spacing } from '@/constants/theme';
 import { useAuth } from '@/features/auth/auth-context';
 import { hasErrors, validateSignIn, type FieldErrors } from '@/features/auth/validation';
+import { Mascot } from '@/features/mascot/mascot';
+import { MascotBubble } from '@/features/mascot/mascot-bubble';
 import { getErrorMessage } from '@/lib/errors';
 
 export default function LoginScreen() {
@@ -40,6 +42,11 @@ export default function LoginScreen() {
       style={styles.flex}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <Screen>
+        <View style={styles.mascotRow}>
+          <Mascot pose="wave" size={150} />
+          <MascotBubble text="Merhaba! Ben Pırıl. Hadi okumaya başlayalım!" side="right" />
+        </View>
+
         <View style={styles.header}>
           <ThemedText type="title">Okumatik</ThemedText>
           <ThemedText themeColor="textSecondary">Hesabına giriş yap ve okumaya başla!</ThemedText>
@@ -96,9 +103,15 @@ const styles = StyleSheet.create({
   flex: {
     flex: 1,
   },
+  mascotRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.two,
+    marginTop: Spacing.four,
+  },
   header: {
     gap: Spacing.two,
-    marginTop: Spacing.five,
   },
   form: {
     gap: Spacing.three,

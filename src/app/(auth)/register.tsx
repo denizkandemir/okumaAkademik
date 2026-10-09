@@ -16,6 +16,8 @@ import {
   validateSignUp,
   type FieldErrors,
 } from '@/features/auth/validation';
+import { Mascot } from '@/features/mascot/mascot';
+import { MascotBubble } from '@/features/mascot/mascot-bubble';
 import { ApiError } from '@/lib/api';
 import { getErrorMessage } from '@/lib/errors';
 
@@ -31,6 +33,7 @@ export default function RegisterScreen() {
   const [errors, setErrors] = useState<FieldErrors<Field>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [mascotTalking, setMascotTalking] = useState(false);
 
   const handleSubmit = async () => {
     const nextErrors = validateSignUp({ name, username, password, grade });
@@ -58,6 +61,15 @@ export default function RegisterScreen() {
       style={styles.flex}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <Screen>
+        <View style={styles.mascotRow}>
+          <Mascot pose="talk" size={130} talking={mascotTalking} />
+          <MascotBubble
+            text="Seni tanımak istiyorum! Adın ne?"
+            side="right"
+            onTypingChange={setMascotTalking}
+          />
+        </View>
+
         <View style={styles.header}>
           <ThemedText type="title">Kayıt ol</ThemedText>
           <ThemedText themeColor="textSecondary">
@@ -128,9 +140,15 @@ const styles = StyleSheet.create({
   flex: {
     flex: 1,
   },
-  header: {
+  mascotRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     gap: Spacing.two,
     marginTop: Spacing.four,
+  },
+  header: {
+    gap: Spacing.two,
   },
   form: {
     gap: Spacing.three,
