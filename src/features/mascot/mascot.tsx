@@ -1,6 +1,11 @@
 import * as Haptics from 'expo-haptics';
-import { Image, type ImageSource } from 'expo-image';
-import { useEffect, useState } from 'react';
+import {
+  Image,
+  type ImageErrorEventData,
+  type ImageLoadEventData,
+  type ImageSource,
+} from 'expo-image';
+import { use, useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
@@ -11,6 +16,7 @@ import Animated, {
 
 import { Confetti } from './confetti';
 import { POSE_ART } from './mascot-assets';
+import { MascotDebugContext, type MascotFrameKind } from './mascot-debug';
 import { SleepZ } from './sleep-z';
 import type { MascotPose, MascotProps } from './types';
 import {
@@ -26,6 +32,12 @@ const CROSSFADE_MS = 180;
 const SHADOW_COLOR = '#4A2E1A';
 /** Gölge yüksekliği, boyuta oranla. */
 const SHADOW_HEIGHT = 0.07;
+
+/** iOS'ta NaN/sonsuz bir transform görünümü tamamen kaybettirir; animasyon değerleri korunur. */
+function finite(value: number, fallback: number) {
+  'worklet';
+  return Number.isFinite(value) ? value : fallback;
+}
 
 /** Geliştirici vitrini için: maskot bileşenlerinin toplam commit sayısı (yalnızca __DEV__). */
 export const mascotRenderStats = { commits: 0 };
@@ -70,8 +82,16 @@ export function Mascot({
   }, [layers]);
   const visibleLayers = reduceMotion ? [current] : layers;
 
+  // Dokunma zıplaması alt ortadan ölçeklenir: merkez → alt kenar → ölçek → geri.
   const tap = useSharedValue(1);
-  const tapStyle = useAnimatedStyle(() => ({ transform: [{ scale: tap.get() }] }));
+  const tapPivot = size / 2;
+  const tapStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateY: tapPivot },
+      { scale: finite(tap.get(), 1) },
+      { translateY: -tapPivot },
+    ],
+  }));
   const handlePress = () => {
     if (!reduceMotion) {
       tap.set(
@@ -93,7 +113,7 @@ export function Mascot({
       accessibilityRole={onPress ? 'button' : 'image'}
       accessibilityLabel={accessibilityLabel}
       style={{ width: size, height: size }}>
-      <Animated.View style={[StyleSheet.absoluteFill, styles.tapOrigin, tapStyle]}>
+      <Animated.View style={[StyleSheet.absoluteFill, tapStyle]}>
         {visibleLayers.map((layer) => (
           <PoseLayer
             key={reduceMotion ? `still-${layer.pose}` : layer.id}
@@ -121,6 +141,7 @@ type PoseLayerProps = {
 
 function PoseLayer({ pose, size, talking, active, exiting, animateIn }: PoseLayerProps) {
   useCountCommit();
+  const debug = use(MascotDebugContext);
   const art = POSE_ART[pose];
   const unit = size / MASCOT_BASE_SIZE;
   const { breathe, rotate, lift, squashX, squashY, overlay } = usePoseAnimation(pose, {
@@ -143,17 +164,25 @@ function PoseLayer({ pose, size, talking, active, exiting, animateIn }: PoseLaye
     return { opacity: p, transform: [{ scale: 0.96 + 0.04 * p }] };
   });
 
+  // Gövde ayakların hizasından (alt orta) döner ve ölçeklenir. transformOrigin yerine pivot,
+  // çevir → dönüştür → geri çevir ile kurulur: RN'nin iOS/Android için kullandığı transformOrigin
+  // ayrıştırıcısı ondalıklı yüzdeleri tanımıyor ("98.5%" → "5%"); bu yöntem her platformda aynı.
+  const pivot = debug.legacyTransformOrigin ? 0 : (art.ground - 0.5) * size;
   const bodyStyle = useAnimatedStyle(() => {
-    const b = breathe.get();
+    const b = finite(breathe.get(), 0);
     return {
       transform: [
-        { translateY: lift.get() - b * breathLift },
-        { rotate: `${rotate.get()}deg` },
-        { scaleX: squashX.get() },
-        { scaleY: squashY.get() * (1 + b * breathScale) },
+        { translateY: pivot + finite(lift.get(), 0) - b * breathLift },
+        { rotate: `${finite(rotate.get(), 0)}deg` },
+        { scaleX: finite(squashX.get(), 1) },
+        { scaleY: finite(squashY.get(), 1) * (1 + b * breathScale) },
+        { translateY: -pivot },
       ],
     };
   });
+  const legacyOrigin = debug.legacyTransformOrigin
+    ? { transformOrigin: `50% ${art.ground * 100}%` }
+    : null;
 
   // Gölge, yassılaştırılmış bir dairedir (her platformda gerçek elips). İçte koyu, dışta açık
   // iki halka kenarı yumuşatır.
@@ -161,8 +190,9 @@ function PoseLayer({ pose, size, talking, active, exiting, animateIn }: PoseLaye
   const flatten = (size * SHADOW_HEIGHT) / shadowWidth;
   const shadowStyle = useAnimatedStyle(() => {
     // Havadayken (yukarı kaydıkça) gölge küçülür ve açılır; nefes alırken hafifçe daralır.
-    const air = Math.min(Math.max(-lift.get() / jumpHeight, 0), 1);
-    const scale = (1 - 0.45 * air) * (1 - 0.04 * breathe.get()) * squashX.get();
+    const air = Math.min(Math.max(-finite(lift.get(), 0) / jumpHeight, 0), 1);
+    const scale =
+      (1 - 0.45 * air) * (1 - 0.04 * finite(breathe.get(), 0)) * finite(squashX.get(), 1);
     return {
       opacity: 1 - 0.5 * air,
       transform: [{ scaleX: scale }, { scaleY: scale * flatten }],
@@ -170,11 +200,31 @@ function PoseLayer({ pose, size, talking, active, exiting, animateIn }: PoseLaye
   });
 
   // Ön kare tam görünürken alttaki kareyi gizle: iki karenin kenarlarındaki 1-2 piksellik
-  // farklar çift kontur gibi görünmesin. Geçiş sırasında (esneme) ikisi birlikte görünür.
-  const baseStyle = useAnimatedStyle(() => ({ opacity: overlay.get() > 0.99 ? 0 : 1 }));
-  const overlayStyle = useAnimatedStyle(() => ({ opacity: overlay.get() }));
+  // farklar çift kontur gibi görünmesin. Ancak yalnızca ön kare gerçekten yüklendiyse: aksi halde
+  // ikisi birden görünmez olurdu. Geçiş sırasında (esneme) ikisi birlikte görünür.
+  const overlayReady = useSharedValue(0);
+  const baseStyle = useAnimatedStyle(() => ({
+    opacity: overlayReady.get() === 1 && finite(overlay.get(), 0) > 0.99 ? 0 : 1,
+  }));
+  const overlayStyle = useAnimatedStyle(() => ({ opacity: finite(overlay.get(), 0) }));
 
-  const origin = `50% ${art.ground * 100}%`;
+  const report = (frame: MascotFrameKind) => ({
+    onLoad: (event: ImageLoadEventData) => {
+      if (frame === 'overlay') overlayReady.set(1);
+      debug.onFrameEvent?.({
+        pose,
+        frame,
+        status: 'loaded',
+        width: event.source.width,
+        height: event.source.height,
+      });
+    },
+    onError: (event: ImageErrorEventData) => {
+      if (frame === 'overlay') overlayReady.set(0);
+      if (__DEV__) console.warn(`Pırıl görseli yüklenemedi (${pose}, ${frame}):`, event.error);
+      debug.onFrameEvent?.({ pose, frame, status: 'error', message: event.error });
+    },
+  });
 
   return (
     <Animated.View style={[StyleSheet.absoluteFill, styles.passThrough, layerStyle]}>
@@ -195,13 +245,23 @@ function PoseLayer({ pose, size, talking, active, exiting, animateIn }: PoseLaye
         <View style={[styles.shadowRing, styles.shadowInner]} />
       </Animated.View>
 
-      <Animated.View style={[StyleSheet.absoluteFill, { transformOrigin: origin }, bodyStyle]}>
+      <Animated.View style={[StyleSheet.absoluteFill, legacyOrigin, bodyStyle]}>
         <Animated.View style={[StyleSheet.absoluteFill, baseStyle]}>
-          <Frame source={art.base} />
+          <Frame
+            source={art.base}
+            useAppleWebpCodec={debug.useAppleWebpCodec}
+            cachePolicy={debug.disableImageCache ? 'none' : 'memory'}
+            {...report('base')}
+          />
         </Animated.View>
         {art.overlay ? (
           <Animated.View style={[StyleSheet.absoluteFill, styles.hidden, overlayStyle]}>
-            <Frame source={art.overlay} />
+            <Frame
+              source={art.overlay}
+              useAppleWebpCodec={debug.useAppleWebpCodec}
+              cachePolicy={debug.disableImageCache ? 'none' : 'memory'}
+              {...report('overlay')}
+            />
           </Animated.View>
         ) : null}
       </Animated.View>
@@ -211,22 +271,31 @@ function PoseLayer({ pose, size, talking, active, exiting, animateIn }: PoseLaye
   );
 }
 
-function Frame({ source }: { source: ImageSource }) {
+type FrameProps = {
+  source: ImageSource;
+  useAppleWebpCodec: boolean;
+  cachePolicy: 'none' | 'memory';
+  onLoad: (event: ImageLoadEventData) => void;
+  onError: (event: ImageErrorEventData) => void;
+};
+
+function Frame({ source, useAppleWebpCodec, cachePolicy, onLoad, onError }: FrameProps) {
   return (
     <Image
       source={source}
       style={StyleSheet.absoluteFill}
       contentFit="contain"
-      cachePolicy="memory"
+      cachePolicy={cachePolicy}
+      // iOS: varsayılan Apple (ImageIO) WebP çözücüsü yerine libwebp. Yalnızca iOS'u etkiler.
+      useAppleWebpCodec={useAppleWebpCodec}
+      onLoad={onLoad}
+      onError={onError}
       accessible={false}
     />
   );
 }
 
 const styles = StyleSheet.create({
-  tapOrigin: {
-    transformOrigin: '50% 100%',
-  },
   passThrough: {
     pointerEvents: 'none',
   },
