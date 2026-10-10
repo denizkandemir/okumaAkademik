@@ -1,10 +1,9 @@
 export type MascotPose =
-  'idle' | 'happy' | 'sittingHappy' | 'wave' | 'read' | 'talk' | 'think' | 'celebrate' | 'sleep';
+  'idle' | 'happy' | 'wave' | 'read' | 'talk' | 'think' | 'celebrate' | 'sleep';
 
 export const MASCOT_POSES: readonly MascotPose[] = [
   'idle',
   'happy',
-  'sittingHappy',
   'wave',
   'read',
   'talk',

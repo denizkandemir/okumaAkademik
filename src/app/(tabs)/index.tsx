@@ -26,7 +26,7 @@ export default function HomeScreen() {
   const name = user?.name.trim() ?? '';
   const goal = data && !error ? data.dailyGoal : null;
   const goalReached = !!goal && goal.goalMinutes > 0 && goal.readMinutes >= goal.goalMinutes;
-  const mascotPose: MascotPose = error ? 'think' : goalReached ? 'sittingHappy' : 'idle';
+  const mascotPose: MascotPose = error ? 'think' : goalReached ? 'happy' : 'idle';
   const mascotText = goalReached
     ? `Bravo ${name}! Bugünkü hedefini tamamladın.`
     : `Hoş geldin ${name}! Hadi birlikte okuyalım.`;

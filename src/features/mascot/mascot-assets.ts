@@ -40,8 +40,6 @@ export type PoseArt = {
 export const POSE_ART: Record<MascotPose, PoseArt> = {
   idle: { base: frames.sitting, overlay: frames.sittingEyesClosed, ground: 0.985, shadow: 0.55 },
   happy: { base: frames.happy, ground: 0.985, shadow: 0.5 },
-  // TODO: mascot_sitting_happy.png gelince kendi görseline geçir; şimdilik ayakta mutlu poz.
-  sittingHappy: { base: frames.happy, ground: 0.985, shadow: 0.5 },
   wave: { base: frames.handWaving, overlay: frames.handWavingTilted, ground: 0.98, shadow: 0.55 },
   read: { base: frames.reading, overlay: frames.readingEyesClosed, ground: 0.975, shadow: 0.6 },
   talk: { base: frames.talkingMouthClosed, overlay: frames.talking, ground: 0.98, shadow: 0.5 },

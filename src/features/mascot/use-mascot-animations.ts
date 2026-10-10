@@ -26,7 +26,6 @@ type Breath = { period: number; scale: number; lift: number };
 export const BREATH: Record<MascotPose, Breath | null> = {
   idle: { period: 2800, scale: 0.02, lift: 3 },
   happy: { period: 2800, scale: 0.02, lift: 3 },
-  sittingHappy: { period: 2800, scale: 0.02, lift: 3 },
   wave: { period: 2800, scale: 0.02, lift: 3 },
   read: { period: 3400, scale: 0.02, lift: 3 },
   talk: { period: 2800, scale: 0.02, lift: 3 },
@@ -175,17 +174,6 @@ export function usePoseAnimation(
         break;
       case 'happy':
         sway(2.5, 3000);
-        break;
-      case 'sittingHappy':
-        lift.set(
-          withRepeat(
-            withSequence(
-              withDelay(3700, timing(-6 * unit, 150, Easing.out(Easing.quad))),
-              timing(0, 150, Easing.in(Easing.quad)),
-            ),
-            -1,
-          ),
-        );
         break;
       case 'wave': {
         // 200 ms'de bir 6 kare değişimi (A→B→…→A), ardından 2,5 sn dinlenme. Döngü: 3,5 sn.
