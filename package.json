@@ -44,7 +44,8 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "format": "prettier --write .",
-    "mascot:optimize": "node scripts/optimize-mascot.mjs"
+    "mascot:optimize": "node scripts/optimize-mascot.mjs",
+    "mascot:check": "node scripts/check-mascot.mjs"
   },
   "private": true
 }

@@ -4,9 +4,12 @@
  * WASM tabanlı wasm-vips kullanılır; yerel (.node) ikili dosya gerektirmez. Kaynak PNG'ler
  * değiştirilmez, uygulama yalnızca optimized/ klasöründeki dosyaları kullanır.
  *
+ * optimized/ her çalıştırmada boşaltılır: kaynak dosya yeniden adlandırılır ya da silinirse eski
+ * WebP geride kalmaz. Renkler sRGB'ye çevrilir ve meta veri (EXIF, ICC) atılır.
+ *
  * Kullanım: npm run mascot:optimize
  */
-import { mkdir, readdir, readFile, stat, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Vips from 'wasm-vips';
@@ -22,6 +25,7 @@ const outputDir = path.join(sourceDir, 'optimized');
 const kb = (bytes) => `${(bytes / 1024).toFixed(1)} KB`;
 
 const vips = await Vips();
+await rm(outputDir, { recursive: true, force: true });
 await mkdir(outputDir, { recursive: true });
 
 const files = (await readdir(sourceDir))
@@ -39,12 +43,13 @@ const tooLarge = [];
 for (const name of files) {
   const input = await readFile(path.join(sourceDir, name));
   // thumbnail: Lanczos ile küçültür, saydam kenarlarda koyu hale oluşmasın diye alfa çarpımlı çalışır.
-  const image = vips.Image.thumbnailBuffer(input, SIZE, { height: SIZE });
+  const image = vips.Image.thumbnailBuffer(input, SIZE, { height: SIZE, output_profile: 'srgb' });
   const output = image.webpsaveBuffer({
     Q: QUALITY,
     alpha_q: 100,
     effort: 6,
     smart_subsample: true,
+    keep: 'none',
   });
   image.delete();
 
