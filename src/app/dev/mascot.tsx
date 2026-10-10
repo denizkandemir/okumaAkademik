@@ -1,14 +1,22 @@
 import { Stack } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Switch, View } from 'react-native';
+import { use, useEffect, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/button';
 import { Card } from '@/components/card';
-import { Screen } from '@/components/screen';
 import { ThemedText } from '@/components/themed-text';
-import { MinTouchSize, Radius, Spacing } from '@/constants/theme';
+import { MaxContentWidth, MinTouchSize, Radius, Spacing } from '@/constants/theme';
 import { Mascot, MascotSizes, mascotRenderStats } from '@/features/mascot/mascot';
 import { MascotBubble } from '@/features/mascot/mascot-bubble';
+import {
+  DEFAULT_MASCOT_DEBUG,
+  MascotDebugContext,
+  type MascotDebug,
+  type MascotFrameEvent,
+  type MascotFrameKind,
+} from '@/features/mascot/mascot-debug';
+import { POSE_ART } from '@/features/mascot/mascot-assets';
 import { MASCOT_POSES, type MascotPose } from '@/features/mascot/types';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -19,137 +27,231 @@ const BUBBLE_TEXTS = [
   'Harika gidiyorsun, devam et!',
 ];
 
-/** Geliştirici vitrini: tüm pozlar, boyutlar ve animasyon ayarları. Yalnızca __DEV__. */
+const HEADER_OPTIONS = {
+  headerShown: true,
+  title: 'Maskot vitrini',
+  // Geri butonunda önceki rotanın adı ("(tabs)") yerine "Geri" yazsın.
+  headerBackTitle: 'Geri',
+};
+
+/** Geliştirici vitrini: tüm pozlar, boyutlar, animasyon ve tanı ayarları. Yalnızca __DEV__. */
 export default function MascotShowcaseScreen() {
   if (!__DEV__) {
     return (
-      <Screen>
-        <Stack.Screen options={{ headerShown: true, title: '' }} />
+      <View style={styles.unavailable}>
+        <Stack.Screen options={{ ...HEADER_OPTIONS, title: '' }} />
         <ThemedText>Bu sayfa kullanılamıyor.</ThemedText>
-      </Screen>
+      </View>
     );
   }
   return <Showcase />;
 }
 
 function Showcase() {
+  const theme = useTheme();
+  const insets = useSafeAreaInsets();
   const [size, setSize] = useState<number>(MascotSizes.medium);
   const [talking, setTalking] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
-  const [animated, setAnimated] = useState(true);
+  const [useAppleWebpCodec, setUseAppleWebpCodec] = useState(
+    DEFAULT_MASCOT_DEBUG.useAppleWebpCodec,
+  );
+  const [legacyTransformOrigin, setLegacyTransformOrigin] = useState(
+    DEFAULT_MASCOT_DEBUG.legacyTransformOrigin,
+  );
   const [cycleIndex, setCycleIndex] = useState(0);
   const [bubbleIndex, setBubbleIndex] = useState(0);
   const [bubbleTalking, setBubbleTalking] = useState(false);
-  const [taps, setTaps] = useState(0);
 
   const cyclePose = MASCOT_POSES[cycleIndex % MASCOT_POSES.length];
   // Kullanıcı açıkça seçmediyse sistem ayarı kullanılır.
   const motion = reduceMotion ? true : undefined;
+  const debug: MascotDebug = { useAppleWebpCodec, legacyTransformOrigin, disableImageCache: true };
+  // Çözücü ya da pivot değişince kartlar yeniden kurulur: kareler baştan yüklenir, durumlar sıfırlanır.
+  const debugKey = `${useAppleWebpCodec}-${legacyTransformOrigin}`;
 
   return (
-    <Screen>
-      <Stack.Screen options={{ headerShown: true, title: 'Maskot vitrini' }} />
+    <MascotDebugContext value={debug}>
+      <Stack.Screen options={HEADER_OPTIONS} />
+      <ScrollView
+        style={{ backgroundColor: theme.background }}
+        // iOS'ta içerik başlık çubuğunun altında başlar (saydam başlıkta da üst üste binmez).
+        contentInsetAdjustmentBehavior="automatic"
+        contentContainerStyle={[
+          styles.content,
+          {
+            paddingBottom: insets.bottom + Spacing.five,
+            paddingLeft: insets.left + Spacing.three,
+            paddingRight: insets.right + Spacing.three,
+          },
+        ]}>
+        <View style={styles.inner}>
+          <Card>
+            <ThemedText type="subtitle">Ayarlar</ThemedText>
+            <RenderCounter />
 
-      <RenderCounter />
+            <ThemedText type="smallBold" themeColor="textSecondary">
+              Boyut
+            </ThemedText>
+            <View style={styles.row}>
+              {SIZES.map((preset) => (
+                <Chip
+                  key={preset}
+                  label={`${preset} dp`}
+                  selected={size === preset}
+                  onPress={() => setSize(preset)}
+                />
+              ))}
+            </View>
 
-      <Card>
-        <ThemedText type="subtitle">Ayarlar</ThemedText>
-        <View style={styles.row}>
-          {SIZES.map((preset) => (
-            <Chip
-              key={preset}
-              label={`${preset} dp`}
-              selected={size === preset}
-              onPress={() => setSize(preset)}
+            <Toggle label="Konuşuyor (talk)" value={talking} onChange={setTalking} />
+            <Toggle
+              label="Hareketi azalt (simülasyon)"
+              value={reduceMotion}
+              onChange={setReduceMotion}
             />
-          ))}
-        </View>
-        <Toggle label="Konuşuyor (talk)" value={talking} onChange={setTalking} />
-        <Toggle
-          label="Hareketi azalt (simülasyon)"
-          value={reduceMotion}
-          onChange={setReduceMotion}
-        />
-        <Toggle label="Animasyon açık (animated)" value={animated} onChange={setAnimated} />
-      </Card>
+            <Button
+              title={`Pozu değiştir (şimdi: ${cyclePose})`}
+              onPress={() => setCycleIndex((value) => value + 1)}
+            />
 
-      <Card>
-        <ThemedText type="subtitle">Poz geçişi</ThemedText>
-        <View style={styles.center}>
-          <Mascot
-            pose={cyclePose}
-            size={MascotSizes.large}
-            talking={talking}
-            animated={animated}
-            reduceMotion={motion}
-            onPress={() => setTaps((value) => value + 1)}
-          />
-        </View>
-        <ThemedText themeColor="textSecondary" style={styles.centerText}>
-          {cyclePose} · dokunma: {taps}
-        </ThemedText>
-        <Button title="Pozu değiştir" onPress={() => setCycleIndex((value) => value + 1)} />
-      </Card>
+            <ThemedText type="smallBold" themeColor="textSecondary">
+              Tanı (eski davranışla karşılaştırma)
+            </ThemedText>
+            <Toggle
+              label="iOS: Apple WebP çözücüsü"
+              value={useAppleWebpCodec}
+              onChange={setUseAppleWebpCodec}
+            />
+            <Toggle
+              label="Eski pivot (transformOrigin)"
+              value={legacyTransformOrigin}
+              onChange={setLegacyTransformOrigin}
+            />
+          </Card>
 
-      <Card>
-        <ThemedText type="subtitle">Balon</ThemedText>
-        <View style={styles.bubbleRow}>
-          <Mascot
-            pose="talk"
-            size={MascotSizes.medium}
-            talking={bubbleTalking}
-            reduceMotion={motion}
-          />
-          <MascotBubble
-            text={BUBBLE_TEXTS[bubbleIndex % BUBBLE_TEXTS.length]}
-            onTypingChange={setBubbleTalking}
-            reduceMotion={motion}
-          />
-        </View>
-        <Button
-          title="Yeni cümle"
-          variant="secondary"
-          onPress={() => setBubbleIndex((value) => value + 1)}
-        />
-      </Card>
+          <Card>
+            <ThemedText type="subtitle">Poz geçişi</ThemedText>
+            <View style={styles.center}>
+              <Mascot
+                key={debugKey}
+                pose={cyclePose}
+                size={MascotSizes.large}
+                talking={talking}
+                reduceMotion={motion}
+              />
+            </View>
+          </Card>
 
-      <View style={styles.grid}>
-        {MASCOT_POSES.map((pose) => (
-          <PoseTile
-            key={pose}
-            pose={pose}
-            size={size}
-            talking={talking}
-            animated={animated}
-            reduceMotion={motion}
-          />
-        ))}
-      </View>
-    </Screen>
+          <Card>
+            <ThemedText type="subtitle">Balon</ThemedText>
+            <View style={styles.bubbleRow}>
+              <Mascot
+                key={debugKey}
+                pose="talk"
+                size={MascotSizes.medium}
+                talking={bubbleTalking}
+                reduceMotion={motion}
+              />
+              <MascotBubble
+                text={BUBBLE_TEXTS[bubbleIndex % BUBBLE_TEXTS.length]}
+                onTypingChange={setBubbleTalking}
+                reduceMotion={motion}
+              />
+            </View>
+            <Button
+              title="Yeni cümle"
+              variant="secondary"
+              onPress={() => setBubbleIndex((value) => value + 1)}
+            />
+          </Card>
+
+          <View style={styles.grid}>
+            {MASCOT_POSES.map((pose) => (
+              <PoseCard
+                key={`${pose}-${debugKey}`}
+                pose={pose}
+                size={size}
+                talking={talking}
+                reduceMotion={motion}
+              />
+            ))}
+          </View>
+        </View>
+      </ScrollView>
+    </MascotDebugContext>
   );
 }
 
-type PoseTileProps = {
+type FrameStatus =
+  { state: 'waiting' } | { state: 'loaded'; text: string } | { state: 'error'; text: string };
+
+type PoseCardProps = {
   pose: MascotPose;
   size: number;
   talking: boolean;
-  animated: boolean;
   reduceMotion: boolean | undefined;
 };
 
-function PoseTile({ pose, size, talking, animated, reduceMotion }: PoseTileProps) {
+/** Tek poz: kendi "animasyon kapalı" anahtarı ve karelerin yüklenme durumu. */
+function PoseCard({ pose, size, talking, reduceMotion }: PoseCardProps) {
   const theme = useTheme();
+  const parentDebug = use(MascotDebugContext);
+  const [still, setStill] = useState(false);
+  const hasOverlay = !!POSE_ART[pose].overlay;
+  const [frames, setFrames] = useState<Record<MascotFrameKind, FrameStatus>>({
+    base: { state: 'waiting' },
+    overlay: { state: 'waiting' },
+  });
+
+  const onFrameEvent = (event: MascotFrameEvent) => {
+    const status: FrameStatus =
+      event.status === 'loaded'
+        ? { state: 'loaded', text: `${event.width}×${event.height}` }
+        : { state: 'error', text: event.message };
+    setFrames((prev) => ({ ...prev, [event.frame]: status }));
+  };
+
   return (
     <View style={[styles.tile, { backgroundColor: theme.backgroundElement }]}>
-      <Mascot
-        pose={pose}
-        size={size}
-        talking={talking}
-        animated={animated}
-        reduceMotion={reduceMotion}
-      />
+      <MascotDebugContext value={{ ...parentDebug, onFrameEvent }}>
+        <Mascot
+          pose={pose}
+          size={size}
+          talking={talking}
+          animated={!still}
+          reduceMotion={reduceMotion}
+        />
+      </MascotDebugContext>
       <ThemedText type="smallBold">{pose}</ThemedText>
+      <FrameLine label="temel" status={frames.base} />
+      {hasOverlay ? <FrameLine label="2. kare" status={frames.overlay} /> : null}
+      <View style={styles.tileToggle}>
+        <ThemedText type="small">Animasyon kapalı</ThemedText>
+        <Switch
+          value={still}
+          onValueChange={setStill}
+          accessibilityLabel={`${pose} animasyon kapalı`}
+        />
+      </View>
     </View>
+  );
+}
+
+function FrameLine({ label, status }: { label: string; status: FrameStatus }) {
+  const text =
+    status.state === 'waiting'
+      ? 'bekleniyor…'
+      : status.state === 'loaded'
+        ? `yüklendi ${status.text}`
+        : `HATA: ${status.text}`;
+  return (
+    <ThemedText
+      type="small"
+      themeColor={status.state === 'error' ? 'danger' : 'textSecondary'}
+      style={styles.frameLine}>
+      {label}: {text}
+    </ThemedText>
   );
 }
 
@@ -170,11 +272,9 @@ function RenderCounter() {
   }, []);
 
   return (
-    <Card>
-      <ThemedText type="smallBold" testID="render-counter">
-        Maskot render sayısı: {stats.total} (son 1 sn: +{stats.perSecond})
-      </ThemedText>
-    </Card>
+    <ThemedText type="small" testID="render-counter">
+      Maskot render sayısı: {stats.total} (son 1 sn: +{stats.perSecond})
+    </ThemedText>
   );
 }
 
@@ -225,6 +325,21 @@ function Chip({
 }
 
 const styles = StyleSheet.create({
+  unavailable: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  content: {
+    flexGrow: 1,
+    alignItems: 'center',
+    paddingTop: Spacing.three,
+  },
+  inner: {
+    width: '100%',
+    maxWidth: MaxContentWidth,
+    gap: Spacing.three,
+  },
   row: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -251,9 +366,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: Spacing.five,
   },
-  centerText: {
-    textAlign: 'center',
-  },
   bubbleRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -267,9 +379,20 @@ const styles = StyleSheet.create({
   },
   tile: {
     alignItems: 'center',
-    gap: Spacing.two,
+    gap: Spacing.one,
     padding: Spacing.three,
     paddingTop: Spacing.five,
     borderRadius: Radius.large,
+    minWidth: 160,
+  },
+  tileToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.two,
+    marginTop: Spacing.one,
+  },
+  frameLine: {
+    fontSize: 13,
+    lineHeight: 18,
   },
 });
