@@ -1,13 +1,17 @@
 import { createContext, use, useEffect, useState, type PropsWithChildren } from 'react';
+import { Platform } from 'react-native';
 
 import * as authService from './auth-service';
 import type { AuthResponse, SignUpInput, User } from './types';
 
-import { ApiError, setAuthToken, setUnauthorizedHandler } from '@/lib/api';
+import { API_URL, ApiError, setAuthToken, setUnauthorizedHandler } from '@/lib/api';
 import * as storage from '@/lib/storage';
 
-/** Açılışta oturum doğrulaması bu süreden uzun sürerse yerel kullanıcıyla devam edilir. */
-const SESSION_CHECK_TIMEOUT_MS = 5_000;
+/**
+ * Açılışta oturum doğrulaması bu süreden uzun sürerse yerel kullanıcıyla devam edilir.
+ * Açılış ekranı bu istek bitene kadar açık kaldığından kısa tutulur.
+ */
+const SESSION_CHECK_TIMEOUT_MS = 4_000;
 
 type AuthContextValue = {
   user: User | null;
@@ -36,6 +40,19 @@ async function persistSession({ token, user }: AuthResponse) {
 async function clearStoredSession() {
   await storage.removeItem(storage.StorageKeys.authToken);
   await storage.removeItem(storage.StorageKeys.authUser);
+}
+
+/** Geliştirmede, açılıştaki oturum kontrolü sunucuya ulaşamazsa nedenini tek uyarıyla bildirir. */
+function warnUnreachableApi(error: unknown) {
+  const pointsToSelf = /\/\/(localhost|127\.0\.0\.1)(:|\/|$)/.test(API_URL);
+  const hint =
+    pointsToSelf && Platform.OS !== 'web'
+      ? ` Telefon "localhost"a ulaşamaz; .env içinde bilgisayarın yerel ağ IP'sini kullanın (ipconfig).`
+      : ' Sunucunun çalıştığını ve telefonla aynı ağda olduğunu kontrol edin.';
+  console.warn(
+    `Açılışta oturum doğrulanamadı (${API_URL}/me); kayıtlı kullanıcıyla devam ediliyor.${hint}`,
+    error instanceof Error ? error.message : error,
+  );
 }
 
 export function AuthProvider({ children }: PropsWithChildren) {
@@ -89,6 +106,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
           return;
         }
         // Ağ ya da sunucu hatası: çocuk internet yokken çıkışa atılmasın, yerel kullanıcıyla devam.
+        if (__DEV__) warnUnreachableApi(error);
         if (storedUser) setUser(storedUser);
       }
     };

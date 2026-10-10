@@ -5,7 +5,10 @@
  * Sunucu hataları her zaman `{ message, code, fieldErrors? }` biçimindedir.
  */
 
-const API_URL = (process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000').replace(/\/+$/, '');
+export const API_URL = (process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000').replace(
+  /\/+$/,
+  '',
+);
 const DEFAULT_TIMEOUT_MS = 15_000;
 
 let authToken: string | null = null;
