@@ -25,7 +25,7 @@ describe('POST /auth/register', () => {
     expect(response.body).not.toContain('passwordHash');
 
     const stored = await ctx.prisma.user.findUniqueOrThrow({ where: { username: 'ayse.k' } });
-    expect(stored.passwordHash).toMatch(/^\$argon2id\$/);
+    expect(stored.passwordHash).toMatch(/^scrypt\$/);
     expect(stored.dailyGoalMinutes).toBe(10);
   });
 

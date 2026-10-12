@@ -35,7 +35,7 @@ erDiagram
     users {
         text id PK
         text username UK "küçük harf"
-        text password_hash "argon2id"
+        text password_hash "scrypt"
         text name
         int grade "1-8"
         int daily_goal_minutes "dakika"
@@ -87,7 +87,7 @@ erDiagram
 | Kolon                | Açıklama                                                              |
 | -------------------- | --------------------------------------------------------------------- |
 | `username`           | Giriş adı, tekil; her zaman küçük harf (ör. `ayse.k`)                 |
-| `password_hash`      | Şifrenin argon2id hash'i; şifrenin kendisi saklanmaz                  |
+| `password_hash`      | Şifrenin scrypt hash'i; şifrenin kendisi saklanmaz                    |
 | `name`               | Ekranda gösterilen ad (ör. `Ayşe`)                                    |
 | `grade`              | Sınıf, 1-8. Kullanıcıya hangi metinlerin listeleneceğini belirler     |
 | `daily_goal_minutes` | Günlük okuma hedefi (dakika), varsayılan 10                           |

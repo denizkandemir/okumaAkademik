@@ -8,7 +8,7 @@ import { Errors } from './errors.js';
  */
 export const USERNAME_PATTERN = /^[a-zA-Z0-9._]{3,20}$/;
 export const MIN_PASSWORD_LENGTH = 4;
-/** argon2 için makul üst sınır; aşırı uzun girdilerle CPU tüketimini engeller. */
+/** şifre hash'i için makul üst sınır; aşırı uzun girdilerle CPU tüketimini engeller. */
 export const MAX_PASSWORD_LENGTH = 128;
 
 export const usernameSchema = z

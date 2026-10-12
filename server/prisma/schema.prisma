@@ -37,7 +37,7 @@ model User {
   id               String           @id @default(cuid())
   /// Giriş için kullanıcı adı; her zaman küçük harfe normalize edilir, ör. "ayse.k"
   username         String           @unique
-  /// Şifrenin argon2id hash'i. Şifrenin kendisi hiçbir yerde saklanmaz.
+  /// Şifrenin scrypt hash'i. Şifrenin kendisi hiçbir yerde saklanmaz.
   passwordHash     String           @map("password_hash")
   /// Ekranda gösterilen ad, ör. "Ayşe"
   name             String
