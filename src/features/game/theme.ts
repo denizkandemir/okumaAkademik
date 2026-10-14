@@ -50,8 +50,11 @@ export const GameColors = {
   text: '#1F1B3A',
   /** İkincil metin; beyaz üzerinde 7,1:1. */
   textSecondary: '#5A5478',
-  /** Sıcak ana metin (ana sayfa, giriş, okuma gibi krem ekranlarda). */
-  textWarm: '#2B1E16',
+  /**
+   * Sıcak ana metin; tasarımda ana sayfa, giriş, okuma gibi krem ekranlarda kullanılır.
+   * Varsayılan metin rengi `text`tir; ekranlar tasarıma göre `warm`ı seçer.
+   */
+  warm: '#2B1E16',
   /** Sıcak ikincil metin; #FFF4E8 üzerinde 6,4:1. */
   textWarmSecondary: '#6B5647',
   /** Soru ve ipucu ekranlarındaki ikincil metin; #F1EBFF üzerinde 5,4:1. */

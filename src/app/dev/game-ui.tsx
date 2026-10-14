@@ -183,7 +183,7 @@ function Showcase() {
             <GameText>Ders kartı, soru ve okuma ekranlarında.</GameText>
           </Panel>
           <Panel tone="warm">
-            <GameText variant="label" color={GameColors.textWarm}>
+            <GameText variant="label" color={GameColors.warm}>
               warm
             </GameText>
             <GameText color={GameColors.textWarmSecondary}>
