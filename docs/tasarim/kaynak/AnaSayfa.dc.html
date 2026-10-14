@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Ana sayfa bileşeni</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&amp;family=Nunito:wght@600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: {{c.ground}}; font-family: 'Nunito', sans-serif; color: {{c.tx}}">
+
+<div style="position: absolute; left: 0; top: 0">
+<dc-import name="Sahne" sehir="{{sehir}}" genislik="390" hint-size="390px,340px"></dc-import>
+</div>
+
+<div style="position: absolute; left: 14px; right: 14px; top: 14px; display: flex; align-items: center; justify-content: space-between">
+<div style="display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.86); border-radius: 999px; padding: 6px 12px 6px 7px; box-shadow: 0 6px 16px rgba(30,20,60,0.16); color: #2B1E16">
+<span style="width: 26px; height: 26px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #FFF2C4 0%, #FFC23A 55%, #E0920A 100%); display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17l-5.9 3.3 1.3-6.5L2.5 9.3l6.6-.8z" fill="#FFFFFF"></path></svg></span>
+<span style="font-weight: 800; font-size: 14px">Seviye {{d.svNo}}</span>
+</div>
+<div style="display: flex; gap: 8px">
+<div style="display: flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.86); border-radius: 999px; padding: 6px 12px 6px 9px; box-shadow: 0 6px 16px rgba(30,20,60,0.16)">
+<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 2-5 3-7 0 2 1 3 2 3 0-3-1-5 1-8z" fill="#F0662C"></path><path d="M12 13c1 2 3 3 3 5a3 3 0 0 1-6 0c0-1 1-2 1-3 1 1 2 0 2-2z" fill="#FFC23A"></path></svg>
+<span style="font-weight: 800; font-size: 15px; color: #B8461A">{{d.seri}}</span>
+</div>
+<div style="display: flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.86); border-radius: 999px; padding: 6px 12px 6px 9px; box-shadow: 0 6px 16px rgba(30,20,60,0.16)">
+<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="15" rx="4" fill="#F7A3B5" stroke="#C25B76" stroke-width="1.6"></rect><path d="M3 10h18" stroke="#FFD3DE" stroke-width="2"></path><circle cx="8" cy="8" r="1" fill="#FFFFFF"></circle><circle cx="15" cy="7.5" r="1" fill="#FFFFFF"></circle></svg>
+<span style="font-weight: 800; font-size: 15px; color: #A33B5A">{{d.lokum}}</span>
+</div>
+</div>
+</div>
+
+<div style="position: absolute; left: 14px; right: 14px; top: 258px; border-radius: 24px; background: {{c.banner}}; box-shadow: inset 0 2px 0 rgba(255,255,255,0.3), 0 6px 0 {{c.bannerSh}}, 0 16px 30px rgba(20,10,50,0.25); color: #FFFFFF; padding: 12px 14px 14px 18px; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 1px">
+<span style="font-size: 13px; font-weight: 800; letter-spacing: 0.06em">{{d.no}}. DURAK · {{d.ad}}</span>
+<span style="font-family: 'Baloo 2', sans-serif; font-size: 23px; font-weight: 800; line-height: 1.12">{{d.baslik}}</span>
+</div>
+<button type="button" aria-label="Yolculuk haritasını aç" style="width: 46px; height: 46px; flex: none; border: 0; border-radius: 16px; background: rgba(255,255,255,0.2); color: #FFFFFF; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"></path><path d="M9 4v14"></path><path d="M15 6v14"></path></svg>
+</button>
+</div>
+<div style="display: flex; align-items: center; gap: 10px">
+<div style="flex: 1; height: 10px; border-radius: 5px; background: rgba(255,255,255,0.28); overflow: hidden"><div style="width: {{d.ilerleme}}%; height: 10px; border-radius: 5px; background: linear-gradient(90deg, #FFF0A8 0%, #FFC23A 100%)"></div></div>
+<span style="font-size: 13px; font-weight: 800">{{d.ders}}</span>
+</div>
+</div>
+
+<div style="position: absolute; left: 0; top: 340px; width: 390px; height: 504px">
+
+<svg width="390" height="504" viewBox="0 0 390 504" aria-hidden="true" style="position: absolute; left: 0; top: 0">
+<path d="M240 215 C250 268, 170 290, 165 340 C161 380, 245 380, 255 410 C262 440, 220 470, 200 504" fill="none" stroke="{{c.todo}}" stroke-width="16" stroke-linecap="round" opacity="0.55"></path>
+<path d="M240 215 C250 268, 170 290, 165 340 C161 380, 245 380, 255 410 C262 440, 220 470, 200 504" fill="none" stroke="{{c.todoDash}}" stroke-width="5" stroke-linecap="round" stroke-dasharray="1 15"></path>
+<path d="M190 40 C240 52, 275 82, 260 120 C247 158, 228 178, 240 215" fill="none" stroke="{{c.doneSh}}" stroke-width="22" stroke-linecap="round"></path>
+<path d="M190 40 C240 52, 275 82, 260 120 C247 158, 228 178, 240 215" fill="none" stroke="{{c.done}}" stroke-width="14" stroke-linecap="round"></path>
+<path d="M190 40 C240 52, 275 82, 260 120 C247 158, 228 178, 240 215" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-dasharray="2 16" opacity="0.9"><animate attributeName="stroke-dashoffset" values="0;-18" dur="0.9s" repeatCount="indefinite"></animate></path>
+</svg>
+
+<div style="position: absolute; left: 14px; top: 84px; width: 168px; background: #FFFFFF; color: #2B1E16; border-radius: 18px; padding: 8px 12px; box-shadow: 0 10px 22px rgba(30,20,60,0.16); font-size: 14px; font-weight: 800; line-height: 1.3">{{d.mesaj}}</div>
+<div style="position: absolute; left: 22px; top: 146px">
+<dc-import name="Pose" poz="{{d.poz}}" boyut="150" hint-size="150px,150px"></dc-import>
+</div>
+
+<button type="button" aria-label="Ders 1, tamamlandı" style="position: absolute; left: 154px; top: 4px; width: 72px; height: 72px; border-radius: 50%; border: 0; background: radial-gradient(circle at 35% 28%, {{c.d1}} 0%, {{c.d2}} 50%, {{c.d3}} 100%); box-shadow: inset 0 -8px 12px rgba(0,0,0,0.2), inset 0 6px 10px rgba(255,255,255,0.55), 0 7px 0 {{c.dSh}}, 0 14px 20px rgba(0,0,0,0.18); color: {{c.dIcon}}; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l5 5L19 7"></path></svg>
+</button>
+
+<button type="button" aria-label="Ders 2, kelime avı, tamamlandı" style="position: absolute; left: 224px; top: 84px; width: 72px; height: 72px; border-radius: 50%; border: 0; background: radial-gradient(circle at 35% 28%, {{c.d1}} 0%, {{c.d2}} 50%, {{c.d3}} 100%); box-shadow: inset 0 -8px 12px rgba(0,0,0,0.2), inset 0 6px 10px rgba(255,255,255,0.55), 0 7px 0 {{c.dSh}}, 0 14px 20px rgba(0,0,0,0.18); color: {{c.dIcon}}; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6"></circle><path d="M15 15l5 5"></path></svg>
+</button>
+
+<div style="position: absolute; left: 200px; top: 175px; width: 80px; height: 80px">
+<svg width="160" height="160" viewBox="0 0 160 160" aria-hidden="true" style="position: absolute; left: -40px; top: -40px">
+<circle cx="80" cy="80" r="40" fill="none" stroke="{{c.a2}}" stroke-width="6"><animate attributeName="r" values="40;72" dur="1.8s" repeatCount="indefinite"></animate><animate attributeName="opacity" values="0.7;0" dur="1.8s" repeatCount="indefinite"></animate></circle>
+</svg>
+<button type="button" aria-label="{{d.dersAria}}" style="position: absolute; left: 0; top: 0; width: 80px; height: 80px; border-radius: 50%; border: 0; background: radial-gradient(circle at 35% 28%, {{c.a1}} 0%, {{c.a2}} 50%, {{c.a3}} 100%); box-shadow: inset 0 -8px 12px rgba(0,0,0,0.25), inset 0 6px 10px rgba(255,255,255,0.55), 0 7px 0 {{c.aSh}}, 0 16px 24px rgba(0,0,0,0.25); color: #FFFFFF; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M3 5h6a3 3 0 0 1 3 3v12a2 2 0 0 0-2-2H3z"></path><path d="M21 5h-6a3 3 0 0 0-3 3v12a2 2 0 0 1 2-2h7z"></path></svg>
+</button>
+</div>
+
+<svg width="80" height="48" viewBox="0 0 80 48" aria-hidden="true" style="position: absolute; left: 286px; top: 190px">
+<g><animateTransform attributeName="transform" type="translate" values="0 6;0 0;0 6" dur="1.3s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.45 0 0.55 1;0.45 0 0.55 1"></animateTransform>
+<path d="M4 14 L-4 22 L8 20 Z" fill="#FFFFFF"></path>
+<rect x="2" y="6" width="74" height="30" rx="12" fill="#FFFFFF"></rect>
+<text x="39" y="26" text-anchor="middle" font-family="Nunito, sans-serif" font-weight="800" font-size="14" letter-spacing="1" fill="{{c.a3}}">BAŞLA!</text>
+</g>
+</svg>
+
+<button type="button" aria-label="Hazine sandığı, kilitli" style="position: absolute; left: 129px; top: 304px; width: 72px; height: 72px; border-radius: 50%; border: 0; background: radial-gradient(circle at 35% 28%, {{c.l1}} 0%, {{c.l2}} 50%, {{c.l3}} 100%); box-shadow: inset 0 -7px 10px rgba(0,0,0,0.12), inset 0 6px 10px rgba(255,255,255,0.6), 0 7px 0 {{c.lSh}}, 0 12px 18px rgba(0,0,0,0.12); color: {{c.lIcon}}; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M3 10a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"></path><path d="M3 11h18"></path><rect x="10.5" y="9.5" width="3" height="4" rx="1"></rect></svg>
+</button>
+
+<button type="button" aria-label="Ders 4, sesli okuma, kilitli" style="position: absolute; left: 219px; top: 374px; width: 72px; height: 72px; border-radius: 50%; border: 0; background: radial-gradient(circle at 35% 28%, {{c.l1}} 0%, {{c.l2}} 50%, {{c.l3}} 100%); box-shadow: inset 0 -7px 10px rgba(0,0,0,0.12), inset 0 6px 10px rgba(255,255,255,0.6), 0 7px 0 {{c.lSh}}, 0 12px 18px rgba(0,0,0,0.12); color: {{c.lIcon}}; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="12" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0"></path><path d="M12 18v3"></path></svg>
+</button>
+
+</div>
+
+<nav aria-label="Ana menü" style="position: absolute; left: 14px; right: 14px; bottom: 14px; height: 70px; border-radius: 26px; background: rgba(255,255,255,0.94); box-shadow: 0 12px 30px rgba(20,10,50,0.22); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 6px; box-sizing: border-box">
+<button type="button" aria-current="page" style="border: 0; border-radius: 20px; background: {{c.banner}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #FFFFFF; font: 800 12px 'Nunito', sans-serif; cursor: pointer">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"></path></svg>Yol</button>
+<button type="button" style="border: 0; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #5B4A60; font: 800 12px 'Nunito', sans-serif; cursor: pointer">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M3 5h6a3 3 0 0 1 3 3v12a2 2 0 0 0-2-2H3z"></path><path d="M21 5h-6a3 3 0 0 0-3 3v12a2 2 0 0 1 2-2h7z"></path></svg>Kitaplık</button>
+<button type="button" style="border: 0; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #5B4A60; font: 800 12px 'Nunito', sans-serif; cursor: pointer">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><circle cx="12" cy="9" r="5"></circle><path d="M9 13.5L7 21l5-3 5 3-2-7.5"></path></svg>Rozetler</button>
+<button type="button" style="border: 0; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #5B4A60; font: 800 12px 'Nunito', sans-serif; cursor: pointer">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>Profil</button>
+</nav>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"sehir":{"editor":"enum","options":["istanbul","izmir","efes","antalya","kapadokya","van"],"default":"istanbul"},"poz":{"editor":"enum","options":["","idle","happy","wave","read","talk","think","celebrate","sleep"],"default":""},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+var D = {
+istanbul: { no: 1, ad: 'İSTANBUL', baslik: "Boğaz'ın Hikâyeleri", svNo: 3, ders: '3/10 ders', ilerleme: 30, seri: 6, lokum: 320, poz: 'idle', mesaj: "Merhaba! Boğaz'da bir hikâye okuyalım mı?", dersAria: 'Ders 3, Minik Serçe, sıradaki ders' },
+izmir: { no: 2, ad: 'İZMİR', baslik: "Kordon'un Rüzgârı", svNo: 8, ders: '3/6 ders', ilerleme: 50, seri: 9, lokum: 560, poz: 'wave', mesaj: "İzmir'e hoş geldin! Kordon'da okuyalım mı?", dersAria: "Ders 3, Kordon'da Bisiklet, sıradaki ders" },
+efes: { no: 3, ad: 'EFES', baslik: 'Antik Kentin Sırları', svNo: 12, ders: '2/6 ders', ilerleme: 33, seri: 14, lokum: 980, poz: 'read', mesaj: 'Bu antik kitaplıkta neler saklı? Hadi okuyalım!', dersAria: 'Ders 3, Kayıp Anahtar, sıradaki ders' },
+antalya: { no: 4, ad: 'ANTALYA', baslik: 'Portakal Kokulu Sahil', svNo: 17, ders: '4/6 ders', ilerleme: 66, seri: 21, lokum: '1.980', poz: 'happy', mesaj: 'Önce bir hikâye, sonra denize!', dersAria: 'Ders 5, Portakal Bahçesi, sıradaki ders' },
+kapadokya: { no: 5, ad: 'KAPADOKYA', baslik: 'Balonlar Yükselirken', svNo: 22, ders: '1/6 ders', ilerleme: 16, seri: 28, lokum: '2.650', poz: 'think', mesaj: 'Hangi balon en yükseğe çıkar dersin?', dersAria: 'Ders 2, Uçan Balon, sıradaki ders' },
+van: { no: 6, ad: 'VAN', baslik: "Pırıl'ın Memleketi", svNo: 27, ders: '5/6 ders', ilerleme: 83, seri: 35, lokum: '3.400', poz: 'talk', mesaj: 'Neredeyse evdeyiz! Son hikâyeler seni bekliyor.', dersAria: 'Ders 6, Eve Dönüş, sıradaki ders' }
+};
+var C = {
+istanbul: { ground: 'linear-gradient(180deg, #FFE6CF 0%, #F9CFDE 100%)', tx: '#2A1B3D', banner: 'linear-gradient(135deg, #FF8A5B 0%, #E0457B 100%)', bannerSh: '#A8305A', d1: '#FFF2C4', d2: '#FFC23A', d3: '#E0920A', dSh: '#A86A00', dIcon: '#5A3A00', a1: '#E2D2FF', a2: '#9B6BFF', a3: '#5B34D6', aSh: '#3F22A0', l1: '#FFFFFF', l2: '#F8ECF2', l3: '#E4CFDB', lSh: '#CDB2C2', lIcon: '#9C7F92', done: '#FFC23A', doneSh: '#E0920A', todo: '#FFFFFF', todoDash: '#C9A3B8' },
+izmir: { ground: 'linear-gradient(180deg, #E6F7FF 0%, #F7EAD2 100%)', tx: '#0E2A3B', banner: 'linear-gradient(135deg, #12B5E0 0%, #0A6FB8 100%)', bannerSh: '#07528A', d1: '#D2F8FF', d2: '#36C5E8', d3: '#0E8DB8', dSh: '#0A6A8C', dIcon: '#04324A', a1: '#FFD6C9', a2: '#FF7E5F', a3: '#D9432A', aSh: '#A8321F', l1: '#FFFFFF', l2: '#EAF4F8', l3: '#D0E2EA', lSh: '#AFC6D2', lIcon: '#6A8698', done: '#36C5E8', doneSh: '#0A6FB8', todo: '#FFFFFF', todoDash: '#9FB6C3' },
+efes: { ground: 'linear-gradient(180deg, #2A1F6E 0%, #17123F 100%)', tx: '#FFFFFF', banner: 'linear-gradient(135deg, #FF6FB5 0%, #7B4DFF 100%)', bannerSh: '#4E2AA8', d1: '#D4FFF0', d2: '#3BE8B0', d3: '#12A57E', dSh: '#0B7558', dIcon: '#053D2C', a1: '#FFD1EA', a2: '#FF6FB5', a3: '#C42A78', aSh: '#8C1A55', l1: '#7A6ED0', l2: '#4A3F98', l3: '#2E2770', lSh: '#1C1650', lIcon: '#C9C2F7', done: '#7CFFD4', doneSh: '#12A57E', todo: '#4A3F98', todoDash: '#9E95E0' },
+antalya: { ground: 'linear-gradient(180deg, #FFF0CF 0%, #FFDDA0 100%)', tx: '#3A2208', banner: 'linear-gradient(135deg, #FFA41C 0%, #F2541B 100%)', bannerSh: '#B8420C', d1: '#CFFBFF', d2: '#22D3EE', d3: '#0891B2', dSh: '#0E6C85', dIcon: '#053845', a1: '#FFE6B8', a2: '#FFA41C', a3: '#D9660A', aSh: '#A84E05', l1: '#FFFFFF', l2: '#FFF4DA', l3: '#F2DDB0', lSh: '#D9BE86', lIcon: '#A07E44', done: '#22D3EE', doneSh: '#0891B2', todo: '#FFFFFF', todoDash: '#D6B98A' },
+kapadokya: { ground: 'linear-gradient(180deg, #FFE7CC 0%, #F3C9A0 100%)', tx: '#3A1F0B', banner: 'linear-gradient(135deg, #1FC7B6 0%, #0E8FD9 100%)', bannerSh: '#0A6E86', d1: '#FFE3B8', d2: '#FF9A3C', d3: '#E0670F', dSh: '#B0500A', dIcon: '#4A1F00', a1: '#C8FFF6', a2: '#22C3B0', a3: '#0B8578', aSh: '#075E56', l1: '#FFFFFF', l2: '#FFF1E2', l3: '#EBD2B6', lSh: '#D3B28E', lIcon: '#9A7652', done: '#FF9A3C', doneSh: '#E0670F', todo: '#FFFFFF', todoDash: '#C99A70' },
+van: { ground: 'linear-gradient(180deg, #E3F6D8 0%, #C9E9B8 100%)', tx: '#14301F', banner: 'linear-gradient(135deg, #4F7BF2 0%, #2453C9 100%)', bannerSh: '#183A99', d1: '#DCE6FF', d2: '#5B85F5', d3: '#1E44B8', dSh: '#14307F', dIcon: '#FFFFFF', a1: '#FFE0B8', a2: '#F5A04B', a3: '#C9581A', aSh: '#8F3C0E', l1: '#FFFFFF', l2: '#EFF8EA', l3: '#D2E8C6', lSh: '#AFCDA0', lIcon: '#6C8F5E', done: '#5B85F5', doneSh: '#1E44B8', todo: '#FFFFFF', todoDash: '#8DB57C' }
+};
+var sehir = D[this.props.sehir] ? this.props.sehir : 'istanbul';
+var d = Object.assign({}, D[sehir]);
+if (this.props.poz) d.poz = this.props.poz;
+return { sehir: sehir, d: d, c: C[sehir] };
+}
+}
+</script>
+</body>
+</html>

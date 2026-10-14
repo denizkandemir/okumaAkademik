@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Karşılama</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&amp;family=Nunito:wght@600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+@keyframes okYuz{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.ok-yuz{animation:okYuz 3s ease-in-out infinite}
+@media (prefers-reduced-motion: reduce){.ok-yuz{animation:none}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: linear-gradient(180deg, #3A2B8F 0%, #FFE9D2 46%, #FFD8B4 100%); font-family: 'Nunito', sans-serif; color: #2B1E16">
+
+<div style="position: absolute; left: 0; top: 0">
+<dc-import name="Sahne" sehir="istanbul" genislik="390" hint-size="390px,340px"></dc-import>
+</div>
+<div style="position: absolute; left: 0; right: 0; top: 300px; height: 80px; background: linear-gradient(180deg, rgba(255,233,210,0) 0%, #FFE9D2 100%)"></div>
+
+<div style="position: absolute; left: 0; right: 0; top: 42px; display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center">
+<span style="font-family: 'Baloo 2', sans-serif; font-size: 50px; font-weight: 800; line-height: 1; color: #FFFFFF; text-shadow: 0 3px 0 rgba(58,43,143,0.55), 0 8px 24px rgba(30,20,80,0.4)">Okumatik</span>
+<span style="font-size: 16px; font-weight: 800; color: #FFFFFF; text-shadow: 0 2px 10px rgba(30,20,80,0.5)">Okudukça Türkiye'yi gez!</span>
+</div>
+
+<div style="position: absolute; left: 50%; top: 214px; margin-left: -140px">
+<dc-import name="Pose" poz="wave" boyut="280" hint-size="280px,280px"></dc-import>
+</div>
+
+<div class="ok-yuz" style="position: absolute; left: 22px; right: 22px; top: 506px; background: #FFFFFF; border-radius: 22px; padding: 14px 18px; box-shadow: 0 12px 28px rgba(201,99,31,0.18)">
+<div style="position: absolute; left: 50%; top: -9px; width: 18px; height: 18px; margin-left: -9px; background: #FFFFFF; transform: rotate(45deg); border-radius: 3px"></div>
+<p style="position: relative; margin: 0; font-size: 17px; font-weight: 800; line-height: 1.4; text-align: center">Merhaba! Ben <span style="color: #E0702A">Pırıl</span>. Memleketim Van'a dönüyorum. Yolda hikâye okumama yardım eder misin?</p>
+</div>
+
+<div style="position: absolute; left: 22px; right: 22px; top: 628px; display: flex; justify-content: center; gap: 6px; flex-wrap: wrap">
+<span style="font-size: 13px; font-weight: 800; color: #6B5647; background: rgba(255,255,255,0.7); border-radius: 999px; padding: 6px 10px">6 şehir</span>
+<span style="font-size: 13px; font-weight: 800; color: #6B5647; background: rgba(255,255,255,0.7); border-radius: 999px; padding: 6px 10px">Yüzlerce hikâye</span>
+<span style="font-size: 13px; font-weight: 800; color: #6B5647; background: rgba(255,255,255,0.7); border-radius: 999px; padding: 6px 10px">Her gün 5 dakika</span>
+</div>
+
+<div style="position: absolute; left: 22px; right: 22px; bottom: 34px; display: flex; flex-direction: column; gap: 12px">
+<a href="S02Giris.dc.html" style="height: 60px; border-radius: 20px; background: linear-gradient(180deg, #4F7BF2 0%, #2453C9 100%); color: #FFFFFF; font-weight: 800; font-size: 18px; letter-spacing: 0.04em; text-decoration: none; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 2px 0 rgba(255,255,255,0.35), 0 6px 0 #183A99, 0 14px 24px rgba(36,83,201,0.3)">HADİ BAŞLAYALIM</a>
+<a href="S02Giris.dc.html" style="height: 54px; border-radius: 20px; background: #FFFFFF; color: #2453C9; font-weight: 800; font-size: 17px; text-decoration: none; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 0 #F0D3B8, 0 10px 20px rgba(201,99,31,0.12)">Zaten hesabım var</a>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

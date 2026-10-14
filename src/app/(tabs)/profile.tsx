@@ -55,11 +55,18 @@ export default function ProfileScreen() {
       />
 
       {__DEV__ ? (
-        <Link href="/dev/mascot" asChild>
-          <Pressable accessibilityRole="link" style={styles.devLink}>
-            <ThemedText type="link">Maskot vitrini (geliştirici)</ThemedText>
-          </Pressable>
-        </Link>
+        <>
+          <Link href="/dev/mascot" asChild>
+            <Pressable accessibilityRole="link" style={styles.devLink}>
+              <ThemedText type="link">Maskot vitrini (geliştirici)</ThemedText>
+            </Pressable>
+          </Link>
+          <Link href="/dev/game-ui" asChild>
+            <Pressable accessibilityRole="link" style={styles.devLink}>
+              <ThemedText type="link">Oyun arayüzü vitrini (geliştirici)</ThemedText>
+            </Pressable>
+          </Link>
+        </>
       ) : null}
     </Screen>
   );

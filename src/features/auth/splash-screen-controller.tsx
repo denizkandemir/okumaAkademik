@@ -4,11 +4,11 @@ import { useAuth } from './auth-context';
 
 SplashScreen.preventAutoHideAsync();
 
-/** Kayıtlı oturum okunana kadar açılış ekranını açık tutar. */
-export function SplashScreenController() {
+/** Kayıtlı oturum okunana ve yazı tipleri hazır olana kadar açılış ekranını açık tutar. */
+export function SplashScreenController({ fontsReady }: { fontsReady: boolean }) {
   const { isLoading } = useAuth();
 
-  if (!isLoading) {
+  if (!isLoading && fontsReady) {
     SplashScreen.hide();
   }
 

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Yeni şehir açıldı · Kapadokya</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&amp;family=Nunito:wght@600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+@keyframes okDus{0%{transform:translateY(-60px) rotate(0deg);opacity:1}100%{transform:translateY(760px) rotate(620deg);opacity:0}}
+@keyframes okBuyu{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+.ok-dus{animation:okDus 3.4s linear infinite}
+.ok-buyu{animation:okBuyu 2.2s ease-in-out infinite}
+@media (prefers-reduced-motion: reduce){.ok-dus,.ok-buyu{animation:none}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: linear-gradient(180deg, #7CC8F5 0%, #7CC8F5 18%, #E2A672 60%, #F7D7B0 100%); font-family: 'Nunito', sans-serif; color: #3A1F0B">
+
+<div style="position: absolute; left: 0; top: 160px">
+<dc-import name="Sahne" sehir="kapadokya" genislik="390" hint-size="390px,340px"></dc-import>
+</div>
+
+<div style="position: absolute; left: 0; right: 0; top: 30px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center">
+<span class="ok-buyu" style="display: inline-block; background: linear-gradient(180deg, #1FC7B6 0%, #0E8FD9 100%); color: #FFFFFF; font-size: 14px; font-weight: 800; letter-spacing: 0.1em; padding: 8px 16px; border-radius: 999px; box-shadow: 0 4px 0 #0A6E86, 0 10px 20px rgba(10,110,134,0.3)">YENİ ŞEHİR AÇILDI</span>
+<h1 style="margin: 2px 0 0; font-family: 'Baloo 2', sans-serif; font-size: 54px; font-weight: 800; line-height: 1; color: #FFFFFF; text-shadow: 0 3px 0 #0A6E86, 0 10px 24px rgba(10,60,90,0.35)">Kapadokya</h1>
+<span style="font-size: 16px; font-weight: 800; color: #0B3A5C">5. Durak · Balonlar Yükselirken</span>
+</div>
+
+<span class="ok-dus" style="position: absolute; left: 30px; top: 0; width: 10px; height: 6px; border-radius: 2px; background: #FF5A4E"></span>
+<span class="ok-dus" style="position: absolute; left: 90px; top: 0; width: 8px; height: 8px; border-radius: 50%; background: #FFD23F; animation-delay: 0.7s"></span>
+<span class="ok-dus" style="position: absolute; left: 150px; top: 0; width: 12px; height: 6px; border-radius: 2px; background: #2F7DE1; animation-delay: 1.4s"></span>
+<span class="ok-dus" style="position: absolute; left: 230px; top: 0; width: 10px; height: 6px; border-radius: 2px; background: #16B39A; animation-delay: 0.4s"></span>
+<span class="ok-dus" style="position: absolute; left: 290px; top: 0; width: 8px; height: 8px; border-radius: 50%; background: #FF8A1F; animation-delay: 2s"></span>
+<span class="ok-dus" style="position: absolute; left: 350px; top: 0; width: 12px; height: 6px; border-radius: 2px; background: #9B6BFF; animation-delay: 1s"></span>
+
+<div style="position: absolute; left: 50%; top: 360px; margin-left: -115px">
+<dc-import name="Pose" poz="celebrate" boyut="230" hint-size="230px,230px"></dc-import>
+</div>
+
+<div style="position: absolute; left: 20px; right: 20px; top: 604px; display: flex; flex-direction: column; gap: 10px">
+<p style="margin: 0; text-align: center; font-size: 16px; font-weight: 800; line-height: 1.4; color: #4A2A10">Balonlar seni bekliyor! Kapadokya'da 6 yeni hikâye var.</p>
+<div style="display: flex; justify-content: center; gap: 8px; flex-wrap: wrap">
+<span style="background: #FFFFFF; border-radius: 999px; padding: 8px 12px; font-size: 14px; font-weight: 800; color: #A33B5A; box-shadow: 0 6px 14px rgba(150,80,30,0.14)">+100 lokum</span>
+<span style="background: #FFFFFF; border-radius: 999px; padding: 8px 12px; font-size: 14px; font-weight: 800; color: #0B7A8C; box-shadow: 0 6px 14px rgba(150,80,30,0.14)">6 yeni hikâye</span>
+<span style="background: #FFFFFF; border-radius: 999px; padding: 8px 12px; font-size: 14px; font-weight: 800; color: #B8461A; box-shadow: 0 6px 14px rgba(150,80,30,0.14)">Balon rozeti</span>
+</div>
+</div>
+
+<a href="EvKapadokya.dc.html" style="position: absolute; left: 20px; right: 20px; bottom: 28px; height: 60px; border-radius: 20px; background: linear-gradient(180deg, #1FC7B6 0%, #0B8578 100%); color: #FFFFFF; font-weight: 800; font-size: 18px; letter-spacing: 0.04em; text-decoration: none; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 2px 0 rgba(255,255,255,0.35), 0 6px 0 #075E56, 0 14px 24px rgba(7,94,86,0.3)">KAPADOKYA'YI KEŞFET</a>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

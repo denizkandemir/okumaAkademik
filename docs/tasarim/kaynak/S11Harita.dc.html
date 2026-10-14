@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Yolculuk haritası</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&amp;family=Nunito:wght@600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: linear-gradient(180deg, #FFF7EC 0%, #EEF3FF 100%); font-family: 'Nunito', sans-serif; color: #1F1B3A">
+
+<div style="display: flex; align-items: center; gap: 12px; padding: 16px 16px 8px">
+<a href="EvIzmir.dc.html" aria-label="Geri" style="width: 44px; height: 44px; flex: none; border-radius: 14px; background: #FFFFFF; color: #1F1B3A; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 0 rgba(31,27,58,0.12)">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg>
+</a>
+<div style="display: flex; flex-direction: column">
+<h1 style="margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 26px; font-weight: 800; line-height: 1.05">Pırıl'ın Yolculuğu</h1>
+<span style="font-size: 14px; font-weight: 700; color: #5A5478">Seviye atladıkça yeni şehir açılır</span>
+</div>
+</div>
+
+<div style="padding: 6px 14px 0; display: flex; flex-direction: column; gap: 8px">
+<sc-for list="{{duraklar}}" as="d" hint-placeholder-count="6">
+<div style="position: relative; display: flex; align-items: center; gap: 12px; padding: 7px; border-radius: 20px; background: {{d.kart}}; border: {{d.kenar}}; box-shadow: {{d.golge}}">
+<div style="position: relative; width: 112px; height: 98px; flex: none; border-radius: 14px; overflow: hidden; filter: {{d.filtre}}">
+<dc-import name="Sahne" sehir="{{d.id}}" genislik="112" hint-size="112px,98px"></dc-import>
+</div>
+<sc-if value="{{d.kilitli}}" hint-placeholder-val="{{false}}">
+<span style="position: absolute; left: 92px; top: 76px; width: 28px; height: 28px; border-radius: 50%; background: #5A5478; border: 3px solid #FFFFFF; color: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg></span>
+</sc-if>
+<sc-if value="{{d.bitti}}" hint-placeholder-val="{{false}}">
+<span style="position: absolute; left: 92px; top: 76px; width: 28px; height: 28px; border-radius: 50%; background: #1E9E57; border: 3px solid #FFFFFF; color: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l5 5L19 7"></path></svg></span>
+</sc-if>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 12px; font-weight: 800; letter-spacing: 0.05em; color: #5A5478">{{d.no}}. DURAK · SEVİYE {{d.seviye}}</span>
+<span style="font-family: 'Baloo 2', sans-serif; font-size: 22px; font-weight: 800; line-height: 1.05">{{d.ad}}</span>
+<span style="font-size: 13px; font-weight: 700; line-height: 1.3; color: {{d.notRenk}}">{{d.not}}</span>
+<sc-if value="{{d.simdi}}" hint-placeholder-val="{{false}}">
+<div style="margin-top: 4px; width: 120px; height: 10px; border-radius: 5px; background: #DCEFF8; overflow: hidden"><div style="width: 50%; height: 10px; border-radius: 5px; background: linear-gradient(90deg, #36C5E8 0%, #0A6FB8 100%)"></div></div>
+</sc-if>
+</div>
+<sc-if value="{{d.simdi}}" hint-placeholder-val="{{false}}">
+<div style="position: absolute; right: -2px; top: -14px">
+<dc-import name="Pose" poz="wave" boyut="82" hint-size="82px,82px"></dc-import>
+</div>
+</sc-if>
+</div>
+</sc-for>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+var rows = [
+{ id: 'istanbul', no: 1, ad: 'İstanbul', seviye: '1-5', not: 'Tamamlandı · 30 hikâye', durum: 'bitti' },
+{ id: 'izmir', no: 2, ad: 'İzmir', seviye: '6-10', not: 'Buradasın · Seviye 8', durum: 'simdi' },
+{ id: 'efes', no: 3, ad: 'Efes', seviye: '11-15', not: "Seviye 11'de açılır", durum: 'kilitli' },
+{ id: 'antalya', no: 4, ad: 'Antalya', seviye: '16-20', not: "Seviye 16'da açılır", durum: 'kilitli' },
+{ id: 'kapadokya', no: 5, ad: 'Kapadokya', seviye: '21-25', not: "Seviye 21'de açılır", durum: 'kilitli' },
+{ id: 'van', no: 6, ad: 'Van', seviye: '26-30', not: "Final: Pırıl'ın memleketi", durum: 'kilitli' }
+];
+return {
+duraklar: rows.map(function (r) {
+var simdi = r.durum === 'simdi';
+var kilitli = r.durum === 'kilitli';
+return Object.assign({}, r, {
+simdi: simdi,
+kilitli: kilitli,
+bitti: r.durum === 'bitti',
+kart: simdi ? '#FFFFFF' : kilitli ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.85)',
+kenar: simdi ? '3px solid #36C5E8' : '1.5px solid rgba(31,27,58,0.08)',
+golge: simdi ? '0 10px 24px rgba(10,111,184,0.2)' : 'none',
+filtre: kilitli ? 'grayscale(0.85) brightness(1.08)' : 'none',
+notRenk: simdi ? '#0A6FB8' : kilitli ? '#6E6890' : '#1E9E57'
+});
+})
+};
+}
+}
+</script>
+</body>
+</html>

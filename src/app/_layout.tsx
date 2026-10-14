@@ -1,34 +1,37 @@
-import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
+import { DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
 import { AuthProvider, useAuth } from '@/features/auth/auth-context';
 import { SplashScreenController } from '@/features/auth/splash-screen-controller';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useGameFonts } from '@/features/game/fonts';
 import { useTheme } from '@/hooks/use-theme';
 
 export default function RootLayout() {
+  // Yazı tipleri yüklenmeden metin çizilirse iOS bilinmeyen aile uyarısı verir; açılış ekranı
+  // bu sürede açık kalır. Yüklenemezse sistem yazı tipiyle devam edilir (bkz. useGameFonts).
+  const fontsReady = useGameFonts();
+
   return (
     <AuthProvider>
-      <SplashScreenController />
-      <RootNavigator />
+      <SplashScreenController fontsReady={fontsReady} />
+      <RootNavigator fontsReady={fontsReady} />
     </AuthProvider>
   );
 }
 
-function RootNavigator() {
+function RootNavigator({ fontsReady }: { fontsReady: boolean }) {
   const { user, isLoading } = useAuth();
-  const scheme = useColorScheme();
   const colors = useTheme();
 
   // Oturum okunmadan guard'lar değerlendirilirse açılan derin bağlantı (ör. /reading/x)
   // login'e yönlendirilip kaybolur. Bu sürede açılış ekranı görünür kalır.
-  if (isLoading) return null;
+  if (isLoading || !fontsReady) return null;
 
-  const baseTheme = scheme === 'dark' ? DarkTheme : DefaultTheme;
+  // Oyun tasarımı yalnızca açık temadır.
   const navigationTheme = {
-    ...baseTheme,
+    ...DefaultTheme,
     colors: {
-      ...baseTheme.colors,
+      ...DefaultTheme.colors,
       primary: colors.primary,
       background: colors.background,
       card: colors.background,
@@ -39,7 +42,7 @@ function RootNavigator() {
 
   return (
     <ThemeProvider value={navigationTheme}>
-      <StatusBar style="auto" />
+      <StatusBar style="dark" />
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Protected guard={!!user}>
           <Stack.Screen name="(tabs)" />

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Ders kartı</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&amp;family=Nunito:wght@600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; font-family: 'Nunito', sans-serif; color: #2B1E16">
+
+<div style="position: absolute; left: 0; top: 0">
+<dc-import name="AnaSayfa" sehir="istanbul" hint-size="390px,844px"></dc-import>
+</div>
+<div style="position: absolute; inset: 0; background: rgba(30,18,50,0.5)"></div>
+
+<div style="position: absolute; left: 0; right: 0; bottom: 0; height: 500px; background: #FFFFFF; border-radius: 30px 30px 0 0; box-shadow: 0 -12px 40px rgba(20,10,40,0.3); padding: 14px 22px 30px; box-sizing: border-box; display: flex; flex-direction: column; gap: 14px">
+<div style="align-self: center; width: 44px; height: 5px; border-radius: 3px; background: #E6DCE6"></div>
+
+<div style="position: absolute; right: 8px; top: -104px">
+<dc-import name="Pose" poz="read" boyut="130" hint-size="130px,130px"></dc-import>
+</div>
+
+<div style="display: flex; align-items: center; gap: 8px">
+<span style="background: #EDE5FF; color: #4A2BC2; font-size: 13px; font-weight: 800; letter-spacing: 0.06em; padding: 6px 10px; border-radius: 999px">OKUMA</span>
+<span style="font-size: 14px; font-weight: 800; color: #6B5A7A">Ders 3 / 10</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h2 style="margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 32px; font-weight: 800; line-height: 1.05">Minik Serçe</h2>
+<p style="margin: 0; font-size: 16px; font-weight: 600; line-height: 1.45; color: #4F4060">Rüzgârda yuvası düşen minik serçe Pıtır'ın, arkadaşlarıyla yeni bir yuva kurma hikâyesi.</p>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+<div style="background: #FFF4E8; border-radius: 16px; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; gap: 2px"><span style="font-family: 'Baloo 2', sans-serif; font-size: 22px; font-weight: 800; color: #C2541B">2 dk</span><span style="font-size: 12px; font-weight: 800; color: #7A5A44">süre</span></div>
+<div style="background: #ECFAF2; border-radius: 16px; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; gap: 2px"><span style="font-family: 'Baloo 2', sans-serif; font-size: 22px; font-weight: 800; color: #1B8A52">Kolay</span><span style="font-size: 12px; font-weight: 800; color: #3D6B52">seviye</span></div>
+<div style="background: #FFEFF4; border-radius: 16px; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; gap: 2px"><span style="font-family: 'Baloo 2', sans-serif; font-size: 22px; font-weight: 800; color: #B23A62">+20</span><span style="font-size: 12px; font-weight: 800; color: #7A4258">lokum</span></div>
+</div>
+
+<ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px">
+<li style="display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 700"><span style="width: 28px; height: 28px; flex: none; border-radius: 50%; background: #2453C9; color: #FFFFFF; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center">1</span>Hikâyeyi oku</li>
+<li style="display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 700"><span style="width: 28px; height: 28px; flex: none; border-radius: 50%; background: #2453C9; color: #FFFFFF; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center">2</span>Pırıl'ın 3 sorusunu cevapla</li>
+<li style="display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 700"><span style="width: 28px; height: 28px; flex: none; border-radius: 50%; background: #2453C9; color: #FFFFFF; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center">3</span>Yıldızlarını topla</li>
+</ol>
+
+<div style="flex: 1"></div>
+<a href="S04Okuma.dc.html" style="height: 60px; border-radius: 20px; background: linear-gradient(180deg, #9B6BFF 0%, #5B34D6 100%); color: #FFFFFF; font-weight: 800; font-size: 18px; letter-spacing: 0.04em; text-decoration: none; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 2px 0 rgba(255,255,255,0.35), 0 6px 0 #3F22A0, 0 14px 24px rgba(91,52,214,0.3)">OKUMAYA BAŞLA</a>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

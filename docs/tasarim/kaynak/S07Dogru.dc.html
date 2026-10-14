@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Doğru cevap</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&amp;family=Nunito:wght@600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+@keyframes okPop{0%{transform:scale(0.6);opacity:0}60%{transform:scale(1.1);opacity:1}100%{transform:scale(1)}}
+.ok-pop{animation:okPop 0.6s ease-out both}
+@media (prefers-reduced-motion: reduce){.ok-pop{animation:none}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: linear-gradient(180deg, #F1EBFF 0%, #FFF4E8 100%); font-family: 'Nunito', sans-serif; color: #2B1E16">
+
+<div style="position: absolute; left: 16px; right: 16px; top: 16px; display: flex; align-items: center; gap: 12px">
+<a href="EvIstanbul.dc.html" aria-label="Kapat" style="width: 44px; height: 44px; flex: none; border-radius: 14px; background: #FFFFFF; color: #6B5A7A; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 0 #E6DCF5">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+</a>
+<div aria-label="Soru 2 / 3" style="flex: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px">
+<span style="height: 12px; border-radius: 6px; background: #2FB86B"></span>
+<span style="height: 12px; border-radius: 6px; background: #2FB86B"></span>
+<span style="height: 12px; border-radius: 6px; background: #E3D9F2"></span>
+</div>
+<span style="font-size: 15px; font-weight: 800; color: #5B4A75">2/3</span>
+</div>
+
+<div style="position: absolute; left: 0; top: 76px">
+<dc-import name="Pose" poz="happy" boyut="180" hint-size="180px,180px"></dc-import>
+</div>
+<div style="position: absolute; left: 172px; top: 96px; width: 202px; background: #FFFFFF; border-radius: 22px; padding: 14px 16px; box-shadow: 0 12px 26px rgba(91,52,214,0.14)">
+<div style="position: absolute; left: -8px; top: 40px; width: 16px; height: 16px; background: #FFFFFF; transform: rotate(45deg); border-radius: 3px"></div>
+<span style="position: relative; display: block; font-size: 12px; font-weight: 800; letter-spacing: 0.06em; color: #7B4DFF">PIRIL SORUYOR</span>
+<span style="position: relative; display: block; margin-top: 4px; font-family: 'Baloo 2', sans-serif; font-size: 21px; font-weight: 700; line-height: 1.2">Rüzgâr esince Pıtır'ın yuvasına ne oldu?</span>
+</div>
+
+<div role="radiogroup" aria-label="Cevaplar" style="position: absolute; left: 20px; right: 20px; top: 292px; display: flex; flex-direction: column; gap: 12px">
+<button type="button" role="radio" aria-checked="true" aria-describedby="geri-bildirim" style="height: 68px; border-radius: 20px; border: 3px solid #2FB86B; background: #E7F8EE; box-shadow: 0 5px 0 #9FDDB8; display: flex; align-items: center; gap: 14px; padding: 0 15px; font: 800 18px 'Nunito', sans-serif; color: #2B1E16; text-align: left; cursor: pointer"><span style="width: 36px; height: 36px; flex: none; border-radius: 12px; background: #1E9E57; color: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l5 5L19 7"></path></svg></span>Yere düştü</button>
+<button type="button" role="radio" aria-checked="false" style="height: 68px; border-radius: 20px; border: 2px solid #E6DCF5; background: #FFFFFF; box-shadow: 0 5px 0 #E6DCF5; display: flex; align-items: center; gap: 14px; padding: 0 16px; font: 800 18px 'Nunito', sans-serif; color: #9A8FA8; text-align: left; cursor: pointer"><span style="width: 36px; height: 36px; flex: none; border-radius: 12px; background: #F3EEFF; color: #8E80A8; display: flex; align-items: center; justify-content: center">B</span>Daha da büyüdü</button>
+<button type="button" role="radio" aria-checked="false" style="height: 68px; border-radius: 20px; border: 2px solid #E6DCF5; background: #FFFFFF; box-shadow: 0 5px 0 #E6DCF5; display: flex; align-items: center; gap: 14px; padding: 0 16px; font: 800 18px 'Nunito', sans-serif; color: #9A8FA8; text-align: left; cursor: pointer"><span style="width: 36px; height: 36px; flex: none; border-radius: 12px; background: #F3EEFF; color: #8E80A8; display: flex; align-items: center; justify-content: center">C</span>Ağaçta saklandı</button>
+</div>
+
+<div id="geri-bildirim" role="status" style="position: absolute; left: 0; right: 0; bottom: 0; background: #DDF6E7; border-radius: 28px 28px 0 0; padding: 22px 20px 30px; box-shadow: 0 -10px 30px rgba(30,158,87,0.15); display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: center; gap: 10px">
+<span class="ok-pop" style="width: 40px; height: 40px; border-radius: 50%; background: #1E9E57; color: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l5 5L19 7"></path></svg></span>
+<span style="font-family: 'Baloo 2', sans-serif; font-size: 24px; font-weight: 800; color: #145C35; white-space: nowrap">Harika, doğru!</span>
+<span class="ok-pop" style="margin-left: auto; background: #FFFFFF; color: #B23A62; font-weight: 800; font-size: 14px; padding: 6px 10px; border-radius: 999px">+5 lokum</span>
+</div>
+<p style="margin: 0; font-size: 16px; font-weight: 700; line-height: 1.45; color: #1F4A33">Güçlü rüzgâr yuvayı dalından düşürdü. Çok dikkatli okumuşsun!</p>
+<a href="S08Tamamlandi.dc.html" style="height: 58px; border-radius: 18px; background: linear-gradient(180deg, #3FCB7E 0%, #1E9E57 100%); color: #FFFFFF; font-weight: 800; font-size: 17px; letter-spacing: 0.04em; text-decoration: none; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 2px 0 rgba(255,255,255,0.3), 0 5px 0 #13703D">DEVAM ET</a>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

@@ -1,14 +1,9 @@
-/**
- * Learn more about light and dark modes:
- * https://docs.expo.dev/guides/color-schemes/
- */
-
 import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
 
+/**
+ * Uygulamanın renk paleti. Oyun tasarımı yalnızca açık temadır (bkz. docs/tasarim/README.md);
+ * koyu palet yeni tasarıma geçilene kadar `Colors.dark` içinde duruyor ama kullanılmıyor.
+ */
 export function useTheme() {
-  const scheme = useColorScheme();
-  const theme = scheme === 'unspecified' ? 'light' : scheme;
-
-  return Colors[theme];
+  return Colors.light;
 }

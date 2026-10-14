@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Ders tamamlandı</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&amp;family=Nunito:wght@600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+@keyframes okDon{to{transform:rotate(360deg)}}
+@keyframes okDus{0%{transform:translateY(-60px) rotate(0deg);opacity:1}100%{transform:translateY(560px) rotate(620deg);opacity:0}}
+.ok-don{animation:okDon 22s linear infinite}
+.ok-dus{animation:okDus 2.8s linear infinite}
+@media (prefers-reduced-motion: reduce){.ok-don,.ok-dus{animation:none}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: linear-gradient(180deg, #FFF3E2 0%, #FFDDB8 55%, #FFCB98 100%); font-family: 'Nunito', sans-serif; color: #2B1E16">
+
+<div class="ok-don" style="position: absolute; left: -105px; top: -60px; width: 600px; height: 600px; border-radius: 50%; background: repeating-conic-gradient(rgba(255,255,255,0.55) 0deg 8deg, rgba(255,255,255,0) 8deg 22deg); -webkit-mask-image: radial-gradient(circle, #000 20%, transparent 68%); mask-image: radial-gradient(circle, #000 20%, transparent 68%)"></div>
+
+<span class="ok-dus" style="position: absolute; left: 30px; top: 0; width: 10px; height: 6px; border-radius: 2px; background: #2453C9"></span>
+<span class="ok-dus" style="position: absolute; left: 80px; top: 0; width: 8px; height: 8px; border-radius: 50%; background: #FFB347; animation-delay: 0.6s"></span>
+<span class="ok-dus" style="position: absolute; left: 130px; top: 0; width: 12px; height: 6px; border-radius: 2px; background: #F7A3B5; animation-delay: 1.2s"></span>
+<span class="ok-dus" style="position: absolute; left: 190px; top: 0; width: 10px; height: 6px; border-radius: 2px; background: #2FB89A; animation-delay: 0.3s"></span>
+<span class="ok-dus" style="position: absolute; left: 240px; top: 0; width: 8px; height: 8px; border-radius: 50%; background: #2453C9; animation-delay: 1.8s"></span>
+<span class="ok-dus" style="position: absolute; left: 290px; top: 0; width: 12px; height: 6px; border-radius: 2px; background: #F0662C; animation-delay: 0.9s"></span>
+<span class="ok-dus" style="position: absolute; left: 340px; top: 0; width: 10px; height: 6px; border-radius: 2px; background: #FFD23F; animation-delay: 2.2s"></span>
+<span class="ok-dus" style="position: absolute; left: 360px; top: 0; width: 8px; height: 8px; border-radius: 50%; background: #F7A3B5; animation-delay: 1.5s"></span>
+<span class="ok-dus" style="position: absolute; left: 55px; top: 0; width: 10px; height: 6px; border-radius: 2px; background: #FFD23F; animation-delay: 2.5s"></span>
+<span class="ok-dus" style="position: absolute; left: 215px; top: 0; width: 12px; height: 6px; border-radius: 2px; background: #F0662C; animation-delay: 2s"></span>
+
+<div style="position: absolute; left: 50%; top: 96px; margin-left: -125px">
+<dc-import name="Pose" poz="celebrate" boyut="250" hint-size="250px,250px"></dc-import>
+</div>
+
+<div style="position: absolute; left: 24px; right: 24px; top: 362px; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center">
+<h1 style="margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 40px; font-weight: 800; line-height: 1.05; color: #2453C9">Harika okudun!</h1>
+<p style="margin: 0; font-size: 17px; font-weight: 700; color: #6B5647">Minik Serçe hikâyesini bitirdin.</p>
+</div>
+
+<div style="position: absolute; left: 20px; right: 20px; top: 452px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
+<div style="border-radius: 20px; background: #FFFFFF; box-shadow: 0 10px 22px rgba(201,99,31,0.15); padding: 12px 6px; display: flex; flex-direction: column; align-items: center; gap: 2px">
+<span style="font-family: 'Baloo 2', sans-serif; font-size: 28px; font-weight: 800; line-height: 1.1; color: #A33B5A">+20</span>
+<span style="font-size: 13px; font-weight: 800; color: #6B5647">lokum</span>
+</div>
+<div style="border-radius: 20px; background: #FFFFFF; box-shadow: 0 10px 22px rgba(201,99,31,0.15); padding: 12px 6px; display: flex; flex-direction: column; align-items: center; gap: 2px">
+<span style="font-family: 'Baloo 2', sans-serif; font-size: 28px; font-weight: 800; line-height: 1.1; color: #2453C9">2:14</span>
+<span style="font-size: 13px; font-weight: 800; color: #6B5647">dakika</span>
+</div>
+<div style="border-radius: 20px; background: #FFFFFF; box-shadow: 0 10px 22px rgba(201,99,31,0.15); padding: 12px 6px; display: flex; flex-direction: column; align-items: center; gap: 2px">
+<span style="font-family: 'Baloo 2', sans-serif; font-size: 28px; font-weight: 800; line-height: 1.1; color: #B8461A">3/3</span>
+<span style="font-size: 13px; font-weight: 800; color: #6B5647">doğru cevap</span>
+</div>
+</div>
+
+<div style="position: absolute; left: 20px; right: 20px; top: 566px; display: flex; justify-content: center; gap: 8px" aria-label="3 yıldızdan 3 yıldız">
+<svg width="52" height="52" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17l-5.9 3.3 1.3-6.5L2.5 9.3l6.6-.8z" fill="#FFC23A" stroke="#D99400" stroke-width="1.2" stroke-linejoin="round"></path></svg>
+<svg width="64" height="64" viewBox="0 0 24 24" aria-hidden="true" style="margin-top: -10px"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17l-5.9 3.3 1.3-6.5L2.5 9.3l6.6-.8z" fill="#FFC23A" stroke="#D99400" stroke-width="1.2" stroke-linejoin="round"></path></svg>
+<svg width="52" height="52" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17l-5.9 3.3 1.3-6.5L2.5 9.3l6.6-.8z" fill="#FFC23A" stroke="#D99400" stroke-width="1.2" stroke-linejoin="round"></path></svg>
+</div>
+
+<div style="position: absolute; left: 20px; right: 20px; top: 642px; border-radius: 20px; background: rgba(255,255,255,0.85); padding: 12px 14px; font-size: 15px; font-weight: 700; line-height: 1.4"><strong style="color: #E0702A">Pırıl:</strong> Serçe'nin arkadaşları gibi yardımsever olmak çok güzel. Sen en son kime yardım ettin?</div>
+
+<a href="S09SeviyeAtladi.dc.html" style="position: absolute; left: 20px; right: 20px; bottom: 28px; height: 60px; border-radius: 20px; background: linear-gradient(180deg, #4F7BF2 0%, #2453C9 100%); color: #FFFFFF; font-weight: 800; font-size: 18px; letter-spacing: 0.05em; text-decoration: none; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 2px 0 rgba(255,255,255,0.35), 0 6px 0 #183A99, 0 14px 24px rgba(36,83,201,0.3)">DEVAM ET</a>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>
