@@ -21,9 +21,9 @@ const PRESS_DEPTH = 3;
 
 const SIZES = {
   /** Ekranın ana butonu (tasarımda 58-60 dp) */
-  lg: { height: 60, radius: 20, lip: 6, fontSize: 18 },
+  lg: { height: 60, radius: 20, lip: 6, fontSize: 19 },
   /** Panel içi ikincil buton (tasarımda 54-56 dp) */
-  md: { height: 56, radius: 18, lip: 5, fontSize: 16 },
+  md: { height: 56, radius: 18, lip: 5, fontSize: 19 },
 } as const;
 
 export type GameButtonProps = Omit<PressableProps, 'children' | 'style'> & {

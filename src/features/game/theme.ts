@@ -115,7 +115,10 @@ export type GameButtonPalette = {
   glow: { offsetY: number; blur: number; color: string };
 };
 
-/** 3B "şeker" butonun renkleri: README'deki tablo ve kaynaklardaki buton stilleri. */
+/**
+ * 3B "şeker" butonun renkleri: README'deki tablo ve kaynaklardaki buton stilleri. Yeşil, turuncu
+ * ve turkuaz yüz gradyanları beyaz yazının kontrastı için tasarımdakinden koyudur (dudaklar aynı).
+ */
 export const GameButtonColors: Record<GameButtonVariant, GameButtonPalette> = {
   blue: {
     face: vertical('#4F7BF2', '#2453C9'),
@@ -132,14 +135,14 @@ export const GameButtonColors: Record<GameButtonVariant, GameButtonPalette> = {
     glow: { offsetY: 14, blur: 24, color: 'rgba(91,52,214,0.3)' },
   },
   green: {
-    face: vertical('#3FCB7E', '#1E9E57'),
+    face: vertical('#2DA663', '#19864A'),
     lip: '#13703D',
     text: '#FFFFFF',
     highlight: 'rgba(255,255,255,0.3)',
     glow: { offsetY: 12, blur: 22, color: 'rgba(19,112,61,0.25)' },
   },
   orange: {
-    face: vertical('#F59A45', '#C9581A'),
+    face: vertical('#E4750C', '#C25519'),
     lip: '#8F3C0E',
     text: '#FFFFFF',
     highlight: 'rgba(255,255,255,0.3)',
@@ -153,7 +156,7 @@ export const GameButtonColors: Record<GameButtonVariant, GameButtonPalette> = {
     glow: { offsetY: 14, blur: 30, color: 'rgba(255,176,32,0.35)' },
   },
   teal: {
-    face: vertical('#1FC7B6', '#0B8578'),
+    face: vertical('#1AA597', '#0B8578'),
     lip: '#075E56',
     text: '#FFFFFF',
     highlight: 'rgba(255,255,255,0.35)',
