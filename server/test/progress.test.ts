@@ -1,10 +1,26 @@
 import { describe, expect, it } from 'vitest';
 
 import { startOfDayInTimeZone } from '../src/lib/time.js';
-import { bearer, registerUser, useTestContext } from './helpers.js';
+import {
+  bearer,
+  completeLessonsDirectly,
+  registerUser,
+  type RegisterInput,
+  useTestContext,
+} from './helpers.js';
 
 const ctx = useTestContext();
 const MINUTE = 60 * 1000;
+
+/**
+ * Testlerde kullanılan metinler (Minik Serçe, Kayıp Anahtar, Deniz Feneri) yolculukta Antalya'nın
+ * 7. dersine kadar dağılır; kullanıcı ilk 40 dersi bitirmiş sayılır ki hepsi açık olsun.
+ */
+async function registerReader(app: typeof ctx.app, input: RegisterInput = {}) {
+  const registered = await registerUser(app, input);
+  await completeLessonsDirectly(ctx.prisma, registered.user.id, 40);
+  return registered;
+}
 
 async function startReading(token: string, textId: string) {
   const response = await ctx.app.inject({
@@ -47,7 +63,7 @@ async function backdate(id: string, startedAt: Date) {
 
 describe('okuma oturumu', () => {
   it('başlatılır, ilerleme ve bitiş kaydedilir', async () => {
-    const { token } = await registerUser(ctx.app);
+    const { token } = await registerReader(ctx.app);
     const id = await startReading(token, 'minik-serce');
     await backdate(id, new Date(Date.now() - 10 * MINUTE));
 
@@ -71,7 +87,7 @@ describe('okuma oturumu', () => {
   });
 
   it('ilerleme geri gitmez, bitmiş oturum bitmemiş olmaz', async () => {
-    const { token } = await registerUser(ctx.app);
+    const { token } = await registerReader(ctx.app);
     const id = await startReading(token, 'minik-serce');
 
     await updateReading(token, id, { progress: 0.8, durationSeconds: 5, completed: true });
@@ -84,7 +100,7 @@ describe('okuma oturumu', () => {
   });
 
   it('süre, gerçekte geçen zamanı aşamaz', async () => {
-    const { token } = await registerUser(ctx.app);
+    const { token } = await registerReader(ctx.app);
     const id = await startReading(token, 'minik-serce');
 
     const response = await updateReading(token, id, {
@@ -96,7 +112,7 @@ describe('okuma oturumu', () => {
   });
 
   it('olmayan metin için 404, geçersiz gövde için 400 döner', async () => {
-    const { token } = await registerUser(ctx.app);
+    const { token } = await registerReader(ctx.app);
     const missing = await ctx.app.inject({
       method: 'POST',
       url: '/reading-sessions',
@@ -116,8 +132,8 @@ describe('okuma oturumu', () => {
   });
 
   it('başka bir kullanıcının oturumu güncellenemez', async () => {
-    const ayse = await registerUser(ctx.app, { username: 'ayse' });
-    const ali = await registerUser(ctx.app, { username: 'ali' });
+    const ayse = await registerReader(ctx.app, { username: 'ayse' });
+    const ali = await registerReader(ctx.app, { username: 'ali' });
     const id = await startReading(ayse.token, 'minik-serce');
 
     const response = await updateReading(ali.token, id, {
@@ -127,11 +143,23 @@ describe('okuma oturumu', () => {
     });
     expect(response.statusCode).toBe(404);
   });
+
+  it('yolculukta kilitli olan dersin metni okunamaz (403)', async () => {
+    const { token } = await registerUser(ctx.app);
+    const response = await ctx.app.inject({
+      method: 'POST',
+      url: '/reading-sessions',
+      headers: bearer(token),
+      payload: { textId: 'minik-serce' },
+    });
+    expect(response.statusCode).toBe(403);
+    expect(response.json().code).toBe('LESSON_LOCKED');
+  });
 });
 
 describe('GET /me/progress', () => {
   it('yeni kullanıcı için boş ilerleme döner', async () => {
-    const { token } = await registerUser(ctx.app);
+    const { token } = await registerReader(ctx.app);
     expect(await getProgress(token)).toEqual({
       dailyGoal: { goalMinutes: 10, readMinutes: 0 },
       continueReading: null,
@@ -139,7 +167,7 @@ describe('GET /me/progress', () => {
   });
 
   it('yalnızca bugün (Türkiye saatiyle) okunan dakikaları toplar', async () => {
-    const { token } = await registerUser(ctx.app);
+    const { token } = await registerReader(ctx.app);
     const dayStart = startOfDayInTimeZone(new Date());
 
     // Bugün: 3 dk + 2,5 dk = 5,5 dk → 5
@@ -166,7 +194,7 @@ describe('GET /me/progress', () => {
   });
 
   it('en son yarım bırakılan metni "devam et" olarak döner', async () => {
-    const { token } = await registerUser(ctx.app);
+    const { token } = await registerReader(ctx.app);
 
     const first = await startReading(token, 'minik-serce');
     await updateReading(token, first, { progress: 0.3, durationSeconds: 10, completed: false });
@@ -194,8 +222,8 @@ describe('GET /me/progress', () => {
   });
 
   it('başka kullanıcıların okumalarını saymaz', async () => {
-    const ayse = await registerUser(ctx.app, { username: 'ayse' });
-    const ali = await registerUser(ctx.app, { username: 'ali' });
+    const ayse = await registerReader(ctx.app, { username: 'ayse' });
+    const ali = await registerReader(ctx.app, { username: 'ali' });
     const id = await startReading(ayse.token, 'minik-serce');
     await backdate(id, new Date(Date.now() - 5 * MINUTE));
     await updateReading(ayse.token, id, { progress: 0.5, durationSeconds: 240, completed: false });

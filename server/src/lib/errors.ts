@@ -36,6 +36,23 @@ export const Errors = {
   invalidCredentials: () =>
     new AppError(401, 'INVALID_CREDENTIALS', 'Kullanıcı adı veya şifre hatalı.'),
   notFound: (message = 'Aradığın şey bulunamadı.') => new AppError(404, 'NOT_FOUND', message),
+  lessonLocked: () =>
+    new AppError(
+      403,
+      'LESSON_LOCKED',
+      'Bu ders henüz kilitli. Önceki dersleri bitirince açılacak.',
+    ),
+  cityLocked: (cityName: string) =>
+    new AppError(
+      403,
+      'CITY_LOCKED',
+      `${cityName} henüz kilitli. Yolculuğa devam edince oraya da varacağız!`,
+    ),
+  readingNotFinished: () =>
+    new AppError(400, 'READING_NOT_FINISHED', 'Önce hikâyeyi sonuna kadar oku.'),
+  questionsNotAnswered: () =>
+    new AppError(400, 'QUESTIONS_NOT_ANSWERED', 'Önce Pırıl’ın tüm sorularını doğru cevapla.'),
+  noQuestions: () => new AppError(400, 'NO_QUESTIONS', 'Bu derste soru yok.'),
   usernameTaken: () =>
     new AppError(409, 'USERNAME_TAKEN', 'Bu kullanıcı adı alınmış.', {
       username: 'Bu kullanıcı adı alınmış. Başka bir tane dene.',

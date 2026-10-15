@@ -66,6 +66,11 @@ export default function ProfileScreen() {
               <ThemedText type="link">Oyun arayüzü vitrini (geliştirici)</ThemedText>
             </Pressable>
           </Link>
+          <Link href="/dev/scenes" asChild>
+            <Pressable accessibilityRole="link" style={styles.devLink}>
+              <ThemedText type="link">Şehir sahneleri vitrini (geliştirici)</ThemedText>
+            </Pressable>
+          </Link>
         </>
       ) : null}
     </Screen>

@@ -1,14 +1,27 @@
 import { describe, expect, it } from 'vitest';
 
 import { createPrismaClient } from '../src/db.js';
-import { bearer, registerUser, useTestContext } from './helpers.js';
+import { startOfDayInTimeZone } from '../src/lib/time.js';
+import { bearer, completeLessonsDirectly, registerUser, useTestContext } from './helpers.js';
 import { getTestDatabaseUrl } from './test-db.js';
 
 /** Veritabanının SQL araçlarından okunabilirliği: açıklamalar ve rapor görünümleri. */
 const ctx = useTestContext();
 
-const TABLES = ['users', 'auth_sessions', 'texts', 'reading_sessions'];
-const VIEWS = ['v_user_summary', 'v_daily_reading', 'v_reading_history'];
+const TABLES = [
+  'users',
+  'auth_sessions',
+  'texts',
+  'reading_sessions',
+  'lessons',
+  'questions',
+  'glossary_entries',
+  'question_attempts',
+  'lesson_completions',
+  'lokum_entries',
+];
+const VIEWS = ['v_user_summary', 'v_daily_reading', 'v_reading_history', 'v_user_journey'];
+const DAY = 24 * 60 * 60 * 1000;
 
 describe('saat dilimi', () => {
   it('veritabanının varsayılan saat dilimi UTC olmasa da zamanlar kaymaz', async () => {
@@ -56,7 +69,8 @@ describe('veritabanı şeması', () => {
   });
 
   it('görünümler okuma verisini özetler', async () => {
-    const { token } = await registerUser(ctx.app, { username: 'ayse' });
+    const { token, user } = await registerUser(ctx.app, { username: 'ayse' });
+    await completeLessonsDirectly(ctx.prisma, user.id, 22);
     const start = await ctx.app.inject({
       method: 'POST',
       url: '/reading-sessions',
@@ -96,6 +110,46 @@ describe('veritabanı şeması', () => {
       level_name: 'Orta',
       progress_percent: 50,
       completed: false,
+    });
+  });
+
+  it('v_user_journey seviye, şehir, lokum ve seriyi kodla aynı kuralla türetir', async () => {
+    const { user } = await registerUser(ctx.app, { username: 'ayse' });
+    await completeLessonsDirectly(ctx.prisma, user.id, 11);
+    await ctx.prisma.lokumEntry.createMany({
+      data: [
+        { userId: user.id, amount: 20, reason: 'LESSON' },
+        { userId: user.id, amount: 50, reason: 'LEVEL_UP', level: 2 },
+      ],
+    });
+    // Dün ve evvelsi gün biten okumalar: bugün okunmadığı için seri dünden sayılır → 2.
+    const today = startOfDayInTimeZone(new Date()).getTime();
+    for (const daysAgo of [1, 2]) {
+      const endedAt = new Date(today - daysAgo * DAY + 12 * 60 * 60 * 1000);
+      await ctx.prisma.readingSession.create({
+        data: {
+          userId: user.id,
+          textId: 'minik-serce',
+          startedAt: new Date(endedAt.getTime() - 60_000),
+          endedAt,
+          durationSeconds: 60,
+          progress: 1,
+          completed: true,
+        },
+      });
+    }
+
+    const [row] = await ctx.prisma.$queryRaw<Record<string, unknown>[]>`
+      SELECT username, completed_lesson_count AS completed, level, current_city,
+             lokum_balance AS lokum, current_streak AS streak
+      FROM v_user_journey`;
+    expect(row).toEqual({
+      username: 'ayse',
+      completed: 11,
+      level: 6,
+      current_city: 'İzmir',
+      lokum: 70,
+      streak: 2,
     });
   });
 });

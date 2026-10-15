@@ -34,25 +34,31 @@ enum ReadingLevel {
 /// Uygulamaya kayıtlı öğrenci. Kişisel veri en aza indirilmiştir (e-posta, doğum tarihi yok).
 model User {
   /// Birincil anahtar (cuid), ör. "cmg8x1k2p0000abcd1234efgh"
-  id               String           @id @default(cuid())
+  id                String             @id @default(cuid())
   /// Giriş için kullanıcı adı; her zaman küçük harfe normalize edilir, ör. "ayse.k"
-  username         String           @unique
+  username          String             @unique
   /// Şifrenin scrypt hash'i. Şifrenin kendisi hiçbir yerde saklanmaz.
-  passwordHash     String           @map("password_hash")
+  passwordHash      String             @map("password_hash")
   /// Ekranda gösterilen ad, ör. "Ayşe"
-  name             String
+  name              String
   /// Okuduğu sınıf, 1-8 arası, ör. 3
-  grade            Int
+  grade             Int
   /// Günlük okuma hedefi (dakika), ör. 10
-  dailyGoalMinutes Int              @default(10) @map("daily_goal_minutes")
+  dailyGoalMinutes  Int                @default(10) @map("daily_goal_minutes")
   /// Kaydın oluşturulma zamanı
-  createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdAt         DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
   /// Kaydın son güncellenme zamanı (uygulama tarafından otomatik)
-  updatedAt        DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
+  updatedAt         DateTime           @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
   /// Kullanıcının giriş oturumları
-  authSessions     AuthSession[]
+  authSessions      AuthSession[]
   /// Kullanıcının okuma kayıtları
-  readingSessions  ReadingSession[]
+  readingSessions   ReadingSession[]
+  /// Kullanıcının soru cevapları
+  questionAttempts  QuestionAttempt[]
+  /// Kullanıcının bitirdiği dersler
+  lessonCompletions LessonCompletion[]
+  /// Kullanıcının lokum hareketleri
+  lokumEntries      LokumEntry[]
 
   @@map("users")
 }
@@ -101,6 +107,12 @@ model Text {
   updatedAt        DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
   /// Bu metne ait okuma kayıtları
   readingSessions  ReadingSession[]
+  /// Bu metni okutan yolculuk dersi (varsa)
+  lesson           Lesson?
+  /// Metnin anlama soruları
+  questions        Question[]
+  /// Metindeki kelimelerin anlamları
+  glossaryEntries  GlossaryEntry[]
 
   @@map("texts")
 }
@@ -109,28 +121,240 @@ model Text {
 /// okuma sırasında ilerleme ve süre güncellenir.
 model ReadingSession {
   /// Birincil anahtar (cuid)
-  id              String    @id @default(cuid())
+  id                String             @id @default(cuid())
   /// Okuyan kullanıcı (users.id)
-  userId          String    @map("user_id")
+  userId            String             @map("user_id")
   /// Okuyan kullanıcı
-  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   /// Okunan metin (texts.id), ör. "minik-serce"
-  textId          String    @map("text_id")
+  textId            String             @map("text_id")
   /// Okunan metin
-  text            Text      @relation(fields: [textId], references: [id], onDelete: Cascade)
+  text              Text               @relation(fields: [textId], references: [id], onDelete: Cascade)
   /// Okumanın başladığı zaman; günlük hedef bu zamanın günüyle (Türkiye saati) hesaplanır
-  startedAt       DateTime  @default(now()) @map("started_at") @db.Timestamptz(3)
+  startedAt         DateTime           @default(now()) @map("started_at") @db.Timestamptz(3)
   /// Son ilerleme kaydının zamanı; hiç kaydedilmediyse boş
-  endedAt         DateTime? @map("ended_at") @db.Timestamptz(3)
+  endedAt           DateTime?          @map("ended_at") @db.Timestamptz(3)
   /// Toplam okuma süresi (saniye), ör. 185
-  durationSeconds Int       @default(0) @map("duration_seconds")
+  durationSeconds   Int                @default(0) @map("duration_seconds")
   /// Okuma ilerlemesi, 0 ile 1 arası oran, ör. 0.6 (= %60)
-  progress        Float     @default(0)
+  progress          Float              @default(0)
   /// Metin sonuna kadar okundu mu
-  completed       Boolean   @default(false)
+  completed         Boolean            @default(false)
   /// Kaydın son güncellenme zamanı (uygulama tarafından otomatik)
-  updatedAt       DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
+  updatedAt         DateTime           @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
+  /// Bu okuma sırasında verilen cevaplar
+  questionAttempts  QuestionAttempt[]
+  /// Bu okumayla bitirilen dersler
+  lessonCompletions LessonCompletion[]
 
   @@index([userId, startedAt])
   @@map("reading_sessions")
+}
+
+/// Yolculuğun durakları (şehirler), yolculuk sırasıyla. API'de küçük harfli kimlik olarak döner:
+/// ISTANBUL → "istanbul" (bkz. src/lib/city.ts).
+enum City {
+  /// 1. durak, seviye 1-5
+  ISTANBUL
+  /// 2. durak, seviye 6-10
+  IZMIR
+  /// 3. durak, seviye 11-15
+  EFES
+  /// 4. durak, seviye 16-20
+  ANTALYA
+  /// 5. durak, seviye 21-25
+  KAPADOKYA
+  /// 6. durak (final), seviye 26-30
+  VAN
+
+  @@map("city")
+}
+
+/// Ders türü.
+enum LessonKind {
+  /// Hikâye: metni oku + 3 anlama sorusu
+  STORY
+  /// Hazine sandığı: okuma yok, açınca lokum verir
+  CHEST
+
+  @@map("lesson_kind")
+}
+
+/// Lokum kazanma sebebi.
+enum LokumReason {
+  /// Hikâye dersi bitti (5 + ilk denemede doğru her soru için 5)
+  LESSON
+  /// Sandık açıldı (30)
+  CHEST
+  /// Seviye atlandı (her seviye için 50)
+  LEVEL_UP
+  /// Yeni şehir açıldı (100)
+  CITY_UNLOCK
+
+  @@map("lokum_reason")
+}
+
+/// Yolculuktaki ders (yoldaki düğüm). Her şehirde 10 ders vardır; 5. ve 10. ders sandık, diğerleri
+/// hikâyedir. Dersler şehir sırası, sonra sıra numarasıyla tek tek açılır.
+model Lesson {
+  /// Okunabilir kimlik (slug), ör. "istanbul-03-minik-serce"
+  id           String             @id
+  /// Dersin bulunduğu şehir, ör. ISTANBUL
+  city         City
+  /// Şehir içindeki sıra (1-10), ör. 3
+  position     Int
+  /// Ders türü: STORY (hikâye) veya CHEST (sandık)
+  kind         LessonKind
+  /// Ders kartındaki başlık, ör. "Minik Serçe"
+  title        String
+  /// Ders kartındaki tek cümlelik özet
+  summary      String
+  /// Hikâyenin metni (texts.id); hikâyelerde zorunlu, sandıklarda boş
+  textId       String?            @unique @map("text_id")
+  /// Hikâyenin metni
+  text         Text?              @relation(fields: [textId], references: [id], onDelete: SetNull)
+  /// Kaydın oluşturulma zamanı
+  createdAt    DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
+  /// Kaydın son güncellenme zamanı (uygulama tarafından otomatik)
+  updatedAt    DateTime           @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
+  /// Bu dersin tamamlanma kayıtları
+  completions  LessonCompletion[]
+  /// Bu dersten kazanılan lokumlar
+  lokumEntries LokumEntry[]
+
+  @@unique([city, position])
+  @@map("lessons")
+}
+
+/// Bir metnin anlama sorusu. Her hikâyenin 3 sorusu vardır; her sorunun 3 şıkkı ve 1 doğru cevabı.
+model Question {
+  /// Birincil anahtar (cuid)
+  id           String            @id @default(cuid())
+  /// Sorunun ait olduğu metin (texts.id), ör. "minik-serce"
+  textId       String            @map("text_id")
+  /// Sorunun ait olduğu metin
+  text         Text              @relation(fields: [textId], references: [id], onDelete: Cascade)
+  /// Metin içindeki sıra (1-3)
+  position     Int
+  /// Soru, ör. "Rüzgâr esince Pıtır'ın yuvasına ne oldu?"
+  prompt       String
+  /// Tam olarak 3 şık, ekrandaki sırasıyla (A, B, C)
+  options      String[]
+  /// Doğru şıkkın sırası (0-2); istemciye gönderilmez
+  correctIndex Int               @map("correct_index")
+  /// Yanlış cevaptan sonra gösterilen ipucu
+  hint         String
+  /// Doğru cevaptan sonra gösterilen açıklama
+  explanation  String
+  /// Kaydın oluşturulma zamanı
+  createdAt    DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  /// Kaydın son güncellenme zamanı (uygulama tarafından otomatik)
+  updatedAt    DateTime          @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
+  /// Bu soruya verilen cevaplar
+  attempts     QuestionAttempt[]
+
+  @@unique([textId, position])
+  @@map("questions")
+}
+
+/// Metindeki bir kelimenin çocuk diliyle anlamı; okurken kelimeye dokununca gösterilir.
+model GlossaryEntry {
+  /// Birincil anahtar (cuid)
+  id      String @id @default(cuid())
+  /// Kelimenin geçtiği metin (texts.id)
+  textId  String @map("text_id")
+  /// Kelimenin geçtiği metin
+  text    Text   @relation(fields: [textId], references: [id], onDelete: Cascade)
+  /// Kelime, metinde yazıldığı gibi, ör. "yuvası"
+  word    String
+  /// Tek cümlelik, çocuk dostu anlam
+  meaning String
+
+  @@unique([textId, word])
+  @@map("glossary_entries")
+}
+
+/// Bir soruya verilen tek bir cevap. Şıkka her dokunuş bir satırdır; yıldız ve lokum, bir okuma
+/// içinde soruya verilen ilk cevabın doğru olup olmadığına göre hesaplanır.
+model QuestionAttempt {
+  /// Birincil anahtar (cuid)
+  id               String         @id @default(cuid())
+  /// Cevaplayan kullanıcı (users.id)
+  userId           String         @map("user_id")
+  /// Cevaplayan kullanıcı
+  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// Cevaplanan soru (questions.id)
+  questionId       String         @map("question_id")
+  /// Cevaplanan soru
+  question         Question       @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  /// Cevabın verildiği okuma (reading_sessions.id)
+  readingSessionId String         @map("reading_session_id")
+  /// Cevabın verildiği okuma
+  readingSession   ReadingSession @relation(fields: [readingSessionId], references: [id], onDelete: Cascade)
+  /// Seçilen şık (0-2)
+  choiceIndex      Int            @map("choice_index")
+  /// Seçilen şık doğru muydu
+  correct          Boolean
+  /// Cevabın verildiği zaman
+  createdAt        DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([readingSessionId, questionId])
+  @@index([userId])
+  @@map("question_attempts")
+}
+
+/// Kullanıcının bir dersi bitirmesi. İlk tamamlama satırı oluşturur ve ödül verir; tekrar oynamak
+/// yalnızca en iyi yıldızı yükseltebilir.
+model LessonCompletion {
+  /// Birincil anahtar (cuid)
+  id               String          @id @default(cuid())
+  /// Dersi bitiren kullanıcı (users.id)
+  userId           String          @map("user_id")
+  /// Dersi bitiren kullanıcı
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// Bitirilen ders (lessons.id)
+  lessonId         String          @map("lesson_id")
+  /// Bitirilen ders
+  lesson           Lesson          @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  /// İlk tamamlamadaki okuma (reading_sessions.id); sandıklarda boş
+  readingSessionId String?         @map("reading_session_id")
+  /// İlk tamamlamadaki okuma
+  readingSession   ReadingSession? @relation(fields: [readingSessionId], references: [id], onDelete: SetNull)
+  /// İlk tamamlamada kazanılan yıldız (1-3); sandıklarda boş
+  stars            Int?
+  /// Tekrar oynamalar dahil en iyi yıldız (1-3); sandıklarda boş
+  bestStars        Int?            @map("best_stars")
+  /// Dersin ilk bitirildiği zaman
+  completedAt      DateTime        @default(now()) @map("completed_at") @db.Timestamptz(3)
+  /// Kaydın son güncellenme zamanı (uygulama tarafından otomatik)
+  updatedAt        DateTime        @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@unique([userId, lessonId])
+  @@map("lesson_completions")
+}
+
+/// Lokum defteri: her kazanç bir satırdır. Bakiye, kullanıcının satırlarının toplamıdır (users
+/// tablosunda bakiye kolonu yoktur).
+model LokumEntry {
+  /// Birincil anahtar (cuid)
+  id        String      @id @default(cuid())
+  /// Lokumu kazanan kullanıcı (users.id)
+  userId    String      @map("user_id")
+  /// Lokumu kazanan kullanıcı
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// Kazanılan lokum (> 0), ör. 20
+  amount    Int
+  /// Kazanma sebebi, ör. LESSON
+  reason    LokumReason
+  /// Kazancı doğuran ders (lessons.id); ders silinirse boş kalır
+  lessonId  String?     @map("lesson_id")
+  /// Kazancı doğuran ders
+  lesson    Lesson?     @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  /// LEVEL_UP satırlarında ulaşılan seviye (2-30); diğerlerinde boş
+  level     Int?
+  /// Kazanç zamanı
+  createdAt DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([userId])
+  @@map("lokum_entries")
 }
