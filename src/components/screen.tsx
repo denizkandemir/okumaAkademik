@@ -2,7 +2,7 @@ import type { PropsWithChildren } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { BottomTabInset, MaxContentWidth, Spacing, TopTabInset } from '@/constants/theme';
+import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 type ScreenProps = PropsWithChildren<{
@@ -22,7 +22,7 @@ export function Screen({ children, withTabBar = false }: ScreenProps) {
       contentContainerStyle={[
         styles.content,
         {
-          paddingTop: insets.top + Spacing.four + (withTabBar ? TopTabInset : 0),
+          paddingTop: insets.top + Spacing.four,
           paddingBottom: insets.bottom + Spacing.four + (withTabBar ? BottomTabInset : 0),
           paddingLeft: insets.left + Spacing.four,
           paddingRight: insets.right + Spacing.four,

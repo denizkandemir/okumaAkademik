@@ -5,12 +5,16 @@ import type { MascotBubbleProps } from './types';
 import { useMascotReducedMotion } from './use-mascot-animations';
 
 import { Fonts, Spacing } from '@/constants/theme';
+import { GameColors, GameFonts } from '@/features/game/theme';
 
 const CHAR_MS = 35;
 const BUBBLE_COLOR = '#FFFFFF';
 const BORDER_COLOR = '#DCE1EC';
 const TEXT_COLOR = '#111318';
 const TAIL = 14;
+const GAME_TAIL = 16;
+/** "Pırıl" vurgusu (S01Karsilama #E0702A); beyaz üzerinde 4,5:1 için bir ton koyu. */
+const HIGHLIGHT_COLOR = '#C25519';
 
 /**
  * Pırıl'ın konuşma balonu. Metin harf harf yazılır (~35 ms/harf); `onTypingChange` ile ebeveyn
@@ -19,9 +23,15 @@ const TAIL = 14;
 export function MascotBubble({
   text,
   side = 'right',
+  tone = 'default',
+  size = 'md',
+  highlight,
+  align = 'left',
+  style,
   onTypingChange,
   reduceMotion: reduceMotionOverride,
 }: MascotBubbleProps) {
+  const game = tone === 'game';
   const reduceMotion = useMascotReducedMotion(reduceMotionOverride);
   const [typing, setTyping] = useState({ text: '', length: 0 });
   // Metin değiştiyse daktilo baştan başlar (render sırasında sıfırlanır, ek effect gerekmez).
@@ -49,18 +59,55 @@ export function MascotBubble({
       accessible
       accessibilityLabel={text}
       accessibilityLiveRegion="polite"
-      style={[styles.bubble, side === 'top' && styles.top]}>
+      style={[
+        styles.bubble,
+        game && styles.gameBubble,
+        (side === 'top' || side === 'bottom') && styles.top,
+        style,
+      ]}>
       {/*
         Yazılmamış kısım saydam çizilir: balonun boyutu ve satır kırılımları baştan sabittir,
         metin yazılırken hiçbir şey zıplamaz.
       */}
-      <Text style={styles.text}>
-        {text.slice(0, length)}
-        <Text style={styles.pending}>{text.slice(length)}</Text>
+      <Text
+        style={[
+          styles.text,
+          game && (size === 'lg' ? styles.gameTextLarge : styles.gameText),
+          align === 'center' && styles.center,
+        ]}>
+        {splitHighlight(text, highlight).map((part) => {
+          const typed = Math.max(0, Math.min(part.text.length, length - part.start));
+          return (
+            <Text key={part.start} style={part.highlighted ? styles.highlight : undefined}>
+              {part.text.slice(0, typed)}
+              <Text style={styles.pending}>{part.text.slice(typed)}</Text>
+            </Text>
+          );
+        })}
       </Text>
-      <View style={[styles.tail, tailStyles[side]]} />
+      <View
+        style={[
+          styles.tail,
+          game ? gameTailStyles[side] : tailStyles[side],
+          game && styles.gameTail,
+        ]}
+      />
     </View>
   );
+}
+
+type TextPart = { text: string; start: number; highlighted: boolean };
+
+/** Metni vurgulanan kelimenin ilk geçtiği yerden en fazla üç parçaya böler. */
+function splitHighlight(text: string, highlight?: string): TextPart[] {
+  const index = highlight ? text.indexOf(highlight) : -1;
+  if (!highlight || index < 0) return [{ text, start: 0, highlighted: false }];
+  const end = index + highlight.length;
+  return [
+    { text: text.slice(0, index), start: 0, highlighted: false },
+    { text: highlight, start: index, highlighted: true },
+    { text: text.slice(end), start: end, highlighted: false },
+  ].filter((part) => part.text.length > 0);
 }
 
 /** Boşlukları beklemeden geçer ki yazım ritmi düzgün olsun. */
@@ -95,6 +142,41 @@ const styles = StyleSheet.create({
   pending: {
     color: 'transparent',
   },
+  center: {
+    textAlign: 'center',
+  },
+  highlight: {
+    color: HIGHLIGHT_COLOR,
+  },
+  // Oyun tonu: S01Karsilama / S02Giris balonları.
+  gameBubble: {
+    maxWidth: '100%',
+    borderWidth: 0,
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    boxShadow: '0 10px 24px rgba(201,99,31,0.16)',
+  },
+  gameText: {
+    fontFamily: GameFonts.bodyHeavy,
+    fontWeight: 'normal',
+    fontSize: 16,
+    lineHeight: 22,
+    color: GameColors.warm,
+  },
+  gameTextLarge: {
+    fontFamily: GameFonts.bodyHeavy,
+    fontWeight: 'normal',
+    fontSize: 17,
+    lineHeight: 24,
+    color: GameColors.warm,
+  },
+  gameTail: {
+    width: GAME_TAIL,
+    height: GAME_TAIL,
+    borderRadius: 3,
+    borderWidth: 0,
+  },
   // Kenarlıklı, 45° döndürülmüş kare; içteki yarısı balonun kenarlığını örter, dıştaki köşe kuyruk olur.
   tail: {
     position: 'absolute',
@@ -107,6 +189,15 @@ const styles = StyleSheet.create({
 });
 
 const tailOffset = -TAIL / 2 - 1;
+const gameTailOffset = -GAME_TAIL / 2;
+
+/** Kenarlıksız oyun balonunun kuyrukları (S02Giris: solda, üstten 30; S01Karsilama: üstte, ortada). */
+const gameTailStyles = StyleSheet.create({
+  right: { left: gameTailOffset, top: 30 },
+  left: { right: gameTailOffset, top: 30 },
+  top: { bottom: gameTailOffset, left: '50%', marginLeft: gameTailOffset },
+  bottom: { top: gameTailOffset, left: '50%', marginLeft: gameTailOffset },
+});
 
 const tailStyles = StyleSheet.create({
   // Balon maskotun sağında: kuyruk sola bakar.
@@ -130,5 +221,13 @@ const tailStyles = StyleSheet.create({
     marginLeft: -TAIL / 2,
     borderRightWidth: 2,
     borderBottomWidth: 2,
+  },
+  // Balon maskotun altında: kuyruk yukarı bakar.
+  bottom: {
+    top: tailOffset,
+    left: '50%',
+    marginLeft: -TAIL / 2,
+    borderLeftWidth: 2,
+    borderTopWidth: 2,
   },
 });
