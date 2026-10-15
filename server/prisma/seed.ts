@@ -3,12 +3,19 @@ import 'dotenv/config';
 import { createPrismaClient } from '../src/db.js';
 import { startOfDayInTimeZone } from '../src/lib/time.js';
 import { hashPassword } from '../src/modules/auth/password.js';
-import { seedTexts } from './seed-data.js';
+import {
+  seedGlossaryRows,
+  seedLessonRows,
+  seedQuestionRows,
+  seedTexts,
+} from './seed-data/index.js';
+import { DEMO_PASSWORD, seedDemoUsers } from './seed-demo.js';
 
 /**
- * Geliştirme verisi. Üretimde çalıştırılmamalı. Tekrar çalıştırılabilir (upsert): kullanıcılar
- * ve metinler güncellenir, okuma geçmişi sabit kimliklerle (seed-<kullanıcı>-NN) yeniden yazılır
- * ve tarihleri her çalıştırmada "bugün"e göre son 7 güne taşınır.
+ * Geliştirme verisi. Üretimde çalıştırılmamalı. Tekrar çalıştırılabilir (upsert): içerik
+ * (metinler, dersler, sorular, kelime anlamları) seed-data/ ile eşitlenir, kullanıcılar
+ * güncellenir, okuma geçmişi sabit kimliklerle (seed-<kullanıcı>-NN) yeniden yazılır ve
+ * tarihleri her çalıştırmada "bugün"e göre taşınır. Demo kullanıcılar: seed-demo.ts.
  */
 
 type SeedUser = {
@@ -135,11 +142,51 @@ async function upsertUser(user: SeedUser) {
   });
 }
 
-try {
+/** İçeriği seed-data/ ile eşitler: eksikler eklenir, değişenler güncellenir, fazlalar silinir. */
+async function syncContent() {
+  const textIds = seedTexts.map(({ id }) => id);
+  const lessonIds = seedLessonRows.map(({ id }) => id);
+
   for (const text of seedTexts) {
     const { id, ...data } = text;
     await prisma.text.upsert({ where: { id }, create: text, update: data });
   }
+
+  // Ders kimliği şehri ve sırayı içerir; artık olmayan dersler (bitirme kayıtlarıyla birlikte)
+  // önce silinir ki yeni dersler (city, position) tekil kısıtına takılmasın.
+  await prisma.lesson.deleteMany({ where: { id: { notIn: lessonIds } } });
+  for (const lesson of seedLessonRows) {
+    const { id, ...data } = lesson;
+    await prisma.lesson.upsert({ where: { id }, create: lesson, update: data });
+  }
+  await prisma.text.deleteMany({ where: { id: { notIn: textIds } } });
+
+  for (const question of seedQuestionRows) {
+    const { textId, position, ...data } = question;
+    await prisma.question.upsert({
+      where: { textId_position: { textId, position } },
+      create: question,
+      update: data,
+    });
+  }
+  for (const textId of textIds) {
+    const positions = seedQuestionRows.filter((q) => q.textId === textId).map((q) => q.position);
+    const words = seedGlossaryRows.filter((g) => g.textId === textId).map((g) => g.word);
+    await prisma.question.deleteMany({ where: { textId, position: { notIn: positions } } });
+    await prisma.glossaryEntry.deleteMany({ where: { textId, word: { notIn: words } } });
+  }
+  for (const entry of seedGlossaryRows) {
+    const { textId, word, meaning } = entry;
+    await prisma.glossaryEntry.upsert({
+      where: { textId_word: { textId, word } },
+      create: entry,
+      update: { meaning },
+    });
+  }
+}
+
+try {
+  await syncContent();
 
   await upsertUser(TEST_USER);
 
@@ -173,10 +220,26 @@ try {
     }
   }
 
+  const demoUsers = await seedDemoUsers(prisma, now);
+
   const sampleUsernames = SAMPLE_USERS.map(({ user }) => user.username).join(', ');
   console.log(
-    `Seed tamam: ${seedTexts.length} metin, test kullanıcısı "${TEST_USER.username}" / "${TEST_USER.password}", ` +
+    `Seed tamam: ${seedLessonRows.length} ders, ${seedTexts.length} metin, ${seedQuestionRows.length} soru, ` +
+      `test kullanıcısı "${TEST_USER.username}" / "${TEST_USER.password}", ` +
       `örnek kullanıcılar (şifre 1234): ${sampleUsernames}, ${readingCount} okuma kaydı`,
+  );
+  console.log(`\nDemo kullanıcılar (şifre: ${DEMO_PASSWORD}):`);
+  console.table(
+    demoUsers.map((demo) => ({
+      'kullanıcı adı': demo.username,
+      ad: demo.name,
+      ders: demo.completed,
+      seviye: demo.level,
+      şehir: demo.city,
+      lokum: demo.lokum,
+      seri: demo.streak,
+      'bugün okudu': demo.readToday ? 'evet' : 'hayır (seri tehlikede)',
+    })),
   );
 } finally {
   await prisma.$disconnect();

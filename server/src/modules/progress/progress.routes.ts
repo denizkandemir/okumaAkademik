@@ -6,6 +6,7 @@ import { toApiLevel } from '../../lib/reading-level.js';
 import { startOfDayInTimeZone } from '../../lib/time.js';
 import { parse } from '../../lib/validation.js';
 import { requireAuth } from '../../plugins/auth.js';
+import { loadJourneyState, lockedTextIds } from '../journey/journey-state.js';
 
 /** İstemcinin bildirdiği süre, oturum başlangıcından bu yana geçen süreyi en fazla bu kadar aşabilir. */
 const DURATION_SLACK_SECONDS = 60;
@@ -37,6 +38,9 @@ export async function progressRoutes(app: FastifyInstance) {
 
     const text = await prisma.text.findUnique({ where: { id: textId }, select: { id: true } });
     if (!text) throw Errors.notFound('Bu metni bulamadık.');
+    if (lockedTextIds(await loadJourneyState(prisma, user.id)).has(textId)) {
+      throw Errors.lessonLocked();
+    }
 
     const session = await prisma.readingSession.create({
       data: { userId: user.id, textId },

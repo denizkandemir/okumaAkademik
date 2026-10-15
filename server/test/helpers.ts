@@ -3,7 +3,12 @@ import 'dotenv/config';
 import type { FastifyInstance } from 'fastify';
 import { afterAll, beforeAll, beforeEach } from 'vitest';
 
-import { seedTexts } from '../prisma/seed-data.js';
+import {
+  seedGlossaryRows,
+  seedLessonRows,
+  seedQuestionRows,
+  seedTexts,
+} from '../prisma/seed-data/index.js';
 import { buildApp } from '../src/app.js';
 import { loadConfig } from '../src/config.js';
 import { createPrismaClient, type PrismaClient } from '../src/db.js';
@@ -15,8 +20,9 @@ export type TestContext = {
 };
 
 /**
- * Her test dosyası için uygulama kurar; her testten önce veritabanını temizleyip metinleri yükler.
- * Rate limit sayaçları bellekte olduğundan her test yeni bir uygulama örneği kullanır.
+ * Her test dosyası için uygulama kurar; her testten önce veritabanını temizleyip içeriği (metinler,
+ * dersler, sorular, kelime anlamları) yükler. Rate limit sayaçları bellekte olduğundan her test
+ * yeni bir uygulama örneği kullanır.
  */
 export function useTestContext(): TestContext {
   const databaseUrl = getTestDatabaseUrl();
@@ -35,9 +41,13 @@ export function useTestContext(): TestContext {
 
   beforeEach(async () => {
     await prisma.$executeRawUnsafe(
-      'TRUNCATE TABLE reading_sessions, auth_sessions, users, texts CASCADE',
+      'TRUNCATE TABLE lokum_entries, lesson_completions, question_attempts, glossary_entries, ' +
+        'questions, lessons, reading_sessions, auth_sessions, users, texts CASCADE',
     );
     await prisma.text.createMany({ data: seedTexts });
+    await prisma.lesson.createMany({ data: seedLessonRows });
+    await prisma.question.createMany({ data: seedQuestionRows });
+    await prisma.glossaryEntry.createMany({ data: seedGlossaryRows });
     await context.app?.close();
     context.app = await buildApp({ config, prisma, logger: false });
   });
@@ -68,4 +78,19 @@ export async function registerUser(app: FastifyInstance, input: RegisterInput = 
 
 export function bearer(token: string) {
   return { authorization: `Bearer ${token}` };
+}
+
+/**
+ * Yolculuk sırasıyla ilk `count` dersi doğrudan veritabanında bitirilmiş yapar (3 yıldız, lokum
+ * yazılmaz). Testlerde kullanıcıyı yolculuğun ileri bir noktasına taşımak içindir.
+ */
+export async function completeLessonsDirectly(prisma: PrismaClient, userId: string, count: number) {
+  await prisma.lessonCompletion.createMany({
+    data: seedLessonRows.slice(0, count).map((lesson) => ({
+      userId,
+      lessonId: lesson.id,
+      stars: lesson.textId ? 3 : null,
+      bestStars: lesson.textId ? 3 : null,
+    })),
+  });
 }

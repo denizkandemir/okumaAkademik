@@ -25,6 +25,17 @@ function timeZoneOffsetMinutes(date: Date, timeZone: string): number {
   return Math.round((asUtc - Math.floor(date.getTime() / 1000) * 1000) / 60_000);
 }
 
+/**
+ * `date` anının verilen saat dilimindeki takvim günü, ardışık bir tamsayı olarak (1970-01-01 = 0).
+ * Ardışık günler ardışık sayılardır; seri hesabı bu sayılarla yapılır.
+ */
+export function dayNumberInTimeZone(date: Date, timeZone: string = APP_TIME_ZONE): number {
+  const local = new Date(date.getTime() + timeZoneOffsetMinutes(date, timeZone) * 60_000);
+  return Math.floor(
+    Date.UTC(local.getUTCFullYear(), local.getUTCMonth(), local.getUTCDate()) / 86_400_000,
+  );
+}
+
 /** `now` anının içinde bulunduğu günün, verilen saat dilimine göre başlangıcı (UTC Date). */
 export function startOfDayInTimeZone(now: Date, timeZone: string = APP_TIME_ZONE): Date {
   const offset = timeZoneOffsetMinutes(now, timeZone);
