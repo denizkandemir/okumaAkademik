@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { bearer, completeLessonsDirectly, registerUser, useTestContext } from './helpers.js';
+import {
+  bearer,
+  completeLessonsDirectly,
+  registerUser,
+  storyAt,
+  useTestContext,
+} from './helpers.js';
 
 const ctx = useTestContext();
 
@@ -16,21 +22,34 @@ async function listTexts(grade: number, completed = 0) {
 
 describe('GET /texts', () => {
   it('yeni kullanıcı yalnızca yolculukta açık olan ilk dersin metnini görür', async () => {
-    expect((await listTexts(3)).map((text) => text.id)).toEqual(['istanbul-01-hikaye']);
+    expect((await listTexts(3)).map((text) => text.id)).toEqual([storyAt('istanbul', 1).textId]);
   });
 
-  it('dersler açıldıkça metinler kitaplığa eklenir; sınıf aralığı yine geçerlidir', async () => {
+  it('dersler açıldıkça metinler kitaplığa eklenir; yolculuk metinleri her sınıfa açıktır', async () => {
     // 40 ders bitti: Antalya'nın tamamı ve Kapadokya'nın ilk dersi açık, gerisi kilitli.
-    const grade1 = (await listTexts(1, 40)).map((text) => text.id);
-    expect(grade1).toEqual(expect.arrayContaining(['minik-serce', 'bahcedeki-domatesler']));
-    expect(grade1).toContain('kapadokya-01-hikaye');
-    expect(grade1).not.toContain('kayip-anahtar'); // sınıf 2-6
-    expect(grade1).not.toContain('kapadokya-02-hikaye'); // kilitli
+    for (const grade of [1, 8]) {
+      const ids = (await listTexts(grade, 40)).map((text) => text.id);
+      expect(ids).toEqual(expect.arrayContaining(['minik-serce', 'kayip-anahtar', 'deniz-feneri']));
+      expect(ids).toContain(storyAt('kapadokya', 1).textId);
+      expect(ids).not.toContain(storyAt('kapadokya', 2).textId); // kilitli
+      expect(ids).not.toContain('gokyuzundeki-haritalar'); // Kapadokya 7, kilitli
+    }
+  });
 
-    const grade8 = (await listTexts(8, 40)).map((text) => text.id);
-    expect(grade8).toContain('deniz-feneri');
-    expect(grade8).not.toContain('minik-serce'); // sınıf 1-4
-    expect(grade8).not.toContain('gokyuzundeki-haritalar'); // Kapadokya 7, kilitli
+  it('yolculukta olmayan kitaplık metinleri sınıf aralığına göre listelenir', async () => {
+    await ctx.prisma.text.create({
+      data: {
+        id: 'kitaplik-metni',
+        title: 'Kitaplık Metni',
+        level: 'ILERI',
+        estimatedMinutes: 4,
+        minGrade: 5,
+        maxGrade: 8,
+        paragraphs: ['Yalnızca kitaplıkta okunan bir metin.'],
+      },
+    });
+    expect((await listTexts(4)).map((text) => text.id)).not.toContain('kitaplik-metni');
+    expect((await listTexts(6)).map((text) => text.id)).toContain('kitaplik-metni');
   });
 
   it('seviye ve süreye göre sıralar, listede paragraflar yoktur', async () => {

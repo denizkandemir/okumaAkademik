@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
 import { APP_TIME_ZONE, startOfDayInTimeZone } from '../src/lib/time.js';
-import { bearer, completeLessonsDirectly, registerUser, useTestContext } from './helpers.js';
+import {
+  bearer,
+  completeLessonsDirectly,
+  registerUser,
+  storyAt,
+  useTestContext,
+} from './helpers.js';
 
 const ctx = useTestContext();
 const MINUTE = 60 * 1000;
@@ -28,7 +34,7 @@ async function addReading(
   await ctx.prisma.readingSession.create({
     data: {
       userId,
-      textId: 'istanbul-01-hikaye',
+      textId: storyAt('istanbul', 1).textId,
       startedAt,
       endedAt,
       durationSeconds: options.durationSeconds ?? 120,
@@ -61,10 +67,10 @@ describe('GET /me/journey', () => {
     });
     expect(body.lessons).toHaveLength(10);
     expect(body.lessons[0]).toEqual({
-      id: 'istanbul-01-hikaye',
+      id: storyAt('istanbul', 1).id,
       position: 1,
       kind: 'story',
-      title: 'İstanbul Hikâyesi 1',
+      title: storyAt('istanbul', 1).title,
       status: 'current',
       stars: null,
     });

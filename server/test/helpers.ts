@@ -10,6 +10,7 @@ import {
   seedTexts,
 } from '../prisma/seed-data/index.js';
 import { buildApp } from '../src/app.js';
+import { toApiCity, type ApiCityId } from '../src/lib/city.js';
 import { loadConfig } from '../src/config.js';
 import { createPrismaClient, type PrismaClient } from '../src/db.js';
 import { getTestDatabaseUrl } from './test-db.js';
@@ -78,6 +79,18 @@ export async function registerUser(app: FastifyInstance, input: RegisterInput = 
 
 export function bearer(token: string) {
   return { authorization: `Bearer ${token}` };
+}
+
+/**
+ * Yolculuktaki bir hikâye dersi (içerikten bağımsız test yazmak için). Ders kimliği ile metin
+ * kimliği farklıdır: `istanbul-03-minik-serce` / `minik-serce`.
+ */
+export function storyAt(city: ApiCityId, position: number) {
+  const lesson = seedLessonRows.find(
+    (row) => toApiCity(row.city) === city && row.position === position,
+  );
+  if (!lesson?.textId) throw new Error(`${city} ${position}. ders bir hikâye değil`);
+  return { id: lesson.id, textId: lesson.textId, title: lesson.title };
 }
 
 /**

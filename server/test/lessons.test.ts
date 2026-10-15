@@ -1,9 +1,16 @@
 import { describe, expect, it } from 'vitest';
 
-import { bearer, completeLessonsDirectly, registerUser, useTestContext } from './helpers.js';
+import {
+  bearer,
+  completeLessonsDirectly,
+  registerUser,
+  storyAt,
+  useTestContext,
+} from './helpers.js';
 
 const ctx = useTestContext();
 const MINUTE = 60 * 1000;
+const FIRST = storyAt('istanbul', 1);
 
 async function register(completed = 0, username = 'ayse') {
   const { token, user } = await registerUser(ctx.app, { username });
@@ -95,7 +102,7 @@ describe('GET /lessons/:id', () => {
   it('yeni kullanıcıda yalnızca İstanbul’un ilk dersi açıktır', async () => {
     const { token } = await register();
 
-    const first = await getLesson(token, 'istanbul-01-hikaye');
+    const first = await getLesson(token, FIRST.id);
     expect(first.statusCode).toBe(200);
     expect(first.json().lesson).toMatchObject({ status: 'current', maxLokum: 20 });
 
@@ -157,11 +164,11 @@ describe('GET /lessons/:id', () => {
 describe('POST /lessons/:id/answers', () => {
   it('yanlışta ipucu, doğruda açıklama; lokum yalnızca ilk denemede doğruysa', async () => {
     const { token } = await register();
-    const readingSessionId = await read(token, 'istanbul-01-hikaye');
-    const [q1, q2] = await questionsOf('istanbul-01-hikaye');
+    const readingSessionId = await read(token, FIRST.textId);
+    const [q1, q2] = await questionsOf(FIRST.textId);
     if (!q1 || !q2) throw new Error('soru yok');
 
-    const wrong = await answer(token, 'istanbul-01-hikaye', {
+    const wrong = await answer(token, FIRST.id, {
       readingSessionId,
       questionId: q1.id,
       choiceIndex: (q1.correctIndex + 1) % 3,
@@ -169,7 +176,7 @@ describe('POST /lessons/:id/answers', () => {
     expect(wrong.statusCode).toBe(200);
     expect(wrong.json()).toEqual({ correct: false, hint: expect.any(String), lokum: 0 });
 
-    const rightAfterWrong = await answer(token, 'istanbul-01-hikaye', {
+    const rightAfterWrong = await answer(token, FIRST.id, {
       readingSessionId,
       questionId: q1.id,
       choiceIndex: q1.correctIndex,
@@ -180,14 +187,14 @@ describe('POST /lessons/:id/answers', () => {
       lokum: 0,
     });
 
-    const firstTry = await answer(token, 'istanbul-01-hikaye', {
+    const firstTry = await answer(token, FIRST.id, {
       readingSessionId,
       questionId: q2.id,
       choiceIndex: q2.correctIndex,
     });
     expect(firstTry.json()).toMatchObject({ correct: true, lokum: 5 });
 
-    const again = await answer(token, 'istanbul-01-hikaye', {
+    const again = await answer(token, FIRST.id, {
       readingSessionId,
       questionId: q2.id,
       choiceIndex: q2.correctIndex,
@@ -242,10 +249,10 @@ describe('POST /lessons/:id/answers', () => {
   it('başka kullanıcının okuması kullanılamaz', async () => {
     const ayse = await register(0, 'ayse');
     const ali = await register(0, 'ali');
-    const readingSessionId = await read(ayse.token, 'istanbul-01-hikaye');
-    const [question] = await questionsOf('istanbul-01-hikaye');
+    const readingSessionId = await read(ayse.token, FIRST.textId);
+    const [question] = await questionsOf(FIRST.textId);
 
-    const response = await answer(ali.token, 'istanbul-01-hikaye', {
+    const response = await answer(ali.token, FIRST.id, {
       readingSessionId,
       questionId: question?.id ?? '',
       choiceIndex: 0,
@@ -255,10 +262,10 @@ describe('POST /lessons/:id/answers', () => {
 
   it('kilitli derste 403, sandıkta 400 döner', async () => {
     const { token } = await register(4);
-    const readingSessionId = await read(token, 'istanbul-01-hikaye');
+    const readingSessionId = await read(token, FIRST.textId);
     const payload = { readingSessionId, questionId: 'x', choiceIndex: 0 };
 
-    const locked = await answer(token, 'istanbul-06-hikaye', payload);
+    const locked = await answer(token, storyAt('istanbul', 6).id, payload);
     expect(locked.statusCode).toBe(403);
 
     const chest = await answer(token, 'istanbul-05-sandik', payload);
@@ -270,17 +277,17 @@ describe('POST /lessons/:id/answers', () => {
 describe('POST /lessons/:id/complete', () => {
   it('ön koşullar: okuma kaydı, bitmiş okuma ve doğru cevaplanmış tüm sorular', async () => {
     const { token } = await register();
-    const lessonId = 'istanbul-01-hikaye';
+    const lessonId = FIRST.id;
 
     const noSession = await complete(token, lessonId);
     expect(noSession.statusCode).toBe(400);
     expect(noSession.json().fieldErrors).toEqual({ readingSessionId: 'Okuma kaydı eksik.' });
 
-    const unfinished = await read(token, lessonId, false);
+    const unfinished = await read(token, FIRST.textId, false);
     expect((await complete(token, lessonId, unfinished)).json().code).toBe('READING_NOT_FINISHED');
 
-    const readingSessionId = await read(token, lessonId);
-    const [q1, q2] = await questionsOf(lessonId);
+    const readingSessionId = await read(token, FIRST.textId);
+    const [q1, q2] = await questionsOf(FIRST.textId);
     if (!q1 || !q2) throw new Error('soru yok');
     await answer(token, lessonId, {
       readingSessionId,
@@ -301,9 +308,9 @@ describe('POST /lessons/:id/complete', () => {
 
   it('ilk tamamlama: yıldız, lokum, süre, seri ve sonraki ders', async () => {
     const { token, userId } = await register();
-    const readingSessionId = await playStory(token, 'istanbul-01-hikaye', 'istanbul-01-hikaye');
+    const readingSessionId = await playStory(token, FIRST.id, FIRST.textId);
 
-    const response = await complete(token, 'istanbul-01-hikaye', readingSessionId);
+    const response = await complete(token, FIRST.id, readingSessionId);
     expect(response.statusCode).toBe(200);
     expect(response.json()).toEqual({
       firstTime: true,
@@ -321,7 +328,7 @@ describe('POST /lessons/:id/complete', () => {
 
     const entries = await ctx.prisma.lokumEntry.findMany({ where: { userId } });
     expect(entries).toEqual([
-      expect.objectContaining({ amount: 20, reason: 'LESSON', lessonId: 'istanbul-01-hikaye' }),
+      expect.objectContaining({ amount: 20, reason: 'LESSON', lessonId: FIRST.id }),
     ]);
     // Sonraki ders artık açık.
     expect((await getLesson(token, 'istanbul-02-bahcedeki-domatesler')).statusCode).toBe(200);
@@ -348,8 +355,8 @@ describe('POST /lessons/:id/complete', () => {
 
   it('tekrar oynama: ödül yok, en iyi yıldız yükselir ama düşmez', async () => {
     const { token, userId } = await register();
-    const lessonId = 'istanbul-01-hikaye';
-    const first = await playStory(token, lessonId, lessonId, 1);
+    const lessonId = FIRST.id;
+    const first = await playStory(token, lessonId, FIRST.textId, 1);
     expect((await complete(token, lessonId, first)).json()).toMatchObject({ stars: 2 });
 
     expect((await getLesson(token, lessonId)).json().lesson).toMatchObject({
@@ -359,15 +366,15 @@ describe('POST /lessons/:id/complete', () => {
     });
 
     // Tekrarda ilk denemede doğru cevap da lokum göstermez.
-    const replay = await read(token, lessonId);
-    const [question] = await questionsOf(lessonId);
+    const replay = await read(token, FIRST.textId);
+    const [question] = await questionsOf(FIRST.textId);
     const firstAnswer = await answer(token, lessonId, {
       readingSessionId: replay,
       questionId: question?.id ?? '',
       choiceIndex: question?.correctIndex ?? 0,
     });
     expect(firstAnswer.json()).toMatchObject({ correct: true, lokum: 0 });
-    const better = await playStory(token, lessonId, lessonId);
+    const better = await playStory(token, lessonId, FIRST.textId);
     const replayed = (await complete(token, lessonId, better)).json();
     expect(replayed).toMatchObject({
       firstTime: false,
@@ -377,7 +384,7 @@ describe('POST /lessons/:id/complete', () => {
       cityUnlocked: null,
     });
 
-    const worse = await playStory(token, lessonId, lessonId, 3);
+    const worse = await playStory(token, lessonId, FIRST.textId, 3);
     expect((await complete(token, lessonId, worse)).json()).toMatchObject({
       firstTime: false,
       stars: 1,
@@ -399,7 +406,7 @@ describe('POST /lessons/:id/complete', () => {
       durationSeconds: null,
       lokum: { lesson: 30, levelUp: 0, cityUnlock: 0, total: 30, balance: 30 },
       level: { before: 3, after: 3, leveledUp: false },
-      nextLessonId: 'istanbul-06-hikaye',
+      nextLessonId: storyAt('istanbul', 6).id,
     });
   });
 
@@ -412,7 +419,7 @@ describe('POST /lessons/:id/complete', () => {
       level: { before: 5, after: 6, leveledUp: true },
       cityUnlocked: 'izmir',
       finished: false,
-      nextLessonId: 'izmir-01-hikaye',
+      nextLessonId: storyAt('izmir', 1).id,
     });
     const reasons = await ctx.prisma.lokumEntry.findMany({
       where: { userId },
@@ -420,7 +427,7 @@ describe('POST /lessons/:id/complete', () => {
       orderBy: { amount: 'asc' },
     });
     expect(reasons.map(({ reason }) => reason)).toEqual(['CHEST', 'LEVEL_UP', 'CITY_UNLOCK']);
-    expect((await getLesson(token, 'izmir-01-hikaye')).statusCode).toBe(200);
+    expect((await getLesson(token, storyAt('izmir', 1).id)).statusCode).toBe(200);
   });
 
   it('son ders yolculuğu bitirir', async () => {

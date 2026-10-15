@@ -226,6 +226,10 @@ Kısıtlar: `reading_sessions_progress_range_check` (0-1),
 
 Yoldaki düğümler: 6 şehir × 10 ders. 5. ve 10. ders **sandık** (`CHEST`), diğerleri **hikâye**
 (`STORY`: metni oku + 3 soru). İçerik `prisma/seed-data/<şehir>.ts` dosyalarından gelir.
+Yolculuk tüm sınıflar için ortaktır; metinleri 1-8. sınıfların hepsine açıktır ve tahmini
+süreleri tek bir kuralla (yaklaşık 45 kelime ≈ 1 dakika) hesaplanır. İçerik kuralları (4-6
+paragraf, 90-180 kelime, 3 soru × 3 şık, metinde geçen 2-3 kelime anlamı, tekil kimlikler)
+`test/seed-data.test.ts` ile denetlenir.
 
 | Kolon      | Açıklama                                                                          |
 | ---------- | --------------------------------------------------------------------------------- |
