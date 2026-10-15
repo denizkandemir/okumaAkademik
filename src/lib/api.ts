@@ -1,14 +1,39 @@
+import Constants from 'expo-constants';
+import { Platform } from 'react-native';
+
 /**
  * Backend ile konuşan fetch tabanlı küçük istemci.
- * Base URL `EXPO_PUBLIC_API_URL` ortam değişkeninden gelir (bkz. `.env.example`).
- *
  * Sunucu hataları her zaman `{ message, code, fieldErrors? }` biçimindedir.
+ *
+ * Base URL sırasıyla (bkz. `.env.example`):
+ * 1. `EXPO_PUBLIC_API_URL` tanımlıysa o,
+ * 2. geliştirmede telefonda/emülatörde Metro'nun adresi (`expoConfig.hostUri`, ör.
+ *    "192.168.1.20:8081") ve sunucunun portu: `http://192.168.1.20:3000`,
+ * 3. aksi hâlde (web dahil) `http://localhost:3000`.
  */
 
-export const API_URL = (process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000').replace(
-  /\/+$/,
-  '',
-);
+const API_PORT = 3000;
+
+/** Adresin nereden geldiği; geliştirici uyarılarında gösterilir. */
+export type ApiUrlSource = 'env' | 'metro' | 'default';
+
+function resolveApiUrl(): { url: string; source: ApiUrlSource } {
+  const fromEnv = process.env.EXPO_PUBLIC_API_URL?.trim();
+  if (fromEnv) return { url: fromEnv, source: 'env' };
+
+  if (__DEV__ && Platform.OS !== 'web') {
+    // hostUri: Metro'nun telefonun bağlandığı adresi, ör. "192.168.1.20:8081".
+    const host = Constants.expoConfig?.hostUri?.match(/^([^:/]+)/)?.[1];
+    if (host) return { url: `http://${host}:${API_PORT}`, source: 'metro' };
+  }
+
+  return { url: `http://localhost:${API_PORT}`, source: 'default' };
+}
+
+const resolved = resolveApiUrl();
+
+export const API_URL = resolved.url.replace(/\/+$/, '');
+export const API_URL_SOURCE: ApiUrlSource = resolved.source;
 const DEFAULT_TIMEOUT_MS = 15_000;
 
 let authToken: string | null = null;
