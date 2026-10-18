@@ -5,14 +5,8 @@ import { Pressable, StyleSheet, Text, View, type ViewProps } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { TabBar } from '@/constants/theme';
-import { darkenForWhiteText } from '@/features/game/color';
-import {
-  CITY_IDS,
-  CITY_THEMES,
-  GameFonts,
-  type CityId,
-  type Gradient,
-} from '@/features/game/theme';
+import { useCurrentCity } from '@/features/game/current-city';
+import { GameFonts, READABLE_BANNERS } from '@/features/game/theme';
 import {
   BadgeIcon,
   BookIcon,
@@ -20,20 +14,6 @@ import {
   PersonIcon,
   type IconProps,
 } from '@/features/game/ui/icons';
-
-// TODO(P05): kullanıcının şu anki şehri (GET /me/journey). O zamana kadar İstanbul.
-const CURRENT_CITY: CityId = 'istanbul';
-
-/**
- * Seçili sekme hapı: şehrin başlık gradyanı, üstündeki beyaz 12 px yazı en az 4,5:1 kontrast
- * versin diye gerektiği kadar koyulaştırılmış (şehre göre %9-36; ton korunur).
- */
-const TAB_PILLS = Object.fromEntries(
-  CITY_IDS.map((city) => {
-    const banner = CITY_THEMES[city].banner;
-    return [city, { ...banner, colors: darkenForWhiteText(banner.colors) }];
-  }),
-) as Record<CityId, Gradient>;
 
 /** Seçili olmayan sekmenin ikon ve yazı rengi (AnaSayfa.dc.html #5B4A60; beyaz üzerinde 8:1). */
 const INACTIVE_COLOR = '#5B4A60';
@@ -86,7 +66,8 @@ type TabButtonProps = TabTriggerSlotProps & {
 
 function TabButton({ label, Icon, isFocused = false, ...props }: TabButtonProps) {
   const color = isFocused ? ACTIVE_COLOR : INACTIVE_COLOR;
-  const banner = TAB_PILLS[CURRENT_CITY];
+  // Kullanıcının şu anki şehri; ana sayfa GET /me/journey ile günceller.
+  const banner = READABLE_BANNERS[useCurrentCity()];
 
   return (
     <Pressable
