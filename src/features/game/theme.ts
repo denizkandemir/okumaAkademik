@@ -2,6 +2,8 @@
  * Oyun tasarımının ortak değerleri. Kaynak: docs/tasarim/ (README "Tasarım dili" ve
  * kaynak/*.dc.html). Renkler tasarımdan birebir alınmıştır; değiştirmeden önce kaynağa bakın.
  */
+import { darkenForWhiteText } from './color';
+
 import type { MascotPose } from '@/features/mascot/types';
 
 /** expo-linear-gradient'e doğrudan verilebilen gradyan. */
@@ -358,6 +360,18 @@ export const CITY_THEMES: Record<CityId, CityTheme> = {
     todoDash: '#8DB57C',
   },
 };
+
+/**
+ * Üstünde beyaz yazı olan şehir gradyanları (başlık kartı, seçili sekme hapı): `banner`, beyaz
+ * 12-13 px yazı en az 4,5:1 kontrast versin diye gerektiği kadar koyulaştırılmış (şehre göre
+ * %9-36; ton korunur). Dudak/gölge rengi `bannerSh` olduğu gibi kullanılır.
+ */
+export const READABLE_BANNERS = Object.fromEntries(
+  CITY_IDS.map((city) => {
+    const banner = CITY_THEMES[city].banner;
+    return [city, { ...banner, colors: darkenForWhiteText(banner.colors) }];
+  }),
+) as Record<CityId, Gradient>;
 
 export type CityInfo = {
   /** Durak numarası, 1-6 */

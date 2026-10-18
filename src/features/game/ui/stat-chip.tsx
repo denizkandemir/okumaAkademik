@@ -1,4 +1,4 @@
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Circle, Defs, Path, RadialGradient, Stop } from 'react-native-svg';
 
 import { GameColors, GameFonts } from '../theme';
@@ -11,6 +11,10 @@ export type StatChipProps = {
   kind: StatChipKind;
   /** Gösterilecek değer, ör. 6, "320" ya da "1.980" (binlik ayırıcı veriden gelir). */
   value: number | string;
+  /** Verilirse hap düğme olur (ör. Pırıl'ın kısa ipucu). */
+  onPress?: () => void;
+  /** Düğme olduğunda ekran okuyucuya ne olacağını söyler. */
+  accessibilityHint?: string;
 };
 
 const LABELS: Record<StatChipKind, (value: string) => string> = {
@@ -21,16 +25,41 @@ const LABELS: Record<StatChipKind, (value: string) => string> = {
 
 /**
  * Ana sayfanın üst çubuğundaki cam hap (03-ana-sayfa-istanbul.jpg): yıldız para + "Seviye 3",
- * alev + seri, lokum kutusu + lokum. Bilgi gösterir, dokunulamaz.
+ * alev + seri, lokum kutusu + lokum. `onPress` verilirse düğmedir (dokunma alanı 48 dp).
  */
-export function StatChip({ kind, value }: StatChipProps) {
+export function StatChip({ kind, value, onPress, accessibilityHint }: StatChipProps) {
   const text = String(value);
+  const chipStyle = [styles.chip, kind === 'level' ? styles.levelPadding : styles.iconPadding];
+  const content = <ChipContent kind={kind} text={text} />;
+
+  if (onPress) {
+    return (
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={LABELS[kind](text)}
+        accessibilityHint={accessibilityHint}
+        hitSlop={5}
+        onPress={onPress}
+        style={({ pressed }) => [chipStyle, pressed && styles.pressed]}>
+        {content}
+      </Pressable>
+    );
+  }
+
   return (
     <View
       accessible
       accessibilityRole="text"
       accessibilityLabel={LABELS[kind](text)}
-      style={[styles.chip, kind === 'level' ? styles.levelPadding : styles.iconPadding]}>
+      style={chipStyle}>
+      {content}
+    </View>
+  );
+}
+
+function ChipContent({ kind, text }: { kind: StatChipKind; text: string }) {
+  return (
+    <>
       {kind === 'level' ? (
         <StarCoin />
       ) : kind === 'streak' ? (
@@ -50,7 +79,7 @@ export function StatChip({ kind, value }: StatChipProps) {
         }>
         {kind === 'level' ? LABELS.level(text) : text}
       </GameText>
-    </View>
+    </>
   );
 }
 
@@ -86,6 +115,9 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: GameColors.chipBackground,
     boxShadow: GameColors.chipShadow,
+  },
+  pressed: {
+    opacity: 0.8,
   },
   levelPadding: {
     paddingLeft: 7,
