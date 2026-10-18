@@ -2,9 +2,7 @@
 
 ## Git workflow (always follow)
 
-- Work only on the `main` branch. Do NOT create new branches unless I
-  explicitly ask for one.
-- Commit your work with clear messages when a task is done.
-- Do NOT push unless I explicitly say "push".
+- Do NOT create a new branch or change the branch to main.
+- Do NOT commit unless I explicitly say "commit".
 - Never force-push, never rewrite history, never delete branches
   without asking me.
