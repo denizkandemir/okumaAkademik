@@ -1,25 +1,40 @@
-import { Link } from 'expo-router';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 
-import { Button } from '@/components/button';
-import { Screen } from '@/components/screen';
 import { TextField } from '@/components/text-field';
-import { ThemedText } from '@/components/themed-text';
-import { MinTouchSize, Spacing } from '@/constants/theme';
 import { useAuth } from '@/features/auth/auth-context';
+import {
+  AuthFooterLink,
+  AuthFormLayout,
+  PasswordVisibilityButton,
+} from '@/features/auth/auth-form-layout';
 import { hasErrors, validateSignIn, type FieldErrors } from '@/features/auth/validation';
-import { Mascot } from '@/features/mascot/mascot';
-import { MascotBubble } from '@/features/mascot/mascot-bubble';
+import { GameText } from '@/features/game/ui/game-text';
+import { GameButton } from '@/features/game/ui/game-button';
 import { getErrorMessage } from '@/lib/errors';
+
+const GREETING = 'Tekrar hoş geldin! Kullanıcı adını yazar mısın?';
+
+/** Hatayı Pırıl'ın ağzından, çocuğa uygun bir dille söyler; hata yoksa `null`. */
+function errorBubble(errors: FieldErrors<'username' | 'password'>, formError: string | null) {
+  if (formError) return `Hımm, olmadı! ${formError}`;
+  if (errors.username && errors.password) {
+    return 'Hımm, kullanıcı adını ve şifreni yazmayı unuttun galiba.';
+  }
+  if (errors.username) return 'Hımm, önce kullanıcı adını yazar mısın?';
+  if (errors.password) return 'Şifreni de yazar mısın? Sonra hemen başlarız!';
+  return null;
+}
 
 export default function LoginScreen() {
   const { signIn } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<FieldErrors<'username' | 'password'>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [mascotTalking, setMascotTalking] = useState(false);
 
   const handleSubmit = async () => {
     const nextErrors = validateSignIn({ username, password });
@@ -37,96 +52,73 @@ export default function LoginScreen() {
     }
   };
 
+  const problem = errorBubble(errors, formError);
+
   return (
-    <KeyboardAvoidingView
-      style={styles.flex}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <Screen>
-        <View style={styles.mascotRow}>
-          <Mascot pose="wave" size={150} />
-          <MascotBubble text="Merhaba! Ben Pırıl. Hadi okumaya başlayalım!" side="right" />
-        </View>
-
-        <View style={styles.header}>
-          <ThemedText type="title">Okumatik</ThemedText>
-          <ThemedText themeColor="textSecondary">Hesabına giriş yap ve okumaya başla!</ThemedText>
-        </View>
-
-        <View style={styles.form}>
-          <TextField
-            label="Kullanıcı adı"
-            value={username}
-            onChangeText={setUsername}
-            error={errors.username}
-            autoCapitalize="none"
-            autoCorrect={false}
-            autoComplete="username"
-            textContentType="username"
-            returnKeyType="next"
+    <AuthFormLayout
+      pose={problem ? 'think' : 'talk'}
+      talking={!problem && mascotTalking}
+      bubble={problem ?? GREETING}
+      onBubbleTypingChange={setMascotTalking}
+      title="Giriş yap"
+      footer={<AuthFooterLink prompt="Hesabın yok mu?" label="Kayıt ol" href="/register" />}>
+      <TextField
+        variant="game"
+        label="Kullanıcı adın"
+        placeholder="Kullanıcı adını yaz"
+        value={username}
+        onChangeText={setUsername}
+        error={errors.username}
+        autoCapitalize="none"
+        autoCorrect={false}
+        autoComplete="username"
+        textContentType="username"
+        returnKeyType="next"
+      />
+      <TextField
+        variant="game"
+        label="Şifren"
+        placeholder="Şifreni yaz"
+        value={password}
+        onChangeText={setPassword}
+        error={errors.password}
+        secureTextEntry={!showPassword}
+        autoCapitalize="none"
+        autoCorrect={false}
+        autoComplete="current-password"
+        textContentType="password"
+        returnKeyType="go"
+        onSubmitEditing={handleSubmit}
+        trailing={
+          <PasswordVisibilityButton
+            visible={showPassword}
+            onToggle={() => setShowPassword((value) => !value)}
           />
-          <TextField
-            label="Şifre"
-            value={password}
-            onChangeText={setPassword}
-            error={errors.password}
-            secureTextEntry
-            autoCapitalize="none"
-            autoComplete="current-password"
-            textContentType="password"
-            returnKeyType="go"
-            onSubmitEditing={handleSubmit}
-          />
+        }
+      />
 
-          {formError ? (
-            <ThemedText themeColor="danger" accessibilityRole="alert">
-              {formError}
-            </ThemedText>
-          ) : null}
+      {formError ? (
+        <GameText variant="caption" color={ERROR_COLOR} accessibilityRole="alert">
+          {formError}
+        </GameText>
+      ) : null}
 
-          <Button title="Giriş yap" onPress={handleSubmit} loading={submitting} />
-        </View>
-
-        <View style={styles.footer}>
-          <ThemedText themeColor="textSecondary">Hesabın yok mu?</ThemedText>
-          <Link href="/register" replace asChild>
-            <Pressable accessibilityRole="link" style={styles.link}>
-              <ThemedText type="link">Kayıt ol</ThemedText>
-            </Pressable>
-          </Link>
-        </View>
-      </Screen>
-    </KeyboardAvoidingView>
+      <GameButton
+        title="GİRİŞ YAP"
+        accessibilityLabel="Giriş yap"
+        size="md"
+        onPress={handleSubmit}
+        loading={submitting}
+        style={styles.button}
+      />
+    </AuthFormLayout>
   );
 }
 
+const ERROR_COLOR = '#B42318';
+
 const styles = StyleSheet.create({
-  flex: {
-    flex: 1,
-  },
-  mascotRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: Spacing.two,
-    marginTop: Spacing.four,
-  },
-  header: {
-    gap: Spacing.two,
-  },
-  form: {
-    gap: Spacing.three,
-  },
-  footer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexWrap: 'wrap',
-    columnGap: Spacing.two,
-  },
-  link: {
-    minHeight: MinTouchSize,
-    justifyContent: 'center',
-    paddingHorizontal: Spacing.two,
-    paddingVertical: Spacing.two,
+  button: {
+    marginTop: 2,
   },
 });

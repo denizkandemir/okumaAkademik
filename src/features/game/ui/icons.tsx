@@ -156,6 +156,27 @@ export function BackIcon(props: IconProps) {
   );
 }
 
+/** Göz — şifreyi göster (S02Giris) */
+export function EyeIcon(props: IconProps) {
+  return (
+    <LineIcon {...props} defaultStroke={2.2}>
+      <Path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" />
+      <Circle cx={12} cy={12} r={3} />
+    </LineIcon>
+  );
+}
+
+/** Üstü çizili göz — şifreyi gizle (tasarımda yok; göz ikonuna çapraz çizgi eklendi) */
+export function EyeOffIcon(props: IconProps) {
+  return (
+    <LineIcon {...props} defaultStroke={2.2}>
+      <Path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" />
+      <Circle cx={12} cy={12} r={3} />
+      <Path d="M4 4l16 16" />
+    </LineIcon>
+  );
+}
+
 type FilledIconProps = { size?: number };
 
 function FilledSvg({ size = 24, children }: FilledIconProps & { children: ReactNode }) {

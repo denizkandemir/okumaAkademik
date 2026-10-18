@@ -4,7 +4,14 @@ import { Platform } from 'react-native';
 import * as authService from './auth-service';
 import type { AuthResponse, SignUpInput, User } from './types';
 
-import { API_URL, ApiError, setAuthToken, setUnauthorizedHandler } from '@/lib/api';
+import {
+  API_URL,
+  API_URL_SOURCE,
+  ApiError,
+  setAuthToken,
+  setUnauthorizedHandler,
+  type ApiUrlSource,
+} from '@/lib/api';
 import * as storage from '@/lib/storage';
 
 /**
@@ -42,15 +49,25 @@ async function clearStoredSession() {
   await storage.removeItem(storage.StorageKeys.authUser);
 }
 
+const API_URL_SOURCE_LABELS: Record<ApiUrlSource, string> = {
+  env: '.env içindeki EXPO_PUBLIC_API_URL',
+  metro: 'Metro sunucusunun adresi',
+  default: 'varsayılan',
+};
+
 /** Geliştirmede, açılıştaki oturum kontrolü sunucuya ulaşamazsa nedenini tek uyarıyla bildirir. */
 function warnUnreachableApi(error: unknown) {
   const pointsToSelf = /\/\/(localhost|127\.0\.0\.1)(:|\/|$)/.test(API_URL);
-  const hint =
-    pointsToSelf && Platform.OS !== 'web'
-      ? ` Telefon "localhost"a ulaşamaz; .env içinde bilgisayarın yerel ağ IP'sini kullanın (ipconfig).`
-      : ' Sunucunun çalıştığını ve telefonla aynı ağda olduğunu kontrol edin.';
+  let hint =
+    ' Sunucunun çalıştığını (cd server && npm run dev) ve telefonla aynı ağda olduğunu kontrol edin.';
+  if (pointsToSelf && Platform.OS !== 'web') {
+    hint =
+      API_URL_SOURCE === 'env'
+        ? ' Telefon "localhost"a ulaşamaz; .env içindeki EXPO_PUBLIC_API_URL satırını kaldırın (Metro adresi otomatik kullanılır) ya da bilgisayarın yerel ağ IP\'sini yazın.'
+        : ' Telefon "localhost"a ulaşamaz; .env içinde EXPO_PUBLIC_API_URL ile bilgisayarın yerel ağ IP\'sini verin.';
+  }
   console.warn(
-    `Açılışta oturum doğrulanamadı (${API_URL}/me); kayıtlı kullanıcıyla devam ediliyor.${hint}`,
+    `Açılışta oturum doğrulanamadı. API adresi: ${API_URL} (${API_URL_SOURCE_LABELS[API_URL_SOURCE]}); kayıtlı kullanıcıyla devam ediliyor.${hint}`,
     error instanceof Error ? error.message : error,
   );
 }

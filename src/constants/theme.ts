@@ -94,7 +94,15 @@ export const ReadingFont = {
   lineHeightRatio: 1.6,
 } as const;
 
-export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;
-/** Web'de sekme çubuğu üstte yer alır. */
-export const TopTabInset = Platform.select({ web: 96 }) ?? 0;
+/** Yüzen sekme çubuğu (tüm platformlarda altta; bkz. components/app-tabs.tsx). */
+export const TabBar = {
+  height: 70,
+  /** Çubuğun güvenli alanın altından ve kenarlardan uzaklığı. */
+  gap: 14,
+  /** Tablet ve web'de çubuk bu genişlikte ortalanır. */
+  maxWidth: 560,
+} as const;
+
+/** Sekme içindeki ekranların alt boşluğu (güvenli alana ek): içerik çubuğun altında kalmaz. */
+export const BottomTabInset = TabBar.height + TabBar.gap;
 export const MaxContentWidth = 720;
