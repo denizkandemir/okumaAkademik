@@ -1,9 +1,10 @@
-import { router, Stack, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useRef, useState } from 'react';
 import {
   Pressable,
   ScrollView,
   StyleSheet,
+  Text,
   View,
   type LayoutChangeEvent,
   type NativeScrollEvent,
@@ -11,66 +12,101 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Button } from '@/components/button';
-import { QueryState } from '@/components/query-state';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { MaxContentWidth, MinTouchSize, Radius, ReadingFont, Spacing } from '@/constants/theme';
+import { MaxContentWidth, MinTouchSize, ReadingFont } from '@/constants/theme';
+import { LessonCompleteView } from '@/features/game/rewards/lesson-complete-view';
+import { CITY_INFO, GameColors, GameFonts } from '@/features/game/theme';
+import type { LessonDetailResponse } from '@/features/game/types';
+import { ConfirmDialog } from '@/features/game/ui/confirm-dialog';
+import { GameButton } from '@/features/game/ui/game-button';
+import { CloseIcon } from '@/features/game/ui/icons';
+import { ProgressFills, ProgressTrack } from '@/features/game/ui/progress-track';
+import { SquareButton } from '@/features/game/ui/square-button';
 import { Mascot } from '@/features/mascot/mascot';
-import { LevelBadge } from '@/features/reading/level-badge';
-import { ReadingComplete } from '@/features/reading/reading-complete';
+import { MascotBubble } from '@/features/mascot/mascot-bubble';
+import { GlossaryText, type GlossaryEntry } from '@/features/reading/glossary-text';
 import type { ReadingSessionResult, ReadingText } from '@/features/reading/types';
 import { useReadingSession } from '@/features/reading/use-reading-session';
 import { useApiQuery } from '@/hooks/use-api-query';
-import { useTheme } from '@/hooks/use-theme';
-import { ApiError } from '@/lib/api';
 import { getErrorMessage } from '@/lib/errors';
 
+/** Okuma ekranının zemini (S04Okuma). */
+const BACKGROUND = '#FFF9EF';
+const DEFAULT_BUBBLE = 'Mor kelimelere dokun, anlamını söyleyeyim!';
+
+type LessonContext = { id: string; title: string; caption: string };
+
+/**
+ * Okuma ekranı (S04Okuma). `lessonId` ile açılırsa ders akışıdır: BİTİRDİM'den sonra sorular gelir.
+ * `lessonId` yoksa kitaplıktan serbest okumadır: soru ve ödül olmadan bitiş ekranıyla biter.
+ */
 export default function ReadingScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
-  const { data, error, isLoading, refetch } = useApiQuery<{ text: ReadingText }>(
-    id ? `/texts/${encodeURIComponent(id)}` : null,
+  const { id, lessonId } = useLocalSearchParams<{ id: string; lessonId?: string }>();
+  const lessonQuery = useApiQuery<LessonDetailResponse>(
+    lessonId ? `/lessons/${encodeURIComponent(lessonId)}` : null,
   );
-  const text = data?.text;
+  const textQuery = useApiQuery<{ text: ReadingText }>(
+    !lessonId && id ? `/texts/${encodeURIComponent(id)}` : null,
+  );
 
-  if (error instanceof ApiError && error.status === 404) {
+  const query = lessonId ? lessonQuery : textQuery;
+  const lessonData = lessonQuery.data;
+  const text: ReadingText | undefined = lessonId
+    ? (lessonData?.text ?? undefined)
+    : textQuery.data?.text;
+
+  if (!text) {
     return (
-      <ThemedView style={styles.centered}>
-        <Stack.Screen options={{ title: 'Metin bulunamadı' }} />
-        <ThemedText type="subtitle">Bu metni bulamadık.</ThemedText>
-        <Button title="Kitaplığa dön" onPress={() => router.replace('/library')} />
-      </ThemedView>
+      <ReadingState
+        loading={query.isLoading}
+        error={
+          query.error ??
+          (lessonData && !lessonData.text ? new Error('Bu derste okunacak metin yok.') : null)
+        }
+        onRetry={query.refetch}
+      />
     );
   }
 
-  if (!text || error) {
-    return (
-      <ThemedView style={styles.centered}>
-        <Stack.Screen options={{ title: '' }} />
-        <QueryState isLoading={isLoading} error={error} onRetry={refetch} />
-      </ThemedView>
-    );
-  }
+  const lesson: LessonContext | null = lessonData
+    ? {
+        id: lessonData.lesson.id,
+        title: lessonData.lesson.title,
+        caption: `${CITY_INFO[lessonData.lesson.city].upperName} · DERS ${lessonData.lesson.position}`,
+      }
+    : null;
 
-  return <ReadingView text={text} />;
+  return <ReadingView text={text} glossary={lessonData?.glossary ?? []} lesson={lesson} />;
 }
 
-function ReadingView({ text }: { text: ReadingText }) {
+function ReadingView({
+  text,
+  glossary,
+  lesson,
+}: {
+  text: ReadingText;
+  glossary: GlossaryEntry[];
+  lesson: LessonContext | null;
+}) {
   const insets = useSafeAreaInsets();
-  const theme = useTheme();
+  const session = useReadingSession(text.id);
   const [fontSize, setFontSize] = useState<number>(ReadingFont.default);
+  const [fontMenuOpen, setFontMenuOpen] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [bubble, setBubble] = useState(DEFAULT_BUBBLE);
+  const [confirmLeave, setConfirmLeave] = useState(false);
   const [finishing, setFinishing] = useState(false);
   const [finishError, setFinishError] = useState<string | null>(null);
-  const [result, setResult] = useState<ReadingSessionResult | null>(null);
-  const session = useReadingSession(text.id);
+  const [freeResult, setFreeResult] = useState<ReadingSessionResult | null>(null);
 
   // İlerleme = ekranın alt kenarının metin içindeki konumu / metnin toplam yüksekliği.
   const metrics = useRef({ offset: 0, viewport: 0, content: 0 });
   const updateProgress = () => {
     const { offset, viewport, content } = metrics.current;
-    if (content > 0 && viewport > 0) session.reportProgress((offset + viewport) / content);
+    if (content <= 0 || viewport <= 0) return;
+    const value = Math.min(1, (offset + viewport) / content);
+    session.reportProgress(value);
+    setProgress((previous) => Math.max(previous, value));
   };
-
   const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { contentOffset, layoutMeasurement, contentSize } = event.nativeEvent;
     metrics.current = {
@@ -89,113 +125,170 @@ function ReadingView({ text }: { text: ReadingText }) {
     updateProgress();
   };
 
+  const leave = () => {
+    setConfirmLeave(false);
+    if (router.canGoBack()) router.back();
+    else router.replace('/');
+  };
+  const requestClose = () => {
+    if (progress > 0 && !finishing) setConfirmLeave(true);
+    else leave();
+  };
+
   const handleFinish = async () => {
+    if (finishing) return;
     setFinishing(true);
     setFinishError(null);
     try {
-      setResult(await session.finish());
+      const result = await session.finish();
+      if (!lesson) {
+        setFreeResult(result);
+        return;
+      }
+      const readingSessionId = await session.sessionId();
+      if (!readingSessionId)
+        throw new Error('Okuman kaydedilemedi. İnternet bağlantını kontrol et.');
+      router.replace({
+        pathname: '/lesson/[id]/quiz',
+        params: { id: lesson.id, readingSessionId },
+      });
     } catch (error) {
       setFinishError(getErrorMessage(error));
       setFinishing(false);
     }
   };
 
-  const canDecrease = fontSize > ReadingFont.min;
-  const canIncrease = fontSize < ReadingFont.max;
+  if (freeResult) {
+    return (
+      <LessonCompleteView
+        title={text.title}
+        durationSeconds={freeResult.durationSeconds}
+        lokum={null}
+        correct={null}
+        stars={null}
+        note={null}
+        onContinue={leave}
+      />
+    );
+  }
+
   const changeFontSize = (delta: number) =>
     setFontSize((size) => Math.min(Math.max(size + delta, ReadingFont.min), ReadingFont.max));
 
   return (
-    <ThemedView style={styles.container}>
-      {/* Bitiş ekranı tüm ekranı kaplar; başlık çubuğu da gizlenir. */}
-      <Stack.Screen options={{ title: text.title, headerShown: !result }} />
+    <View style={[styles.root, { paddingTop: insets.top + 16 }]}>
+      <View style={styles.header}>
+        <SquareButton accessibilityLabel="Kapat" onPress={requestClose}>
+          <CloseIcon size={20} color={GameColors.textWarmSecondary} />
+        </SquareButton>
+        <ProgressTrack
+          progress={progress}
+          height={14}
+          fill={ProgressFills.purple}
+          trackColor="#EFE2CF"
+          accessibilityLabel="Okuma ilerlemesi"
+          style={styles.progress}
+        />
+        <SquareButton
+          accessibilityLabel="Yazı boyutu"
+          accessibilityState={{ expanded: fontMenuOpen }}
+          onPress={() => setFontMenuOpen((open) => !open)}>
+          <Text style={styles.aa}>Aa</Text>
+        </SquareButton>
+      </View>
 
-      <View style={[styles.toolbar, { borderColor: theme.border }]}>
-        <View style={styles.toolbarStart}>
-          <Mascot pose="read" size={72} animated={!result} />
-          <ThemedText type="smallBold" themeColor="textSecondary">
-            Yazı boyutu
-          </ThemedText>
-        </View>
-        <View style={styles.fontControls}>
-          <FontSizeButton
+      {fontMenuOpen ? (
+        <View style={[styles.fontMenu, { top: insets.top + 68 }]}>
+          <FontButton
             label="A−"
             accessibilityLabel="Yazıyı küçült"
-            disabled={!canDecrease}
+            disabled={fontSize <= ReadingFont.min}
             onPress={() => changeFontSize(-ReadingFont.step)}
           />
-          <FontSizeButton
+          <FontButton
             label="A+"
             accessibilityLabel="Yazıyı büyüt"
-            disabled={!canIncrease}
+            disabled={fontSize >= ReadingFont.max}
             onPress={() => changeFontSize(ReadingFont.step)}
           />
         </View>
-      </View>
+      ) : null}
 
       <ScrollView
+        style={styles.scroll}
         onScroll={onScroll}
         scrollEventThrottle={100}
         onLayout={onLayout}
         onContentSizeChange={onContentSizeChange}
-        contentContainerStyle={[
-          styles.content,
-          {
-            paddingBottom: insets.bottom + Spacing.five,
-            paddingLeft: insets.left + Spacing.four,
-            paddingRight: insets.right + Spacing.four,
-          },
-        ]}>
+        contentContainerStyle={styles.content}>
         <View style={styles.article}>
-          <ThemedText type="title">{text.title}</ThemedText>
-          <View style={styles.meta}>
-            <LevelBadge level={text.level} />
-            <ThemedText themeColor="textSecondary">~{text.estimatedMinutes} dakika</ThemedText>
-          </View>
-
+          <Text style={styles.caption}>{lesson ? lesson.caption : 'KİTAPLIK'}</Text>
+          <Text style={styles.title} accessibilityRole="header" maxFontSizeMultiplier={1.3}>
+            {text.title}
+          </Text>
           {text.paragraphs.map((paragraph, index) => (
-            <ThemedText
+            <GlossaryText
               key={index}
+              paragraph={paragraph}
+              glossary={glossary}
+              onWordPress={(entry) => setBubble(`“${entry.word}”: ${entry.meaning}`)}
               style={[
                 styles.paragraph,
                 { fontSize, lineHeight: Math.round(fontSize * ReadingFont.lineHeightRatio) },
-              ]}>
-              {paragraph}
-            </ThemedText>
+              ]}
+            />
           ))}
-
-          <View style={styles.finish}>
-            {finishError ? (
-              <ThemedText themeColor="danger" accessibilityRole="alert">
-                {finishError}
-              </ThemedText>
-            ) : null}
-            <Button title="Bitirdim" onPress={handleFinish} loading={finishing} />
-          </View>
         </View>
       </ScrollView>
 
-      {result ? (
-        <ReadingComplete
-          durationSeconds={result.durationSeconds}
-          lokum={result.lokum}
-          onContinue={() => router.dismissTo('/')}
+      <View style={[styles.bottom, { paddingBottom: insets.bottom + 16 }]}>
+        <View style={styles.mascotRow}>
+          <Mascot pose="read" size={72} />
+          <View style={styles.bubble}>
+            <MascotBubble
+              tone="game"
+              text={glossary.length > 0 ? bubble : 'Bitirince BİTİRDİM’e bas!'}
+            />
+          </View>
+        </View>
+        {finishError ? (
+          <Text style={styles.error} accessibilityRole="alert">
+            {finishError}
+          </Text>
+        ) : null}
+        <GameButton
+          variant="purple"
+          title="BİTİRDİM"
+          accessibilityLabel="Bitirdim"
+          loading={finishing}
+          onPress={handleFinish}
         />
-      ) : null}
-    </ThemedView>
+      </View>
+
+      <ConfirmDialog
+        visible={confirmLeave}
+        title="Okumayı bırakmak istiyor musun?"
+        message="İlerlemen kaydedilir; sonra kaldığın yerden okuyabilirsin."
+        stayLabel="Okumaya devam et"
+        leaveLabel="Bırak"
+        onStay={() => setConfirmLeave(false)}
+        onLeave={leave}
+      />
+    </View>
   );
 }
 
-type FontSizeButtonProps = {
+function FontButton({
+  label,
+  accessibilityLabel,
+  disabled,
+  onPress,
+}: {
   label: string;
   accessibilityLabel: string;
   disabled: boolean;
   onPress: () => void;
-};
-
-function FontSizeButton({ label, accessibilityLabel, disabled, onPress }: FontSizeButtonProps) {
-  const theme = useTheme();
-
+}) {
   return (
     <Pressable
       accessibilityRole="button"
@@ -205,79 +298,160 @@ function FontSizeButton({ label, accessibilityLabel, disabled, onPress }: FontSi
       onPress={onPress}
       style={({ pressed }) => [
         styles.fontButton,
-        { backgroundColor: theme.backgroundElement, borderColor: theme.border },
         pressed && styles.pressed,
         disabled && styles.disabled,
       ]}>
-      <ThemedText type="subtitle">{label}</ThemedText>
+      <Text style={styles.fontButtonText}>{label}</Text>
     </Pressable>
   );
 }
 
+/** Yükleniyor ya da hata: aynı krem zeminde kapat düğmesi ve Pırıl. */
+function ReadingState({
+  loading,
+  error,
+  onRetry,
+}: {
+  loading: boolean;
+  error: unknown;
+  onRetry: () => void;
+}) {
+  const insets = useSafeAreaInsets();
+  return (
+    <View style={[styles.root, { paddingTop: insets.top + 16 }]}>
+      <View style={styles.header}>
+        <SquareButton
+          accessibilityLabel="Kapat"
+          onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}>
+          <CloseIcon size={20} color={GameColors.textWarmSecondary} />
+        </SquareButton>
+      </View>
+      <View style={styles.state}>
+        <Mascot pose={error ? 'think' : 'read'} size={140} />
+        <MascotBubble
+          tone="game"
+          side="top"
+          align="center"
+          text={
+            error ? `Hımm, hikâyeyi açamadım. ${getErrorMessage(error)}` : 'Hikâyeyi hazırlıyorum…'
+          }
+        />
+        {error && !loading ? (
+          <GameButton title="TEKRAR DENE" accessibilityLabel="Tekrar dene" onPress={onRetry} />
+        ) : null}
+      </View>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
-  container: {
+  root: {
+    flex: 1,
+    backgroundColor: BACKGROUND,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingHorizontal: 16,
+  },
+  progress: {
     flex: 1,
   },
-  centered: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: Spacing.four,
-    padding: Spacing.four,
+  aa: {
+    fontFamily: GameFonts.bodyHeavy,
+    fontSize: 17,
+    color: '#5B34D6',
   },
-  toolbar: {
+  fontMenu: {
+    position: 'absolute',
+    right: 16,
+    zIndex: 2,
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.one,
-    borderBottomWidth: 1,
-  },
-  toolbarStart: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.two,
-  },
-  fontControls: {
-    flexDirection: 'row',
-    gap: Spacing.two,
+    gap: 8,
+    padding: 8,
+    borderRadius: 18,
+    backgroundColor: GameColors.white,
+    boxShadow: '0 10px 24px rgba(150,90,40,0.18)',
   },
   fontButton: {
-    minWidth: MinTouchSize + Spacing.two,
-    minHeight: MinTouchSize + Spacing.two,
-    borderWidth: 2,
-    borderRadius: Radius.medium,
+    minWidth: MinTouchSize + 8,
+    minHeight: MinTouchSize,
+    borderRadius: 14,
+    backgroundColor: '#F3EEFF',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  content: {
-    alignItems: 'center',
-    paddingTop: Spacing.four,
-  },
-  article: {
-    width: '100%',
-    maxWidth: MaxContentWidth,
-    gap: Spacing.three,
-  },
-  meta: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-    gap: Spacing.three,
-    marginBottom: Spacing.two,
-  },
-  paragraph: {
-    fontWeight: 400,
-    letterSpacing: 0.3,
-  },
-  finish: {
-    gap: Spacing.two,
-    marginTop: Spacing.four,
+  fontButtonText: {
+    fontFamily: GameFonts.bodyHeavy,
+    fontSize: 18,
+    color: '#5B34D6',
   },
   pressed: {
     opacity: 0.8,
   },
   disabled: {
     opacity: 0.4,
+  },
+  scroll: {
+    flex: 1,
+  },
+  content: {
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 24,
+  },
+  article: {
+    width: '100%',
+    maxWidth: MaxContentWidth,
+    gap: 14,
+  },
+  caption: {
+    fontFamily: GameFonts.bodyHeavy,
+    fontSize: 13,
+    lineHeight: 18,
+    letterSpacing: 0.8,
+    color: '#7A5A44',
+    marginBottom: -10,
+  },
+  title: {
+    fontFamily: GameFonts.headingHeavy,
+    fontSize: 30,
+    lineHeight: 36,
+    color: GameColors.warm,
+  },
+  paragraph: {
+    fontFamily: GameFonts.body,
+    color: GameColors.warm,
+  },
+  bottom: {
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    gap: 10,
+    backgroundColor: BACKGROUND,
+    boxShadow: '0 -8px 16px rgba(150,90,40,0.08)',
+  },
+  mascotRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 6,
+  },
+  bubble: {
+    flex: 1,
+    marginBottom: 14,
+  },
+  error: {
+    fontFamily: GameFonts.bodyBold,
+    fontSize: 14,
+    color: '#B42318',
+    textAlign: 'center',
+  },
+  state: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 16,
+    paddingHorizontal: 24,
   },
 });

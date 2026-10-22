@@ -47,10 +47,8 @@ function RootNavigator({ fontsReady }: { fontsReady: boolean }) {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Protected guard={!!user}>
           <Stack.Screen name="(tabs)" />
-          <Stack.Screen
-            name="reading/[id]"
-            options={{ headerShown: true, title: '', headerBackTitle: 'Geri' }}
-          />
+          {/* Okuma ekranı kendi üst çubuğunu çizer (kapat, ilerleme, yazı boyutu). */}
+          <Stack.Screen name="reading/[id]" />
           {/* Ders kartı alttan açılan sayfa; web'de modal (formSheet yalnızca native). */}
           <Stack.Screen
             name="lesson/[id]/index"

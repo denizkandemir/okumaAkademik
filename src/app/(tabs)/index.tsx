@@ -83,7 +83,7 @@ export default function HomeScreen() {
             mascotPose={message.pose}
             mascotMessage={message.text}
             onOpenLesson={(lesson) =>
-              router.push({ pathname: '/lesson/[id]/index', params: { id: lesson.id } })
+              router.push({ pathname: '/lesson/[id]', params: { id: lesson.id } })
             }
             onLockedLesson={() => setTip({ text: 'Önce önceki dersi bitirelim!', pose: 'think' })}
           />

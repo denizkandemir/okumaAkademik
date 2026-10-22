@@ -1,6 +1,6 @@
 import { AppState, type AppStateStatus } from 'react-native';
 
-import type { ReadingSessionResult } from './types';
+import type { ReadingSessionResult, ReadingSessionStart } from './types';
 
 import { api } from '@/lib/api';
 
@@ -11,6 +11,8 @@ export type ReadingSessionController = {
   reportProgress: (progress: number) => void;
   /** "Bitirdim": metni tamamlandı olarak kaydeder. Kaydedilemezse hata fırlatır. */
   finish: () => Promise<ReadingSessionResult>;
+  /** Sunucudaki oturum kimliği (soru cevapları ve ders tamamlama bununla gönderilir). */
+  sessionId: () => Promise<string | null>;
   /** Ekrandan çıkarken çağrılır; bitirilmediyse ilerlemeyi ve süreyi kaydeder. */
   dispose: () => void;
 };
@@ -28,7 +30,7 @@ export function startReadingSession(textId: string): ReadingSessionController {
   let finished = false;
 
   const sessionId: Promise<string | null> = api
-    .post<{ id: string }>('/reading-sessions', { textId })
+    .post<ReadingSessionStart>('/reading-sessions', { textId })
     .then(({ id }) => id)
     .catch((error) => {
       console.warn('Okuma oturumu başlatılamadı:', error);
@@ -81,6 +83,7 @@ export function startReadingSession(textId: string): ReadingSessionController {
         throw error;
       }
     },
+    sessionId: () => sessionId,
     dispose: () => {
       subscription.remove();
       saveQuietly();

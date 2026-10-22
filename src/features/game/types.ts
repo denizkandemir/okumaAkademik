@@ -1,7 +1,8 @@
 /**
  * Oyun API'sinin yanıt tipleri. Sunucudaki kodla birebir aynıdır:
  * - `server/src/modules/journey/journey.routes.ts` (GET /me/journey)
- * - `server/src/modules/journey/lessons.routes.ts` (GET /lessons/:id, POST /lessons/:id/complete)
+ * - `server/src/modules/journey/lessons.routes.ts` (GET /lessons/:id, POST /lessons/:id/answers,
+ *   POST /lessons/:id/complete)
  * - durumlar `server/src/lib/journey.ts`, seviye `server/src/lib/reading-level.ts`
  * Sunucu değişirse burayı da güncelleyin.
  */
@@ -70,6 +71,24 @@ export type LessonDetailResponse = {
   /** Doğru cevap, ipucu ve açıklama gönderilmez. */
   questions: { id: string; position: number; prompt: string; options: string[] }[];
 };
+
+/** POST /lessons/:id/answers gövdesi (`answerSchema`; `choiceIndex` 0-2). */
+export type AnswerRequest = {
+  readingSessionId: string;
+  questionId: string;
+  choiceIndex: number;
+};
+
+/**
+ * POST /lessons/:id/answers yanıtı. Doğruysa `explanation`, yanlışsa `hint` gelir. `lokum` yalnızca
+ * gösterim içindir: bu okumada ilk denemede doğru ve ders daha önce bitmemişse 5, yoksa 0.
+ */
+export type AnswerResponse =
+  | { correct: true; explanation: string; lokum: number }
+  | { correct: false; hint: string; lokum: number };
+
+/** POST /lessons/:id/complete gövdesi (`completeSchema`): hikâyede zorunlu, sandıkta yok. */
+export type CompleteLessonRequest = { readingSessionId?: string };
 
 /** POST /lessons/:id/complete */
 export type CompleteLessonResponse = {
