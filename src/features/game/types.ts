@@ -72,6 +72,27 @@ export type LessonDetailResponse = {
   questions: { id: string; position: number; prompt: string; options: string[] }[];
 };
 
+/** GET /me/stats (server/src/modules/journey/journey.routes.ts). */
+export type StatsResponse = {
+  level: number;
+  lokum: number;
+  streak: number;
+  readToday: boolean;
+  streakAtRisk: boolean;
+  bestStreak: number;
+  todayMinutes: number;
+  dailyGoalMinutes: number;
+  storiesDone: number;
+  minutesTotal: number;
+  /** Bugün dahil son 7 gün, eskiden yeniye; `day` ör. "Pzt". */
+  week: { day: string; done: boolean }[];
+  cities: { id: CityId; status: CityStatus }[];
+  achievements: { id: string; title: string; description: string; earned: boolean }[];
+  /** ISO zaman; hiç okumadıysa `null`. */
+  lastReadAt: string | null;
+  finished: boolean;
+};
+
 /** POST /lessons/:id/answers gövdesi (`answerSchema`; `choiceIndex` 0-2). */
 export type AnswerRequest = {
   readingSessionId: string;

@@ -1,6 +1,7 @@
-import { Redirect, router, useLocalSearchParams } from 'expo-router';
+import { Redirect, useLocalSearchParams } from 'expo-router';
 
-import { clearReward, useReward } from '@/features/game/reward-store';
+import { continueRewardFlow } from '@/features/game/reward-flow';
+import { useReward } from '@/features/game/reward-store';
 import { LessonCompleteView } from '@/features/game/rewards/lesson-complete-view';
 
 /** Pırıl'ın notu yoksa (ör. son soru açıklamasız) gösterilen genel cümle. */
@@ -14,11 +15,6 @@ export default function LessonCompleteScreen() {
   if (!reward || reward.lessonId !== id) return <Redirect href="/" />;
   const { result } = reward;
 
-  const finish = () => {
-    clearReward();
-    router.dismissTo('/');
-  };
-
   return (
     <LessonCompleteView
       title={reward.lessonTitle}
@@ -28,7 +24,7 @@ export default function LessonCompleteScreen() {
       correct={result.firstTryCorrect != null ? { count: result.firstTryCorrect, total: 3 } : null}
       stars={result.stars}
       note={reward.note ?? GENERIC_NOTE}
-      onContinue={finish}
+      onContinue={() => continueRewardFlow('complete', reward)}
     />
   );
 }
