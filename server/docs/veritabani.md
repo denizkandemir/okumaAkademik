@@ -411,19 +411,20 @@ ORDER BY ilk_deneme_yanlis_yuzde DESC;
 
 ## Demo kullanıcılar (yalnızca geliştirme)
 
-`npm run db:reset` (ya da `npm run db:seed`) yolculuğun farklı noktalarında 7 kullanıcı
+`npm run db:reset` (ya da `npm run db:seed`) yolculuğun farklı noktalarında 8 kullanıcı
 oluşturur; şifre hepsinde `okuma123`. Oyun verileri ve okumaları her seed'de "bugün"e göre
 yeniden yazılır ([`prisma/seed-demo.ts`](../prisma/seed-demo.ts)).
 
-| Kullanıcı        | Bitirilen ders | Seviye | Şehir     | Seri | Not                           |
-| ---------------- | -------------- | ------ | --------- | ---- | ----------------------------- |
-| `demo.istanbul`  | 4              | 3      | İstanbul  | 6    | Bugün okumadı: seri tehlikede |
-| `demo.izmir`     | 14             | 8      | İzmir     | 9    |                               |
-| `demo.efes`      | 22             | 12     | Efes      | 14   | Bugün okumadı: seri tehlikede |
-| `demo.antalya`   | 32             | 17     | Antalya   | 21   |                               |
-| `demo.kapadokya` | 42             | 22     | Kapadokya | 28   |                               |
-| `demo.van`       | 54             | 28     | Van       | 35   |                               |
-| `demo.final`     | 60             | 30     | Van       | 42   | Yolculuk bitti (`finished`)   |
+| Kullanıcı        | Bitirilen ders | Seviye | Şehir     | Seri | Not                             |
+| ---------------- | -------------- | ------ | --------- | ---- | ------------------------------- |
+| `demo.istanbul`  | 4              | 3      | İstanbul  | 6    | Bugün okumadı: seri tehlikede   |
+| `demo.sehir`     | 9              | 5      | İstanbul  | 5    | 10. ders: seviye atlama + İzmir |
+| `demo.izmir`     | 14             | 8      | İzmir     | 9    |                                 |
+| `demo.efes`      | 22             | 12     | Efes      | 14   | Bugün okumadı: seri tehlikede   |
+| `demo.antalya`   | 32             | 17     | Antalya   | 21   |                                 |
+| `demo.kapadokya` | 42             | 22     | Kapadokya | 28   |                                 |
+| `demo.van`       | 54             | 28     | Van       | 35   |                                 |
+| `demo.final`     | 60             | 30     | Van       | 42   | Yolculuk bitti (`finished`)     |
 
 ## Saat dilimi
 

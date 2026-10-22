@@ -20,14 +20,15 @@ export type ReadingText = TextSummary & {
   paragraphs: string[];
 };
 
-/** PATCH /reading-sessions/:id yanıtı. */
+/** POST /reading-sessions yanıtı (201; server/src/modules/progress/progress.routes.ts). */
+export type ReadingSessionStart = { id: string };
+
+/** PATCH /reading-sessions/:id yanıtı (server/src/modules/progress/progress.routes.ts). */
 export type ReadingSessionResult = {
   id: string;
   progress: number;
   durationSeconds: number;
   completed: boolean;
-  /** Kazanılan lokum. Backend henüz göndermiyor; gönderdiğinde bitiş ekranında gösterilir. */
-  lokum?: number;
 };
 
 /** GET /me/progress */

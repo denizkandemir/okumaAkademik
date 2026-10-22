@@ -378,6 +378,10 @@ export type CityInfo = {
   no: number;
   name: string;
   upperName: string;
+  /** Yönelme hâli, ör. "Efes'e" (Türkçe ekler üretilmez, saklanır). */
+  toName: string;
+  /** Şehir açılınca Pırıl'ın cümlesi (yeni şehir ekranı). */
+  unlockMessage: string;
   /** Başlık kartındaki şehir başlığı */
   title: string;
   levelFrom: number;
@@ -395,6 +399,8 @@ export const CITY_INFO: Record<CityId, CityInfo> = {
     no: 1,
     name: 'İstanbul',
     upperName: 'İSTANBUL',
+    toName: "İstanbul'a",
+    unlockMessage: "Boğaz seni bekliyor! İstanbul'da 8 yeni hikâye var.",
     title: "Boğaz'ın Hikâyeleri",
     levelFrom: 1,
     levelTo: 5,
@@ -406,6 +412,8 @@ export const CITY_INFO: Record<CityId, CityInfo> = {
     no: 2,
     name: 'İzmir',
     upperName: 'İZMİR',
+    toName: "İzmir'e",
+    unlockMessage: "Kordon'un rüzgârı seni bekliyor! İzmir'de 8 yeni hikâye var.",
     title: "Kordon'un Rüzgârı",
     levelFrom: 6,
     levelTo: 10,
@@ -417,6 +425,8 @@ export const CITY_INFO: Record<CityId, CityInfo> = {
     no: 3,
     name: 'Efes',
     upperName: 'EFES',
+    toName: "Efes'e",
+    unlockMessage: "Antik kentin sırları seni bekliyor! Efes'te 8 yeni hikâye var.",
     title: 'Antik Kentin Sırları',
     levelFrom: 11,
     levelTo: 15,
@@ -428,6 +438,8 @@ export const CITY_INFO: Record<CityId, CityInfo> = {
     no: 4,
     name: 'Antalya',
     upperName: 'ANTALYA',
+    toName: "Antalya'ya",
+    unlockMessage: "Portakal kokulu sahil seni bekliyor! Antalya'da 8 yeni hikâye var.",
     title: 'Portakal Kokulu Sahil',
     levelFrom: 16,
     levelTo: 20,
@@ -439,6 +451,8 @@ export const CITY_INFO: Record<CityId, CityInfo> = {
     no: 5,
     name: 'Kapadokya',
     upperName: 'KAPADOKYA',
+    toName: "Kapadokya'ya",
+    unlockMessage: "Balonlar seni bekliyor! Kapadokya'da 8 yeni hikâye var.",
     title: 'Balonlar Yükselirken',
     levelFrom: 21,
     levelTo: 25,
@@ -450,6 +464,8 @@ export const CITY_INFO: Record<CityId, CityInfo> = {
     no: 6,
     name: 'Van',
     upperName: 'VAN',
+    toName: "Van'a",
+    unlockMessage: "Pırıl'ın memleketi seni bekliyor! Van'da 8 yeni hikâye var.",
     title: "Pırıl'ın Memleketi",
     levelFrom: 26,
     levelTo: 30,

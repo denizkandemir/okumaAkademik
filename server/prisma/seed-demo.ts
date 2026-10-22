@@ -34,6 +34,8 @@ type DemoUser = {
 
 const DEMO_USERS: DemoUser[] = [
   { username: 'demo.istanbul', name: 'Ayşe', completed: 4, streakDays: 6, readToday: false },
+  // İstanbul'un 9 dersi bitmiş: 10. ders (sandık) seviye atlatır ve İzmir'i açar (P06 akışı).
+  { username: 'demo.sehir', name: 'Selin', completed: 9, streakDays: 5, readToday: false },
   { username: 'demo.izmir', name: 'Mert', completed: 14, streakDays: 9, readToday: true },
   { username: 'demo.efes', name: 'Zeynep', completed: 22, streakDays: 14, readToday: false },
   { username: 'demo.antalya', name: 'Emir', completed: 32, streakDays: 21, readToday: true },

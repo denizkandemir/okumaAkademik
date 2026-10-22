@@ -1,5 +1,4 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
 import {
   ActivityIndicator,
   ScrollView,
@@ -12,14 +11,14 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { GameColors, GameFonts } from '@/features/game/theme';
-import type { CompleteLessonResponse, LessonDetailResponse } from '@/features/game/types';
+import type { LessonDetailResponse } from '@/features/game/types';
 import { GameButton } from '@/features/game/ui/game-button';
 import { ChestIcon } from '@/features/game/ui/icons';
 import { StarRow } from '@/features/game/ui/star-row';
 import { Mascot } from '@/features/mascot/mascot';
 import { MascotBubble } from '@/features/mascot/mascot-bubble';
 import { useApiQuery } from '@/hooks/use-api-query';
-import { api, ApiError } from '@/lib/api';
+import { ApiError } from '@/lib/api';
 import { getErrorMessage } from '@/lib/errors';
 
 /** Metin seviyesinin ders kartındaki adı (API: 1 Başlangıç, 2 Orta, 3 İleri). */
@@ -127,22 +126,9 @@ function StoryCard({ data }: { data: LessonDetailResponse }) {
 function ChestCard({ data }: { data: LessonDetailResponse }) {
   const { lesson } = data;
   const done = lesson.status === 'done';
-  const [opening, setOpening] = useState(false);
-  const [openError, setOpenError] = useState<string | null>(null);
-
-  const openChest = async () => {
-    setOpening(true);
-    setOpenError(null);
-    try {
-      // TODO(P06): sandık açılış animasyonu ve ödül ekranları. Şimdilik dersi bitirip yola dön;
-      // ana sayfa odaklanınca tazelenir.
-      await api.post<CompleteLessonResponse>(`/lessons/${encodeURIComponent(lesson.id)}/complete`);
-      router.back();
-    } catch (error) {
-      setOpenError(getErrorMessage(error));
-      setOpening(false);
-    }
-  };
+  // Sandık kendi ekranında açılır (sallanma, kapak, lokumlar, ödül akışı).
+  const openChest = () =>
+    router.replace({ pathname: '/lesson/[id]/chest', params: { id: lesson.id } });
 
   return (
     <>
@@ -163,11 +149,6 @@ function ChestCard({ data }: { data: LessonDetailResponse }) {
       <Text style={[styles.summary, styles.center]}>
         {done ? 'Bu sandığı açtın! Lokumların kumbarada.' : 'Sandığı aç, lokumları topla!'}
       </Text>
-      {openError ? (
-        <Text style={styles.error} accessibilityRole="alert">
-          {openError}
-        </Text>
-      ) : null}
       {done ? (
         <GameButton
           variant="white"
@@ -181,7 +162,6 @@ function ChestCard({ data }: { data: LessonDetailResponse }) {
           variant="gold"
           title="SANDIĞI AÇ"
           accessibilityLabel="Sandığı aç"
-          loading={opening}
           onPress={openChest}
           style={styles.action}
         />

@@ -25,5 +25,7 @@ export function useReadingSession(textId: string | undefined) {
       if (!controllerRef.current) throw new Error('Okuma oturumu henüz başlamadı.');
       return controllerRef.current.finish();
     },
+    /** Oturum kimliği; oturum başlatılamadıysa `null`. */
+    sessionId: async () => (controllerRef.current ? controllerRef.current.sessionId() : null),
   };
 }

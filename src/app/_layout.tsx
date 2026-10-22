@@ -7,6 +7,9 @@ import { SplashScreenController } from '@/features/auth/splash-screen-controller
 import { useGameFonts } from '@/features/game/fonts';
 import { useTheme } from '@/hooks/use-theme';
 
+/** Ödül ekranları: tam ekran, başlıksız, kaydırarak kapanmaz. */
+const REWARD_SCREEN = { presentation: 'fullScreenModal', gestureEnabled: false } as const;
+
 export default function RootLayout() {
   // Yazı tipleri yüklenmeden metin çizilirse iOS bilinmeyen aile uyarısı verir; açılış ekranı
   // bu sürede açık kalır. Yüklenemezse sistem yazı tipiyle devam edilir (bkz. useGameFonts).
@@ -47,10 +50,8 @@ function RootNavigator({ fontsReady }: { fontsReady: boolean }) {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Protected guard={!!user}>
           <Stack.Screen name="(tabs)" />
-          <Stack.Screen
-            name="reading/[id]"
-            options={{ headerShown: true, title: '', headerBackTitle: 'Geri' }}
-          />
+          {/* Okuma ekranı kendi üst çubuğunu çizer (kapat, ilerleme, yazı boyutu). */}
+          <Stack.Screen name="reading/[id]" />
           {/* Ders kartı alttan açılan sayfa; web'de modal (formSheet yalnızca native). */}
           <Stack.Screen
             name="lesson/[id]/index"
@@ -61,6 +62,14 @@ function RootNavigator({ fontsReady }: { fontsReady: boolean }) {
               sheetCornerRadius: 30,
             }}
           />
+          {/* Ders akışı: soru sırasında kaydırarak geri dönülmez (kapat düğmesi onay sorar). */}
+          <Stack.Screen name="lesson/[id]/quiz" options={{ gestureEnabled: false }} />
+          {/* Ödül ekranları: başlıksız tam ekran modallar; akış DEVAM ET ile ilerler. */}
+          <Stack.Screen name="lesson/[id]/complete" options={REWARD_SCREEN} />
+          <Stack.Screen name="lesson/[id]/chest" options={REWARD_SCREEN} />
+          <Stack.Screen name="level-up" options={REWARD_SCREEN} />
+          <Stack.Screen name="city-unlocked" options={REWARD_SCREEN} />
+          <Stack.Screen name="finale" options={REWARD_SCREEN} />
           <Stack.Screen
             name="journey-map"
             options={{ headerShown: true, title: '', headerBackTitle: 'Geri' }}
