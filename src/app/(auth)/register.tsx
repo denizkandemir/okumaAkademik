@@ -48,6 +48,8 @@ export default function RegisterScreen() {
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async () => {
+    // Düğme ve klavyedeki "git" birlikte basılınca ikinci istek gitmesin.
+    if (submitting) return;
     const nextErrors = validateSignUp({ name, username, password, grade });
     setErrors(nextErrors);
     setFormError(null);

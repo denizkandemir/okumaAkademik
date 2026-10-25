@@ -267,9 +267,12 @@ Okurken mor renkli kelimeye dokununca Pırıl'ın söylediği anlam. `word` meti
 
 ### `question_attempts` — cevaplar
 
-Şıkka her dokunuş bir satırdır (`POST /lessons/:id/answers`). Bir okuma (`reading_session_id`)
-içinde her sorunun **ilk** cevabı, yıldızı ve lokumu belirler. Index:
-`question_attempts_reading_session_id_question_id_idx`.
+Şıkka her dokunuş bir satırdır (`POST /lessons/:id/answers`). Dersin ilk tamamlanışında yıldızı ve
+lokumu, kullanıcının her soruya **hangi okumada olursa olsun** verdiği ilk cevap belirler: yanlış
+cevaptan sonra sorulardan çıkıp hikâyeyi yeniden okumak o soruyu "ilk denemede doğru" yapmaz.
+Tekrar oynamada (ders bitmişken) yıldız yalnızca o okumanın (`reading_session_id`) ilk cevaplarına
+bakar. Index'ler: `question_attempts_reading_session_id_question_id_idx`,
+`question_attempts_user_id_idx`.
 
 ### `lesson_completions` — bitirilen dersler
 
@@ -306,9 +309,14 @@ Kaynak: [`docs/tasarim/README.md`](../../docs/tasarim/README.md) "Oyun kurallar�
 - **Seviye** = 1 + ⌊bitirilen ders / 2⌋, en fazla 30. **Şehir** seviyeden gelir: 1-5 İstanbul,
   6-10 İzmir, 11-15 Efes, 16-20 Antalya, 21-25 Kapadokya, 26-30 Van. Bir şehrin 10. dersi bitince
   seviye bir sonraki şehrin ilk seviyesine geçer ve şehir açılır.
+- **İlk deneme:** dersin ilk tamamlanışından önce soruya verilen ilk cevap; hangi okumada verildiği
+  fark etmez. `/answers`'ta gösterilen lokum da aynı kurala uyar. Tekrar oynamada yalnızca o
+  okumanın ilk cevaplarına bakılır (yalnızca en iyi yıldız için).
 - **Yıldız:** 3 soru da ilk denemede doğru → 3, ikisi → 2, diğer → 1. Sandıkta yıldız yok.
 - **Lokum:** hikâye 5 + ilk denemede doğru her soru için 5 (en fazla 20), sandık 30, seviye atlama
-  50, yeni şehir 100. Yalnızca dersin ilk tamamlanışında verilir.
+  50, yeni şehir 100. Yalnızca dersin ilk tamamlanışında verilir. Yanıtı kaybolan tamamlama isteği
+  aynı denemeyle yeniden gelirse (hikâyede aynı okuma, sandıkta 10 dakika içinde) yeni satır
+  yazılmaz; yanıt ilk tamamlamada yazılan `lokum_entries` satırlarından kurulur.
 - **Seri:** Türkiye saatine göre art arda, en az bir okumanın **bitirildiği** gün sayısı (bitmiş
   okumanın `COALESCE(ended_at, started_at)` anının günü; kitaplıktan okumalar da sayılır). Bugün
   henüz okunmadıysa seri dünden sayılır ve "tehlikede"dir. Not: günlük hedef (`v_daily_reading`,
@@ -396,13 +404,13 @@ LEFT JOIN lessons l ON l.id = le.lesson_id
 WHERE u.username = 'demo.izmir'
 ORDER BY le.created_at;
 
--- En çok ilk denemede yanlış cevaplanan sorular (zor sorular)
+-- En çok ilk denemede yanlış cevaplanan sorular (zor sorular; kullanıcı başına ilk cevap)
 SELECT q.text_id, q.position, q.prompt,
        round(100.0 * count(*) FILTER (WHERE NOT first.correct) / count(*)) AS ilk_deneme_yanlis_yuzde
 FROM (
-  SELECT DISTINCT ON (reading_session_id, question_id) question_id, correct
+  SELECT DISTINCT ON (user_id, question_id) question_id, correct
   FROM question_attempts
-  ORDER BY reading_session_id, question_id, created_at
+  ORDER BY user_id, question_id, created_at, id
 ) first
 JOIN questions q ON q.id = first.question_id
 GROUP BY q.id
@@ -414,6 +422,14 @@ ORDER BY ilk_deneme_yanlis_yuzde DESC;
 `npm run db:reset` (ya da `npm run db:seed`) yolculuğun farklı noktalarında 8 kullanıcı
 oluşturur; şifre hepsinde `okuma123`. Oyun verileri ve okumaları her seed'de "bugün"e göre
 yeniden yazılır ([`prisma/seed-demo.ts`](../prisma/seed-demo.ts)).
+
+Seed; test, örnek ve demo kullanıcıları yalnızca `DATABASE_URL` yerel bir veritabanını
+(`localhost`, `127.0.0.1`, `::1`) gösteriyorsa ya da `SEED_DEMO=1` verildiyse yazar
+([`prisma/seed-guard.ts`](../prisma/seed-guard.ts)). Bu kullanıcıların şifreleri sıfırlanır ve
+verileri silinip yeniden yazılır; paylaşılan bir veritabanında aynı adlı gerçek hesaplar ezilmesin
+diye diğer durumlarda bu kısım bir mesajla atlanır. İçerik (metinler, dersler, sorular) her zaman
+eşitlenir. Not: ders kimliği değişirse seed eski dersi siler ve kullanıcıların o dersteki
+tamamlamaları da silinir.
 
 | Kullanıcı        | Bitirilen ders | Seviye | Şehir     | Seri | Not                             |
 | ---------------- | -------------- | ------ | --------- | ---- | ------------------------------- |

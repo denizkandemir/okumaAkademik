@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -46,9 +46,11 @@ export default function HomeScreen() {
   // Açılışta (ve şehir ya da şu anki ders değişince) şu anki düğüm görünür alanın ortasına gelsin.
   const scrollRef = useRef<ScrollView>(null);
   const scrolledFor = useRef<string | null>(null);
+  /** Yol (iskelet ya da hata değil) çizilip ölçüldü mü. */
+  const pathMeasured = useRef(false);
   const focus = data ? focusIndex(data.lessons) : 0;
   const focusKey = data ? `${data.city.id}:${data.lessons[focus]?.id ?? ''}` : null;
-  const scrollToFocus = () => {
+  const scrollToFocus = useCallback(() => {
     if (!data || !focusKey || scrolledFor.current === focusKey) return;
     const point = nodeCenters(data.lessons.length, width)[focus];
     if (!point) return;
@@ -57,6 +59,16 @@ export default function HomeScreen() {
     const y = sceneHeight + point.y - (visibleTop + visibleBottom) / 2;
     scrollRef.current?.scrollTo({ y: Math.max(0, y), animated: false });
     scrolledFor.current = focusKey;
+  }, [data, focusKey, focus, width, sceneHeight, window.height, insets.bottom]);
+  // Her şehirde 10 ders olduğundan yeni şehirde ya da ders ilerleyince içerik boyu değişmez,
+  // onContentSizeChange tetiklenmez; odak değişince buradan kaydırılır. Yol henüz ölçülmediyse
+  // (ilk açılış, iskeletten yola geçiş) kaydırmayı onContentSizeChange yapar.
+  useEffect(() => {
+    if (pathMeasured.current) scrollToFocus();
+  }, [scrollToFocus]);
+  const onContentSizeChange = () => {
+    pathMeasured.current = data !== undefined;
+    scrollToFocus();
   };
 
   const message = tip ?? homeMessage(data, info.homeMessage, info.homePose);
@@ -74,7 +86,7 @@ export default function HomeScreen() {
           styles.content,
           { paddingTop: sceneHeight, paddingBottom: insets.bottom + BottomTabInset + 24 },
         ]}
-        onContentSizeChange={scrollToFocus}>
+        onContentSizeChange={onContentSizeChange}>
         {data ? (
           <LessonPath
             lessons={data.lessons}

@@ -25,6 +25,7 @@ import { Mascot } from '@/features/mascot/mascot';
 import { MascotBubble } from '@/features/mascot/mascot-bubble';
 import type { MascotPose } from '@/features/mascot/types';
 import { useApiQuery } from '@/hooks/use-api-query';
+import { useHardwareBack } from '@/hooks/use-hardware-back';
 import { api } from '@/lib/api';
 import { getErrorMessage } from '@/lib/errors';
 
@@ -80,6 +81,16 @@ function Quiz({
   const [completeError, setCompleteError] = useState<string | null>(null);
   const [showText, setShowText] = useState(false);
   const [confirmLeave, setConfirmLeave] = useState(false);
+
+  // Kapat (X ve Android geri) onay sorar; ders bitirilirken yok sayılır, yoksa yanıt gelince
+  // uygulama kendiliğinden ders sonu ekranına gider.
+  const requestLeave = () => {
+    if (!completing) setConfirmLeave(true);
+  };
+  useHardwareBack(() => {
+    requestLeave();
+    return true;
+  });
 
   const question = questions[index];
   if (!question) return null;
@@ -164,7 +175,7 @@ function Quiz({
       <LinearGradient {...GameBackgrounds.lilacCream} style={StyleSheet.absoluteFill} />
 
       <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-        <SquareButton accessibilityLabel="Kapat" lip={LIP} onPress={() => setConfirmLeave(true)}>
+        <SquareButton accessibilityLabel="Kapat" lip={LIP} onPress={requestLeave}>
           <CloseIcon size={20} color={GameColors.textLilacSecondary} />
         </SquareButton>
         <View

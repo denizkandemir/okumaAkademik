@@ -94,8 +94,10 @@ export function startReadingSession(textId: string): ReadingSessionController {
 
   void ensureSession();
 
+  // Cihaz saati geri alınırsa dilim negatif çıkmasın (sunucu negatif süreyi reddeder).
+  const elapsedSince = (since: number) => Math.max(0, Date.now() - since);
   const durationSeconds = () =>
-    Math.round((activeMs + (activeSince === null ? 0 : Date.now() - activeSince)) / 1000);
+    Math.round((activeMs + (activeSince === null ? 0 : elapsedSince(activeSince))) / 1000);
 
   const save = async (completed: boolean) => {
     const id = await ensureSession();
@@ -120,7 +122,7 @@ export function startReadingSession(textId: string): ReadingSessionController {
       return;
     }
     if (activeSince !== null) {
-      activeMs += Date.now() - activeSince;
+      activeMs += elapsedSince(activeSince);
       activeSince = null;
     }
     // Uygulama arka plana atıldığında (veya web'de sekme gizlendiğinde) ara kayıt.

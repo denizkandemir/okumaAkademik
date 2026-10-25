@@ -1,7 +1,16 @@
 import type { FastifyError, FastifyInstance } from 'fastify';
 import fp from 'fastify-plugin';
 
+import { Prisma } from '../generated/prisma/client.js';
 import { AppError, Errors } from '../lib/errors.js';
+
+/** Postgres metin kolonuna yazılamayan karakter (ör. `\u0000`): SQLSTATE 22021. İstemci hatasıdır. */
+function isInvalidTextError(error: unknown) {
+  if (!(error instanceof Prisma.PrismaClientKnownRequestError)) return false;
+  const adapterError = error.meta?.driverAdapterError as
+    { cause?: { originalCode?: string } } | undefined;
+  return adapterError?.cause?.originalCode === '22021';
+}
 
 /**
  * Bütün hataları `{ message, code, fieldErrors? }` biçimine çevirir.
@@ -11,6 +20,11 @@ export default fp(async function errorHandlerPlugin(app: FastifyInstance) {
   app.setErrorHandler((error: FastifyError | AppError, request, reply) => {
     if (error instanceof AppError) {
       return reply.status(error.statusCode).send(error.toBody());
+    }
+
+    if (isInvalidTextError(error)) {
+      request.log.info({ err: error }, 'istemci hatası: geçersiz karakter');
+      return reply.status(400).send(Errors.badRequest().toBody());
     }
 
     const statusCode = error.statusCode ?? 500;

@@ -5,7 +5,7 @@ import { Prisma } from '../../generated/prisma/client.js';
 import { Errors } from '../../lib/errors.js';
 import { gradeSchema, parse, passwordSchema, usernameSchema } from '../../lib/validation.js';
 import { requireAuth } from '../../plugins/auth.js';
-import { AUTH_RATE_LIMIT, ipAndUsernameKey } from '../../plugins/rate-limit.js';
+import { AUTH_RATE_LIMIT, authIpRateLimit, ipAndUsernameKey } from '../../plugins/rate-limit.js';
 import { hashPassword, verifyAgainstDummy, verifyPassword } from './password.js';
 import { createAuthSession, deleteAuthSession } from './auth-session.js';
 import { publicUserSelect, toPublicUser } from './user.js';
@@ -39,32 +39,37 @@ const authRateLimit = { rateLimit: { ...AUTH_RATE_LIMIT, keyGenerator: ipAndUser
 
 export async function authRoutes(app: FastifyInstance) {
   const { prisma, config } = app;
+  const ipRateLimit = authIpRateLimit(app);
 
-  app.post('/auth/register', { config: authRateLimit }, async (request, reply) => {
-    const input = parse(registerSchema, request.body);
-    const passwordHash = await hashPassword(input.password);
+  app.post(
+    '/auth/register',
+    { config: authRateLimit, preHandler: ipRateLimit },
+    async (request, reply) => {
+      const input = parse(registerSchema, request.body);
+      const passwordHash = await hashPassword(input.password);
 
-    try {
-      const user = await prisma.user.create({
-        data: {
-          username: input.username,
-          passwordHash,
-          name: input.name,
-          grade: input.grade,
-        },
-        select: publicUserSelect,
-      });
-      const token = await createAuthSession(prisma, user.id, config.SESSION_TTL_DAYS);
-      return reply.status(201).send({ token, user: toPublicUser(user) });
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-        throw Errors.usernameTaken();
+      try {
+        const user = await prisma.user.create({
+          data: {
+            username: input.username,
+            passwordHash,
+            name: input.name,
+            grade: input.grade,
+          },
+          select: publicUserSelect,
+        });
+        const token = await createAuthSession(prisma, user.id, config.SESSION_TTL_DAYS);
+        return reply.status(201).send({ token, user: toPublicUser(user) });
+      } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+          throw Errors.usernameTaken();
+        }
+        throw error;
       }
-      throw error;
-    }
-  });
+    },
+  );
 
-  app.post('/auth/login', { config: authRateLimit }, async (request) => {
+  app.post('/auth/login', { config: authRateLimit, preHandler: ipRateLimit }, async (request) => {
     const input = parse(loginSchema, request.body);
 
     const user = await prisma.user.findUnique({

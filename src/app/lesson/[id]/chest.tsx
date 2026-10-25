@@ -30,7 +30,8 @@ import { SquareButton } from '@/features/game/ui/square-button';
 import { Mascot } from '@/features/mascot/mascot';
 import { MascotBubble } from '@/features/mascot/mascot-bubble';
 import { useApiQuery } from '@/hooks/use-api-query';
-import { api } from '@/lib/api';
+import { useHardwareBack } from '@/hooks/use-hardware-back';
+import { api, ApiError } from '@/lib/api';
 import { getErrorMessage } from '@/lib/errors';
 
 const CHEST_WIDTH = 170;
@@ -52,12 +53,30 @@ export default function ChestScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const reduceMotion = useReducedMotion();
-  const { data } = useApiQuery<LessonDetailResponse>(
-    id ? `/lessons/${encodeURIComponent(id)}` : null,
-  );
+  const {
+    data,
+    error: loadError,
+    refetch,
+  } = useApiQuery<LessonDetailResponse>(id ? `/lessons/${encodeURIComponent(id)}` : null);
   const [phase, setPhase] = useState<Phase>('closed');
   const [reward, setLocalReward] = useState<Reward | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Ders bilgisi alınamadıysa: kilitli ya da yoksa yalnızca çıkılır, diğer hatalarda yeniden denenir.
+  const loadFailed = !data && !!loadError;
+  const locked =
+    loadError instanceof ApiError && (loadError.status === 403 || loadError.status === 404);
+
+  /** Kapat: açılırken bir şey yapmaz; açıldıysa ödül akışına devam eder (X ve Android geri). */
+  const close = () => {
+    if (phase === 'opening') return;
+    if (phase === 'open' && reward) continueRewardFlow('chest', reward);
+    else if (router.canGoBack()) router.back();
+    else router.replace('/');
+  };
+  useHardwareBack(() => {
+    close();
+    return true;
+  });
 
   const shake = useSharedValue(0);
   const lid = useSharedValue(0);
@@ -116,14 +135,18 @@ export default function ChestScreen() {
         : 'Bu sandığı daha önce açmıştın. Yine de çok güzel!'
       : error
         ? `Hımm, sandık açılmadı. ${error}`
-        : 'Sandığa dokun, bakalım içinden ne çıkacak!';
+        : loadFailed
+          ? locked
+            ? getErrorMessage(loadError)
+            : `Hımm, sandığı getiremedim. ${getErrorMessage(loadError)}`
+          : 'Sandığa dokun, bakalım içinden ne çıkacak!';
 
   return (
     <View style={[styles.root, { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 24 }]}>
       <LinearGradient {...GameBackgrounds.cream} style={StyleSheet.absoluteFill} />
 
       <View style={styles.header}>
-        <SquareButton accessibilityLabel="Kapat" onPress={() => router.back()}>
+        <SquareButton accessibilityLabel="Kapat" onPress={close}>
           <CloseIcon size={20} color={GameColors.textWarmSecondary} />
         </SquareButton>
         <Text style={styles.title} accessibilityRole="header">
@@ -136,7 +159,10 @@ export default function ChestScreen() {
       </View>
 
       <View style={styles.stage}>
-        <Mascot pose={phase === 'open' ? 'celebrate' : 'happy'} size={140} />
+        <Mascot
+          pose={phase === 'open' ? 'celebrate' : error || loadFailed ? 'think' : 'happy'}
+          size={140}
+        />
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={phase === 'open' ? 'Açık hazine sandığı' : 'Sandığı aç'}
@@ -173,6 +199,12 @@ export default function ChestScreen() {
           accessibilityLabel="Devam et"
           onPress={() => continueRewardFlow('chest', reward)}
         />
+      ) : loadFailed ? (
+        locked ? (
+          <GameButton variant="white" size="md" title="Tamam" onPress={close} />
+        ) : (
+          <GameButton title="TEKRAR DENE" accessibilityLabel="Tekrar dene" onPress={refetch} />
+        )
       ) : (
         <GameButton
           variant="gold"

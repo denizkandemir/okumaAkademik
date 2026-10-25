@@ -17,6 +17,7 @@ import { Mascot } from '@/features/mascot/mascot';
 import { CityScene } from '@/features/scenes/city-scene';
 import { SCENE_HEIGHT, SCENE_WIDTH } from '@/features/scenes/scene-kit';
 import { useApiQuery } from '@/hooks/use-api-query';
+import { useHardwareBack } from '@/hooks/use-hardware-back';
 
 const MAX_WIDTH = 520;
 const CITY_COUNT = 6;
@@ -30,7 +31,11 @@ export default function FinaleScreen() {
   const window = useWindowDimensions();
   const { user } = useAuth();
   const reward = useReward();
-  const { data: stats } = useApiQuery<StatsResponse>('/me/stats');
+  const {
+    data: stats,
+    error: statsError,
+    refetch: refetchStats,
+  } = useApiQuery<StatsResponse>('/me/stats');
   const width = Math.min(window.width, MAX_WIDTH);
   const sceneHeight = (width * SCENE_HEIGHT) / SCENE_WIDTH;
   const mascotSize = window.height < 700 ? 170 : 220;
@@ -43,6 +48,11 @@ export default function FinaleScreen() {
     else if (router.canGoBack()) router.back();
     else router.replace('/');
   };
+  // Android geri tuşu kapat düğmesiyle aynı (ödül akışındaysa akışı bitirir).
+  useHardwareBack(() => {
+    close();
+    return true;
+  });
 
   const share = () => {
     const totals =
@@ -130,6 +140,18 @@ export default function FinaleScreen() {
               />
             </View>
           </View>
+          {!stats && statsError ? (
+            <View style={styles.statsError}>
+              <Text style={styles.statsErrorText}>Hikâye ve dakika sayılarını getiremedim.</Text>
+              <GameButton
+                variant="white"
+                size="md"
+                title="TEKRAR DENE"
+                accessibilityLabel="Toplamları tekrar dene"
+                onPress={refetchStats}
+              />
+            </View>
+          ) : null}
 
           <View style={styles.spacer} />
           <GameButton
@@ -275,6 +297,17 @@ const styles = StyleSheet.create({
     fontFamily: GameFonts.bodyHeavy,
     fontSize: 12,
     color: '#6B5A3A',
+  },
+  statsError: {
+    alignItems: 'center',
+    gap: 8,
+  },
+  statsErrorText: {
+    fontFamily: GameFonts.bodyBold,
+    fontSize: 14,
+    lineHeight: 19,
+    color: '#4A3A20',
+    textAlign: 'center',
   },
   spacer: {
     flexGrow: 1,

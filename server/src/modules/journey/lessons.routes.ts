@@ -13,6 +13,7 @@ import {
   rewardsFor,
   starsFor,
   streakFrom,
+  unlockedCity,
   type LessonRewards,
 } from '../../lib/journey.js';
 import { withApiLevel } from '../../lib/reading-level.js';
@@ -45,6 +46,29 @@ const answerSchema = z.object({
 
 const completeSchema = z.object({ readingSessionId: readingSessionIdSchema.optional() });
 
+/** Sandık bu süre içinde yeniden bitirilirse yanıtı kaybolmuş isteğin tekrarı sayılır. */
+const CHEST_RETRY_WINDOW_MS = 10 * 60 * 1000;
+
+/** İlk tamamlamada deftere yazılan ödül sebepleri (başka sebeplerle karışmasın diye). */
+const COMPLETION_REASONS: LokumReason[] = [
+  LokumReason.LESSON,
+  LokumReason.CHEST,
+  LokumReason.LEVEL_UP,
+  LokumReason.CITY_UNLOCK,
+];
+
+type Db = PrismaClient | Prisma.TransactionClient;
+
+/** Yanıtta gösterilen ödüller (`finished` yanıtta güncel durumdan gelir). */
+type GrantedRewards = Omit<LessonRewards, 'finished'>;
+
+/** Dersin ilk tamamlanışının sonucu; hikâyede yıldız ve ilk denemede doğru sayısıyla. */
+type FirstCompletion = {
+  rewards: GrantedRewards;
+  stars: number | null;
+  firstTryCorrect: number | null;
+};
+
 /** Ders kimliğine göre dersi bulur; yoksa 404, kilitliyse 403. */
 function findOpenLesson(state: JourneyState, id: string): JourneyLesson {
   const lesson = state.lessons.find((entry) => entry.id === id);
@@ -73,6 +97,64 @@ async function findLessonReading(
 
 function isUniqueViolation(error: unknown) {
   return error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002';
+}
+
+/**
+ * Kullanıcının sorulara verdiği cevaplar, okumadan bağımsız ve zaman sırasıyla. `until` verilirse
+ * yalnızca o ana kadar verilenler (ilk tamamlamadan önceki cevaplar).
+ */
+function attemptsOf(db: Db, userId: string, questionIds: string[], until?: Date) {
+  return db.questionAttempt.findMany({
+    where: {
+      userId,
+      questionId: { in: questionIds },
+      ...(until ? { createdAt: { lte: until } } : {}),
+    },
+    orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+    select: { questionId: true, correct: true },
+  });
+}
+
+/**
+ * Dersin ilk tamamlanışında deftere yazılmış ödüller. Yanıtı kaybolan istek yeniden gelince yanıt
+ * bunlardan kurulur; LEVEL_UP satırı yoksa seviye `currentLevel` olarak kalır.
+ */
+async function writtenRewards(
+  db: Db,
+  userId: string,
+  lessonId: string,
+  currentLevel: number,
+): Promise<GrantedRewards> {
+  const entries = await db.lokumEntry.findMany({
+    where: { userId, lessonId, reason: { in: COMPLETION_REASONS } },
+    select: { amount: true, reason: true, level: true },
+  });
+  const sum = (...reasons: LokumReason[]) =>
+    entries
+      .filter((entry) => reasons.includes(entry.reason))
+      .reduce((total, entry) => total + entry.amount, 0);
+
+  const levelsGained = entries
+    .flatMap((entry) =>
+      entry.reason === LokumReason.LEVEL_UP && entry.level !== null ? [entry.level] : [],
+    )
+    .sort((a, b) => a - b);
+  const levelAfter = levelsGained.at(-1) ?? currentLevel;
+  const levelBefore = levelsGained.length > 0 ? (levelsGained[0] ?? levelAfter) - 1 : levelAfter;
+
+  const lesson = sum(LokumReason.LESSON, LokumReason.CHEST);
+  const levelUp = sum(LokumReason.LEVEL_UP);
+  const cityUnlock = sum(LokumReason.CITY_UNLOCK);
+  return {
+    lesson,
+    levelsGained,
+    levelUp,
+    cityUnlocked: cityUnlock > 0 ? unlockedCity(levelBefore, levelAfter) : null,
+    cityUnlock,
+    total: lesson + levelUp + cityUnlock,
+    levelBefore,
+    levelAfter,
+  };
 }
 
 export async function lessonsRoutes(app: FastifyInstance) {
@@ -152,9 +234,14 @@ export async function lessonsRoutes(app: FastifyInstance) {
     });
     if (!question) throw Errors.validation({ questionId: 'Bu soru bu derse ait değil.' });
 
-    const earlierAttempts = await prisma.questionAttempt.count({
-      where: { readingSessionId: input.readingSessionId, questionId: question.id },
-    });
+    // Ders bitmeden "ilk deneme", kullanıcının bu soruya hangi okumada olursa olsun verdiği ilk
+    // cevaptır (complete ile aynı kural). Bitmiş derste lokum gösterilmez.
+    const earlierAttempts =
+      lesson.status === 'done'
+        ? null
+        : await prisma.questionAttempt.count({
+            where: { userId: user.id, questionId: question.id },
+          });
     const correct = input.choiceIndex === question.correctIndex;
     await prisma.questionAttempt.create({
       data: {
@@ -167,8 +254,7 @@ export async function lessonsRoutes(app: FastifyInstance) {
     });
 
     // Yalnızca gösterim içindir; lokum dersin ilk tamamlanışında yazılır.
-    const lokum =
-      correct && earlierAttempts === 0 && lesson.status !== 'done' ? LOKUM.PER_FIRST_TRY : 0;
+    const lokum = correct && earlierAttempts === 0 ? LOKUM.PER_FIRST_TRY : 0;
     return correct
       ? { correct, explanation: question.explanation, lokum }
       : { correct, hint: question.hint, lokum };
@@ -184,6 +270,7 @@ export async function lessonsRoutes(app: FastifyInstance) {
 
     let story: {
       readingSessionId: string;
+      questionIds: string[];
       stars: number;
       firstTryCorrect: number;
       durationSeconds: number;
@@ -209,21 +296,45 @@ export async function lessonsRoutes(app: FastifyInstance) {
         throw Errors.questionsNotAnswered();
       }
 
-      const firstTryCorrect = firstTryCorrectCount(attempts);
+      // İlk tamamlamada ilk deneme okumadan bağımsızdır; tekrar oynamada yalnızca bu okumanın
+      // cevaplarına bakılır.
+      const questionIds = questions.map((question) => question.id);
+      const firstTryCorrect = firstTryCorrectCount(
+        lesson.status === 'done' ? attempts : await attemptsOf(prisma, user.id, questionIds),
+      );
       story = {
         readingSessionId: session.id,
+        questionIds,
         stars: starsFor(firstTryCorrect),
         firstTryCorrect,
         durationSeconds: session.durationSeconds,
       };
     }
 
-    /** İlk tamamlamada ödülleri döner; ders zaten bitmişse yalnızca en iyi yıldızı yükseltir. */
+    /**
+     * İlk tamamlamada ödülleri yazar ve döner. Ders zaten bitmişse: aynı deneme yeniden geldiyse
+     * (yanıtı kaybolan istek) ilk tamamlamanın sonucunu yazılmış verilerden kurar; tekrar
+     * oynamaysa null döner ve yalnızca en iyi yıldızı yükseltir.
+     */
     const persist = () =>
-      prisma.$transaction(async (tx): Promise<LessonRewards | null> => {
+      prisma.$transaction(async (tx): Promise<FirstCompletion | null> => {
         const where = { userId_lessonId: { userId: user.id, lessonId: lesson.id } };
         const existing = await tx.lessonCompletion.findUnique({ where });
         if (existing) {
+          const isRetry = story
+            ? existing.readingSessionId === story.readingSessionId
+            : Date.now() - existing.completedAt.getTime() <= CHEST_RETRY_WINDOW_MS;
+          if (isRetry) {
+            return {
+              rewards: await writtenRewards(tx, user.id, lesson.id, state.level),
+              stars: existing.stars,
+              firstTryCorrect: story
+                ? firstTryCorrectCount(
+                    await attemptsOf(tx, user.id, story.questionIds, existing.completedAt),
+                  )
+                : null,
+            };
+          }
           if (story && story.stars > (existing.bestStars ?? 0)) {
             await tx.lessonCompletion.update({ where, data: { bestStars: story.stars } });
           }
@@ -265,17 +376,22 @@ export async function lessonsRoutes(app: FastifyInstance) {
               : []),
           ],
         });
-        return rewards;
+        return {
+          rewards,
+          stars: story?.stars ?? null,
+          firstTryCorrect: story?.firstTryCorrect ?? null,
+        };
       });
 
-    let rewards: LessonRewards | null;
+    let first: FirstCompletion | null;
     try {
-      rewards = await persist();
+      first = await persist();
     } catch (error) {
-      // Aynı anda gelen ikinci istek (çift dokunuş): ilk istek dersi bitirdi, bu bir tekrar sayılır.
+      // Aynı anda gelen ikinci istek (çift dokunuş): ilk istek dersi bitirdi, bu onun tekrarı sayılır.
       if (!isUniqueViolation(error)) throw error;
-      rewards = await persist();
+      first = await persist();
     }
+    const rewards = first?.rewards ?? null;
 
     const [after, dates, balance] = await Promise.all([
       loadJourneyState(prisma, user.id),
@@ -284,9 +400,9 @@ export async function lessonsRoutes(app: FastifyInstance) {
     ]);
 
     return {
-      firstTime: rewards !== null,
-      stars: story?.stars ?? null,
-      firstTryCorrect: story?.firstTryCorrect ?? null,
+      firstTime: first !== null,
+      stars: first ? first.stars : (story?.stars ?? null),
+      firstTryCorrect: first ? first.firstTryCorrect : (story?.firstTryCorrect ?? null),
       durationSeconds: story?.durationSeconds ?? null,
       lokum: {
         lesson: rewards?.lesson ?? 0,
