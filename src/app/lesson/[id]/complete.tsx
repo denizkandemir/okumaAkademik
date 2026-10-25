@@ -3,6 +3,7 @@ import { Redirect, useLocalSearchParams } from 'expo-router';
 import { continueRewardFlow } from '@/features/game/reward-flow';
 import { useReward } from '@/features/game/reward-store';
 import { LessonCompleteView } from '@/features/game/rewards/lesson-complete-view';
+import { useHardwareBack } from '@/hooks/use-hardware-back';
 
 /** Pırıl'ın notu yoksa (ör. son soru açıklamasız) gösterilen genel cümle. */
 const GENERIC_NOTE = "Her hikâye beni Van'a biraz daha yaklaştırıyor. Teşekkür ederim!";
@@ -11,6 +12,12 @@ const GENERIC_NOTE = "Her hikâye beni Van'a biraz daha yaklaştırıyor. Teşek
 export default function LessonCompleteScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const reward = useReward();
+  // Android geri tuşu DEVAM ET ile aynı: seviye/şehir/final ekranları atlanmasın.
+  useHardwareBack(() => {
+    if (!reward || reward.lessonId !== id) return false;
+    continueRewardFlow('complete', reward);
+    return true;
+  });
 
   if (!reward || reward.lessonId !== id) return <Redirect href="/" />;
   const { result } = reward;

@@ -12,7 +12,10 @@ import { useTheme } from '@/hooks/use-theme';
 
 export default function LibraryScreen() {
   const theme = useTheme();
-  const { data, error, isLoading, refetch } = useApiQuery<{ texts: TextSummary[] }>('/texts');
+  // Ders bitince yeni hikâyeler açılır; sekme bağlı kaldığı için her odaklanmada tazelenir.
+  const { data, error, isLoading, refetch } = useApiQuery<{ texts: TextSummary[] }>('/texts', {
+    refetchOnFocus: true,
+  });
 
   return (
     <Screen withTabBar>
@@ -21,9 +24,10 @@ export default function LibraryScreen() {
         <ThemedText themeColor="textSecondary">Okumak istediğin metni seç.</ThemedText>
       </View>
 
+      {/* Tazeleme başarısız olsa da eldeki liste gösterilir; hata yalnızca veri yokken. */}
       <QueryState
         isLoading={isLoading}
-        error={error}
+        error={data ? undefined : error}
         onRetry={refetch}
         loadingLabel="Kitaplığını hazırlıyorum…"
       />
@@ -34,7 +38,7 @@ export default function LibraryScreen() {
         </ThemedText>
       ) : null}
 
-      {data && !error ? (
+      {data ? (
         <View style={styles.list}>
           {data.texts.map((text) => (
             <Link

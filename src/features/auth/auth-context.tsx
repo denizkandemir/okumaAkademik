@@ -4,6 +4,7 @@ import { Platform } from 'react-native';
 import * as authService from './auth-service';
 import type { AuthResponse, SignUpInput, User } from './types';
 
+import { clearReward } from '@/features/game/reward-store';
 import {
   API_URL,
   API_URL_SOURCE,
@@ -86,6 +87,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const clearLocalSession = async () => {
     setAuthToken(null);
     setUser(null);
+    // Son dersin ödülü bir sonraki kullanıcıya taşınmasın.
+    clearReward();
     await clearStoredSession().catch((error) => console.warn('Oturum silinemedi:', error));
   };
 

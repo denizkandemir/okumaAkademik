@@ -30,6 +30,7 @@ import { GameButton } from '@/features/game/ui/game-button';
 import { Mascot } from '@/features/mascot/mascot';
 import { CityScene } from '@/features/scenes/city-scene';
 import { SCENE_HEIGHT, SCENE_WIDTH } from '@/features/scenes/scene-kit';
+import { useHardwareBack } from '@/hooks/use-hardware-back';
 
 const MAX_WIDTH = 520;
 /** Şehrin "keşfet" düğmesi: başlık rengine en yakın 3B buton. */
@@ -51,6 +52,13 @@ export default function CityUnlockedScreen() {
   const window = useWindowDimensions();
 
   const city = reward?.result.cityUnlocked;
+  // Android geri tuşu keşfet düğmesiyle aynı: akış yarıda kalmasın.
+  useHardwareBack(() => {
+    if (!reward || !city) return false;
+    continueRewardFlow('city-unlocked', reward);
+    return true;
+  });
+
   if (!reward || !city) return <Redirect href="/" />;
   const info = CITY_INFO[city];
   const theme = CITY_THEMES[city];

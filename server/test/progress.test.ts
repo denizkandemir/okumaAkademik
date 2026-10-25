@@ -111,6 +111,63 @@ describe('okuma oturumu', () => {
     expect(response.json().durationSeconds).toBeLessThanOrEqual(61);
   });
 
+  it('eşzamanlı kayıtlarda bitmiş oturum bitmemiş olmaz', async () => {
+    const { token } = await registerReader(ctx.app);
+    // Yarış her turda oluşmayabilir; birkaç tur denenir.
+    for (let round = 0; round < 10; round++) {
+      const id = await startReading(token, 'minik-serce');
+      await backdate(id, new Date(Date.now() - 10 * MINUTE));
+      await Promise.all([
+        updateReading(token, id, { progress: 0.5, durationSeconds: 100, completed: false }),
+        updateReading(token, id, { progress: 1, durationSeconds: 120, completed: true }),
+      ]);
+      const stored = await ctx.prisma.readingSession.findUniqueOrThrow({ where: { id } });
+      expect(stored).toMatchObject({ completed: true, progress: 1, durationSeconds: 120 });
+    }
+  });
+
+  it('sonradan gelen eski kayıt süreyi düşürmez', async () => {
+    const { token } = await registerReader(ctx.app);
+    const id = await startReading(token, 'minik-serce');
+    await backdate(id, new Date(Date.now() - 10 * MINUTE));
+
+    await updateReading(token, id, { progress: 1, durationSeconds: 240, completed: true });
+    const late = await updateReading(token, id, {
+      progress: 0.5,
+      durationSeconds: 120,
+      completed: false,
+    });
+    expect(late.json()).toMatchObject({ durationSeconds: 240, completed: true });
+  });
+
+  it('4 saati aşan süre reddedilmez, üst sınıra kırpılır', async () => {
+    const { token } = await registerReader(ctx.app);
+    const id = await startReading(token, 'minik-serce');
+    await backdate(id, new Date(Date.now() - 5 * 60 * MINUTE));
+
+    const response = await updateReading(token, id, {
+      progress: 1,
+      durationSeconds: 14_401,
+      completed: true,
+    });
+    expect(response.statusCode).toBe(200);
+    expect(response.json().durationSeconds).toBe(14_400);
+  });
+
+  it('bitmiş oturuma gelen kayıt bitiş anını (seri gününü) değiştirmez', async () => {
+    const { token } = await registerReader(ctx.app);
+    const id = await startReading(token, 'minik-serce');
+    await updateReading(token, id, { progress: 1, durationSeconds: 5, completed: true });
+
+    // Okuma dün bitmiş olsun; bugün gelen geç kayıt onu bugüne taşımamalı.
+    const endedAt = new Date(Date.now() - 24 * 60 * MINUTE);
+    await ctx.prisma.readingSession.update({ where: { id }, data: { endedAt } });
+    await updateReading(token, id, { progress: 1, durationSeconds: 5, completed: true });
+
+    const stored = await ctx.prisma.readingSession.findUniqueOrThrow({ where: { id } });
+    expect(stored.endedAt).toEqual(endedAt);
+  });
+
   it('olmayan metin için 404, geçersiz gövde için 400 döner', async () => {
     const { token } = await registerReader(ctx.app);
     const missing = await ctx.app.inject({

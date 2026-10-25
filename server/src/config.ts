@@ -21,6 +21,8 @@ const configSchema = z.object({
   TRUST_PROXY: booleanString.default(false),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
   SESSION_TTL_DAYS: z.coerce.number().int().positive().default(30),
+  // Giriş/kayıt: kullanıcı adından bağımsız, IP başına 15 dakikadaki deneme sınırı.
+  AUTH_IP_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(100),
 });
 
 export type Config = z.infer<typeof configSchema>;

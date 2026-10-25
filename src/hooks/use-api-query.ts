@@ -45,7 +45,15 @@ export function useApiQuery<T>(
       .get<T>(path, { signal: controller.signal })
       .then((data) => setResult({ key, path, data }))
       .catch((error: unknown) => {
-        if (!controller.signal.aborted) setResult({ key, path, error });
+        if (controller.signal.aborted) return;
+        // Tazeleme başarısız olursa aynı yolun eldeki verisi korunur; ekran onu göstermeye devam
+        // eder (veri varken veri, yoksa hata gösterilir).
+        setResult((previous) => ({
+          key,
+          path,
+          data: previous?.path === path ? previous.data : undefined,
+          error,
+        }));
       });
     return () => controller.abort();
   }, [path, key]);

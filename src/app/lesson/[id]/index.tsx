@@ -25,6 +25,12 @@ import { getErrorMessage } from '@/lib/errors';
 const LEVEL_NAMES = { 1: 'Kolay', 2: 'Orta', 3: 'Zor' } as const;
 const STEPS = ['Hikâyeyi oku', "Pırıl'ın 3 sorusunu cevapla", 'Yıldızlarını topla'];
 
+/** Kartı kapatır; derin bağlantıyla açıldıysa (geri gidilecek ekran yoksa) ana sayfaya gider. */
+function closeCard() {
+  if (router.canGoBack()) router.back();
+  else router.replace('/');
+}
+
 /** Ders kartı (S03DersKarti): yolda bir derse dokununca alttan açılan sayfa. */
 export default function LessonCardScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -154,7 +160,7 @@ function ChestCard({ data }: { data: LessonDetailResponse }) {
           variant="white"
           size="md"
           title="Tamam"
-          onPress={() => router.back()}
+          onPress={closeCard}
           style={styles.action}
         />
       ) : (
@@ -235,7 +241,7 @@ function CardError({ error, onRetry }: { error: unknown; onRetry: () => void }) 
         </View>
       </View>
       {locked ? (
-        <GameButton variant="white" size="md" title="Tamam" onPress={() => router.back()} />
+        <GameButton variant="white" size="md" title="Tamam" onPress={closeCard} />
       ) : (
         <GameButton title="TEKRAR DENE" accessibilityLabel="Tekrar dene" onPress={onRetry} />
       )}

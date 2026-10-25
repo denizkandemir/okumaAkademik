@@ -274,8 +274,9 @@ model GlossaryEntry {
   @@map("glossary_entries")
 }
 
-/// Bir soruya verilen tek bir cevap. Şıkka her dokunuş bir satırdır; yıldız ve lokum, bir okuma
-/// içinde soruya verilen ilk cevabın doğru olup olmadığına göre hesaplanır.
+/// Bir soruya verilen tek bir cevap. Şıkka her dokunuş bir satırdır. Yıldız ve lokum, dersin ilk
+/// tamamlanışından önce kullanıcının soruya (hangi okumada olursa olsun) verdiği ilk cevabın doğru
+/// olup olmadığına göre hesaplanır; tekrar oynamada yıldız yalnızca o okumanın ilk cevaplarına bakar.
 model QuestionAttempt {
   /// Birincil anahtar (cuid)
   id               String         @id @default(cuid())

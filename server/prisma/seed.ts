@@ -10,12 +10,15 @@ import {
   seedTexts,
 } from './seed-data/index.js';
 import { DEMO_PASSWORD, seedDemoUsers } from './seed-demo.js';
+import { sampleUsersAllowed } from './seed-guard.js';
 
 /**
  * Geliştirme verisi. Üretimde çalıştırılmamalı. Tekrar çalıştırılabilir (upsert): içerik
  * (metinler, dersler, sorular, kelime anlamları) seed-data/ ile eşitlenir, kullanıcılar
  * güncellenir, okuma geçmişi sabit kimliklerle (seed-<kullanıcı>-NN) yeniden yazılır ve
  * tarihleri her çalıştırmada "bugün"e göre taşınır. Demo kullanıcılar: seed-demo.ts.
+ * Kullanıcılar yalnızca yerel veritabanında ya da `SEED_DEMO=1` ile yazılır (seed-guard.ts);
+ * içerik her zaman eşitlenir.
  */
 
 type SeedUser = {
@@ -185,9 +188,8 @@ async function syncContent() {
   }
 }
 
-try {
-  await syncContent();
-
+/** Test, örnek ve demo kullanıcılar: şifreleri sıfırlanır, okumaları ve oyun verileri yeniden yazılır. */
+async function seedUsers(contentSummary: string) {
   await upsertUser(TEST_USER);
 
   const now = new Date();
@@ -224,7 +226,7 @@ try {
 
   const sampleUsernames = SAMPLE_USERS.map(({ user }) => user.username).join(', ');
   console.log(
-    `Seed tamam: ${seedLessonRows.length} ders, ${seedTexts.length} metin, ${seedQuestionRows.length} soru, ` +
+    `Seed tamam: ${contentSummary}, ` +
       `test kullanıcısı "${TEST_USER.username}" / "${TEST_USER.password}", ` +
       `örnek kullanıcılar (şifre 1234): ${sampleUsernames}, ${readingCount} okuma kaydı`,
   );
@@ -241,6 +243,22 @@ try {
       'bugün okudu': demo.readToday ? 'evet' : 'hayır (seri tehlikede)',
     })),
   );
+}
+
+try {
+  await syncContent();
+  const contentSummary = `${seedLessonRows.length} ders, ${seedTexts.length} metin, ${seedQuestionRows.length} soru`;
+
+  if (sampleUsersAllowed(databaseUrl, process.env)) {
+    await seedUsers(contentSummary);
+  } else {
+    console.log(
+      `Seed tamam: ${contentSummary}. Test, örnek ve demo kullanıcılar ATLANDI: veritabanı yerel ` +
+        'değil (localhost, 127.0.0.1, ::1). Bu kullanıcıların şifreleri sıfırlanır ve okumaları ' +
+        'yeniden yazılır; paylaşılan bir veritabanında aynı adlı gerçek hesaplar ezilmesin. ' +
+        'Yine de oluşturmak için SEED_DEMO=1 ile çalıştırın.',
+    );
+  }
 } finally {
   await prisma.$disconnect();
 }

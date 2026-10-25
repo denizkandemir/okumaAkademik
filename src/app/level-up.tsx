@@ -15,6 +15,7 @@ import { GameButton } from '@/features/game/ui/game-button';
 import { BookIcon, LokumIcon } from '@/features/game/ui/icons';
 import { ProgressFills, ProgressTrack, ProgressTracks } from '@/features/game/ui/progress-track';
 import { Mascot } from '@/features/mascot/mascot';
+import { useHardwareBack } from '@/hooks/use-hardware-back';
 
 const MAX_LEVEL = 30;
 /** "SEVİYE ATLADIN!" kurdelesi; beyaz yazı okunsun diye tasarımdaki pembeden koyulaştırılmış. */
@@ -25,6 +26,12 @@ export default function LevelUpScreen() {
   const reward = useReward();
   const insets = useSafeAreaInsets();
   const window = useWindowDimensions();
+  // Android geri tuşu DEVAM ET ile aynı: akış yarıda kalmasın.
+  useHardwareBack(() => {
+    if (!reward?.result.level.leveledUp) return false;
+    continueRewardFlow('level-up', reward);
+    return true;
+  });
 
   if (!reward?.result.level.leveledUp) return <Redirect href="/" />;
   const { result } = reward;

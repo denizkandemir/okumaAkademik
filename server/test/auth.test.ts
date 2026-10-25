@@ -140,6 +140,31 @@ describe('POST /auth/login', () => {
     }
     expect((await attempt()).statusCode).toBe(429);
   });
+
+  it('aynı IP için kullanıcı adından bağımsız bir üst sınır vardır (kayıt ve giriş ortak)', async () => {
+    expect(ctx.app.config.AUTH_IP_RATE_LIMIT_MAX).toBe(100);
+    // Boş şifre doğrulamada reddedilir; sınır ondan önce sayıldığı için istekler hızlıdır.
+    const attempt = (index: number) =>
+      ctx.app.inject({
+        method: 'POST',
+        url: '/auth/login',
+        payload: { username: `kisi${index}`, password: '' },
+      });
+
+    for (let index = 0; index < 100; index++) {
+      expect((await attempt(index)).statusCode).toBe(400);
+    }
+    const limited = await attempt(100);
+    expect(limited.statusCode).toBe(429);
+    expect(limited.json().code).toBe('RATE_LIMITED');
+
+    const register = await ctx.app.inject({
+      method: 'POST',
+      url: '/auth/register',
+      payload: { username: 'yeni' },
+    });
+    expect(register.statusCode).toBe(429);
+  });
 });
 
 describe('GET /me ve oturum', () => {
@@ -225,6 +250,19 @@ describe('hata biçimi', () => {
       url: '/auth/login',
       headers: { 'content-type': 'application/json' },
       payload: '{bozuk',
+    });
+    expect(response.statusCode).toBe(400);
+    expect(response.json()).toEqual({
+      code: 'BAD_REQUEST',
+      message: 'İstek anlaşılamadı. Tekrar dene.',
+    });
+  });
+
+  it('metinde veritabanının kabul etmediği karakter (\\u0000) varsa 400 döner', async () => {
+    const response = await ctx.app.inject({
+      method: 'POST',
+      url: '/auth/login',
+      payload: { username: 'a\u0000b', password: '1234' },
     });
     expect(response.statusCode).toBe(400);
     expect(response.json()).toEqual({

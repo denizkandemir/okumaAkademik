@@ -37,6 +37,8 @@ export default function LoginScreen() {
   const [mascotTalking, setMascotTalking] = useState(false);
 
   const handleSubmit = async () => {
+    // Düğme ve klavyedeki "git" birlikte basılınca ikinci istek gitmesin.
+    if (submitting) return;
     const nextErrors = validateSignIn({ username, password });
     setErrors(nextErrors);
     setFormError(null);

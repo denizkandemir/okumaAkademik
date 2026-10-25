@@ -21,9 +21,10 @@ const startSchema = z.object({
 
 const sessionParamsSchema = z.object({ id: z.string().min(1).max(100) });
 
+// Süre üstten reddedilmez, kırpılır: ekranı saatlerce açık kalan okuma da bitirilebilsin.
 const updateSchema = z.object({
   progress: z.number().min(0).max(1),
-  durationSeconds: z.number().int().min(0).max(MAX_DURATION_SECONDS),
+  durationSeconds: z.number().int().min(0),
   completed: z.boolean(),
 });
 
@@ -54,28 +55,39 @@ export async function progressRoutes(app: FastifyInstance) {
     const { id } = parse(sessionParamsSchema, request.params);
     const input = parse(updateSchema, request.body);
 
-    const existing = await prisma.readingSession.findFirst({
-      where: { id, userId: user.id },
-    });
-    if (!existing) throw Errors.notFound('Bu okuma kaydını bulamadık.');
+    // Aynı oturuma eşzamanlı gelen kayıtlar (ör. arka plan ara kaydı ve BİTİRDİM) sırayla işlenir;
+    // yoksa eski satırı okuyan istek, yenisinin yazdığını geri alabilir.
+    return prisma.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT 1 FROM reading_sessions WHERE id = ${id} FOR UPDATE`;
+      const existing = await tx.readingSession.findFirst({
+        where: { id, userId: user.id },
+      });
+      if (!existing) throw Errors.notFound('Bu okuma kaydını bulamadık.');
 
-    const now = new Date();
-    const elapsedSeconds = Math.floor((now.getTime() - existing.startedAt.getTime()) / 1000);
-    // Süre, gerçekte geçen zamandan fazla olamaz; günlük hedef şişirilemez.
-    const durationSeconds = Math.min(
-      input.durationSeconds,
-      elapsedSeconds + DURATION_SLACK_SECONDS,
-    );
-    // Bir kez bitirilen metin "bitmemiş" sayılmaz; ilerleme geri gitmez.
-    const completed = existing.completed || input.completed;
-    const progress = completed ? 1 : Math.max(existing.progress, input.progress);
+      const now = new Date();
+      const elapsedSeconds = Math.floor((now.getTime() - existing.startedAt.getTime()) / 1000);
+      // Süre, gerçekte geçen zamandan fazla olamaz; günlük hedef şişirilemez. Geç gelen eski bir
+      // kayıt süreyi geri götürmez (kayıtlı süre hiçbir zaman negatif değildir).
+      const durationSeconds = Math.max(
+        existing.durationSeconds,
+        Math.min(
+          input.durationSeconds,
+          elapsedSeconds + DURATION_SLACK_SECONDS,
+          MAX_DURATION_SECONDS,
+        ),
+      );
+      // Bir kez bitirilen metin "bitmemiş" sayılmaz; ilerleme geri gitmez. Bitiş anı (seri günü)
+      // da sonradan gelen kayıtlarla kaymaz.
+      const completed = existing.completed || input.completed;
+      const progress = completed ? 1 : Math.max(existing.progress, input.progress);
+      const endedAt = existing.completed ? existing.endedAt : now;
 
-    const updated = await prisma.readingSession.update({
-      where: { id: existing.id },
-      data: { durationSeconds, progress, completed, endedAt: now },
-      select: { id: true, progress: true, durationSeconds: true, completed: true },
+      return tx.readingSession.update({
+        where: { id: existing.id },
+        data: { durationSeconds, progress, completed, endedAt },
+        select: { id: true, progress: true, durationSeconds: true, completed: true },
+      });
     });
-    return updated;
   });
 
   app.get('/me/progress', async (request) => {

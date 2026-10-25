@@ -66,8 +66,9 @@ export function maxLessonLokum(kind: LessonKind): number {
 }
 
 /**
- * Bir okumadaki cevaplardan, ilk denemesi doğru olan soru sayısı. `attempts` zaman sırasıyla
- * verilmelidir; her sorunun yalnızca ilk cevabına bakılır.
+ * Cevaplardan, ilk denemesi doğru olan soru sayısı. `attempts` zaman sırasıyla verilmelidir; her
+ * sorunun yalnızca ilk cevabına bakılır. İlk tamamlamada kullanıcının o metne verdiği tüm cevaplar
+ * (okumadan bağımsız), tekrar oynamada yalnızca o okumanın cevapları verilir.
  */
 export function firstTryCorrectCount(
   attempts: readonly { questionId: string; correct: boolean }[],
@@ -174,6 +175,12 @@ export type LessonRewards = {
   finished: boolean;
 };
 
+/** Seviye `levelBefore`'dan `levelAfter`'a çıkınca açılan şehir; şehir değişmediyse null. */
+export function unlockedCity(levelBefore: number, levelAfter: number): City | null {
+  const cityAfter = cityForLevel(levelAfter);
+  return cityAfter !== cityForLevel(levelBefore) ? cityAfter : null;
+}
+
 /** Bir dersin **ilk** tamamlanışında verilecek ödüller. */
 export function rewardsFor(input: {
   kind: LessonKind;
@@ -186,8 +193,7 @@ export function rewardsFor(input: {
     { length: levelAfter - levelBefore },
     (_, index) => levelBefore + index + 1,
   );
-  const cityAfter = cityForLevel(levelAfter);
-  const cityUnlocked = cityAfter !== cityForLevel(levelBefore) ? cityAfter : null;
+  const cityUnlocked = unlockedCity(levelBefore, levelAfter);
 
   const lesson = input.kind === LessonKind.CHEST ? LOKUM.CHEST : lessonLokum(input.firstTryCorrect);
   const levelUp = levelsGained.length * LOKUM.LEVEL_UP;

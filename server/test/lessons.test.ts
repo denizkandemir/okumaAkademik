@@ -10,6 +10,7 @@ import {
 
 const ctx = useTestContext();
 const MINUTE = 60 * 1000;
+const DAY = 24 * 60 * MINUTE;
 const FIRST = storyAt('istanbul', 1);
 
 async function register(completed = 0, username = 'ayse') {
@@ -450,14 +451,109 @@ describe('POST /lessons/:id/complete', () => {
     expect(await ctx.prisma.lessonCompletion.count()).toBe(0);
   });
 
-  it('aynı anda gelen iki istekte ödül bir kez yazılır', async () => {
+  it('aynı anda gelen iki istekte ödül bir kez yazılır, ikisi de aynı ödülü döner', async () => {
     const { token, userId } = await register(4);
     const responses = await Promise.all([
       complete(token, 'istanbul-05-sandik'),
       complete(token, 'istanbul-05-sandik'),
     ]);
     expect(responses.map((response) => response.statusCode)).toEqual([200, 200]);
-    expect(responses.map((response) => response.json().firstTime).sort()).toEqual([false, true]);
+    expect(responses.map((response) => response.json().firstTime)).toEqual([true, true]);
+    expect(responses.map((response) => response.json().lokum.total)).toEqual([30, 30]);
     expect(await ctx.prisma.lokumEntry.count({ where: { userId } })).toBe(1);
+  });
+
+  it('yanıtı kaybolan tamamlama aynı okumayla yeniden gönderilince aynı ödülü döner', async () => {
+    const { token, userId } = await register();
+    // Önceki dersin defter satırı yeniden kurulan ödüle karışmamalı.
+    const firstReading = await playStory(token, FIRST.id, FIRST.textId);
+    expect((await complete(token, FIRST.id, firstReading)).json().lokum.lesson).toBe(20);
+
+    const lessonId = 'istanbul-02-bahcedeki-domatesler';
+    const readingSessionId = await playStory(token, lessonId, 'bahcedeki-domatesler', 1);
+    const first = (await complete(token, lessonId, readingSessionId)).json();
+    expect(first).toMatchObject({
+      firstTime: true,
+      stars: 2,
+      firstTryCorrect: 2,
+      lokum: { lesson: 15, levelUp: 50, cityUnlock: 0, total: 65, balance: 85 },
+      level: { before: 1, after: 2, leveledUp: true },
+      cityUnlocked: null,
+    });
+
+    const retry = await complete(token, lessonId, readingSessionId);
+    expect(retry.statusCode).toBe(200);
+    expect(retry.json()).toEqual(first);
+    expect(await ctx.prisma.lokumEntry.count({ where: { userId } })).toBe(3);
+  });
+
+  it('sandık 10 dakika içinde yeniden açılırsa aynı ödülü döner, sonrası tekrar sayılır', async () => {
+    const { token, userId } = await register(9);
+    const first = (await complete(token, 'istanbul-10-sandik')).json();
+    expect(first).toMatchObject({
+      firstTime: true,
+      lokum: { lesson: 30, levelUp: 50, cityUnlock: 100, total: 180, balance: 180 },
+      level: { before: 5, after: 6, leveledUp: true },
+      cityUnlocked: 'izmir',
+    });
+
+    const retry = (await complete(token, 'istanbul-10-sandik')).json();
+    expect(retry).toEqual(first);
+    expect(retry.cityUnlocked).toBe('izmir');
+    expect(await ctx.prisma.lokumEntry.count({ where: { userId } })).toBe(3);
+
+    await ctx.prisma.lessonCompletion.update({
+      where: { userId_lessonId: { userId, lessonId: 'istanbul-10-sandik' } },
+      data: { completedAt: new Date(Date.now() - DAY) },
+    });
+    expect((await complete(token, 'istanbul-10-sandik')).json()).toMatchObject({
+      firstTime: false,
+      lokum: { lesson: 0, levelUp: 0, cityUnlock: 0, total: 0, balance: 180 },
+      level: { before: 6, after: 6, leveledUp: false },
+      cityUnlocked: null,
+    });
+  });
+
+  it('ilk deneme okumadan bağımsızdır: yanlış cevaptan sonra yeniden okumak yıldız kazandırmaz', async () => {
+    const { token, userId } = await register();
+    const [q1, q2, q3] = await questionsOf(FIRST.textId);
+    if (!q1 || !q2 || !q3) throw new Error('soru yok');
+
+    // İlk okumada birinci soruya yanlış cevap verip sorulardan çıkar.
+    const abandoned = await read(token, FIRST.textId);
+    await answer(token, FIRST.id, {
+      readingSessionId: abandoned,
+      questionId: q1.id,
+      choiceIndex: (q1.correctIndex + 1) % 3,
+    });
+
+    // Hikâyeyi yeniden okuyup hepsini doğru cevaplar.
+    const reread = await read(token, FIRST.textId);
+    const shownLokum = [];
+    for (const question of [q1, q2, q3]) {
+      const response = await answer(token, FIRST.id, {
+        readingSessionId: reread,
+        questionId: question.id,
+        choiceIndex: question.correctIndex,
+      });
+      shownLokum.push(response.json().lokum);
+    }
+    expect(shownLokum).toEqual([0, 5, 5]);
+
+    expect((await complete(token, FIRST.id, reread)).json()).toMatchObject({
+      firstTime: true,
+      stars: 2,
+      firstTryCorrect: 2,
+      lokum: { lesson: 15, total: 15 },
+    });
+
+    // Yanıt kaybolup aynı okumayla yeniden gönderilse de sonuç aynı; en iyi yıldız yükselmez.
+    expect((await complete(token, FIRST.id, reread)).json()).toMatchObject({
+      firstTime: true,
+      stars: 2,
+      firstTryCorrect: 2,
+    });
+    const completion = await ctx.prisma.lessonCompletion.findFirstOrThrow({ where: { userId } });
+    expect(completion).toMatchObject({ stars: 2, bestStars: 2 });
   });
 });

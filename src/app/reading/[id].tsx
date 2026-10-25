@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Pressable,
   ScrollView,
@@ -27,6 +27,7 @@ import { GlossaryText, type GlossaryEntry } from '@/features/reading/glossary-te
 import type { ReadingSessionResult, ReadingText } from '@/features/reading/types';
 import { useReadingSession } from '@/features/reading/use-reading-session';
 import { useApiQuery } from '@/hooks/use-api-query';
+import { useHardwareBack } from '@/hooks/use-hardware-back';
 import { getErrorMessage } from '@/lib/errors';
 
 /** Okuma ekranının zemini (S04Okuma). */
@@ -125,15 +126,31 @@ function ReadingView({
     updateProgress();
   };
 
+  // Kaydırarak geri (iOS) ile BİTİRDİM sürerken çıkılırsa, yanıt gelince yönlendirme yapılmaz.
+  const mounted = useRef(true);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+
   const leave = () => {
     setConfirmLeave(false);
     if (router.canGoBack()) router.back();
     else router.replace('/');
   };
+  /** Kapat (X ve Android geri): BİTİRDİM kaydedilirken yok sayılır; ilerleme varsa onay sorar. */
   const requestClose = () => {
-    if (progress > 0 && !finishing) setConfirmLeave(true);
+    if (finishing) return;
+    if (progress > 0) setConfirmLeave(true);
     else leave();
   };
+  useHardwareBack(() => {
+    if (freeResult) leave();
+    else requestClose();
+    return true;
+  });
 
   const handleFinish = async () => {
     if (finishing) return;
@@ -141,6 +158,7 @@ function ReadingView({
     setFinishError(null);
     try {
       const result = await session.finish();
+      if (!mounted.current) return;
       if (!lesson) {
         setFreeResult(result);
         return;
@@ -148,6 +166,7 @@ function ReadingView({
       const readingSessionId = await session.sessionId();
       if (!readingSessionId)
         throw new Error('Okuman kaydedilemedi. İnternet bağlantını kontrol et.');
+      if (!mounted.current) return;
       router.replace({
         pathname: '/lesson/[id]/quiz',
         params: { id: lesson.id, readingSessionId },

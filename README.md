@@ -44,7 +44,9 @@ Seed'in oluşturduğu kullanıcılar (hepsinin şifresi `1234`):
 | `zeynep`      | 7     | Okuma geçmişi; günlük hedef 20 dk                     |
 
 `npm run db:seed` tekrar çalıştırılabilir: kullanıcılar ve metinler güncellenir, örnek okuma
-geçmişi bugüne göre yeniden yazılır; uygulamada oluşturduğunuz kayıtlara dokunulmaz.
+geçmişi bugüne göre yeniden yazılır; uygulamada oluşturduğunuz kayıtlara dokunulmaz. Kullanıcılar
+yalnızca yerel veritabanında (`localhost`, `127.0.0.1`, `::1`) ya da `SEED_DEMO=1` ile yazılır;
+aksi halde yalnızca içerik eşitlenir.
 
 ### Günlük çalıştırma
 
