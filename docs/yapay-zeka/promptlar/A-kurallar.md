@@ -15,7 +15,10 @@ Read this file first, then the task.
   reads the database in Prisma Studio and DBeaver.
 - The existing code you build on: `server/src/lib/journey.ts`, `server/src/modules/journey/`,
   `server/prisma/schema.prisma`, `server/prisma/seed*.ts`, `src/features/game/`,
-  `src/features/reading/`, `src/app/`. Never guess shapes: read the code.
+  `src/features/reading/`, `src/design/`, `src/app/`. Never guess shapes: read the code.
+- The app's design: `docs/tasarim/README.md` ("Pırıl'ın Atlası": tokens, components, Pırıl poses,
+  decisions). Every new screen uses the `src/design/` tokens and components and looks like it
+  belongs next to the existing screens. Never bring back the old "game" style.
 
 ## Git (CLAUDE.md wins over anything else)
 
@@ -25,7 +28,8 @@ Read this file first, then the task.
 
 ## Quality bar
 
-- App: check the Expo SDK 57 docs before using any Expo/React Native API; install with
+- App: read the `expo` major version in `package.json` and check that SDK's docs before using
+  any Expo/React Native API; install with
   `npx expo install`; run `npx expo lint` and `npx tsc --noEmit`.
 - Server: run `npm run lint`, `npm run typecheck` and `npm test` in `server/`. New rules and
   endpoints get Vitest tests (follow `server/test/`).

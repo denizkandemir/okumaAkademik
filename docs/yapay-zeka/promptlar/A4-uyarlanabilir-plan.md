@@ -64,7 +64,7 @@ Task `plan.weekly` from A2:
   - each day's exercises with icons
   - Pırıl with the week's message
 
-  It follows the game style and is accessible.
+  It follows the app's design (`docs/tasarim/README.md`, `src/design/`) and is accessible.
 
 ## Done when
 

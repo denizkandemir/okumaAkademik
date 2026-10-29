@@ -3,8 +3,8 @@
 Follow `docs/yapay-zeka/promptlar/A-kurallar.md`. Read `03-yol-haritasi.md` §3 A0,
 `02-egzersiz-katalogu.md` §3-4 and `01-arastirma.md` §4.
 
-Prerequisite: P06 (reading, quiz, rewards) is merged. Check `src/app/lesson/` and the reward store
-exist; if not, stop and tell me.
+Prerequisite: the new design (T00-T06 in `docs/tasarim/promptlar/`) is merged. Check that
+`src/design/` and the restyled `src/app/lesson/` screens exist; if not, stop and tell me.
 
 ## Goal
 
@@ -44,7 +44,7 @@ the AI) can decide well. This task adds no AI calls.
    - `questions_total`, `first_try_correct`, `comprehension` (0-1, first-try based)
    - `rushed` flag (`words_per_minute` above a configurable ceiling for the band **and**
      comprehension < 0.6)
-   - Written when a lesson is completed (`POST /lessons/:id/complete`, used by P06's flow) and
+   - Written when a lesson is completed (`POST /lessons/:id/complete`, used by the lesson flow) and
      when a library reading finishes (comprehension null there).
    - Per-question-type results are derived from `question_attempts` joined with `questions`; add a
      view `v_reading_results_by_type`.
@@ -69,8 +69,8 @@ the AI) can decide well. This task adds no AI calls.
 ## App
 
 1. After registration (and for existing users when `needsPlacement` is true, once), show the
-   placement flow in the game style: Pırıl `talk` → read text 1 → 3 questions → text 2 → 3
-   questions → "Seni tanıdım!" with Pırıl `happy`. Reuse P06's reading and quiz screens or their
+   placement flow in the app's design (`docs/tasarim/README.md`, `src/design/`): Pırıl `talk` → read text 1 → 3 questions → text 2 → 3
+   questions → "Seni tanıdım!" with Pırıl `happy`. Reuse the reading and quiz screens or their
    components; do not duplicate logic. It can be skipped ("Sonra yapalım"), and it never blocks the
    journey.
 2. Nothing else changes visually in this task.

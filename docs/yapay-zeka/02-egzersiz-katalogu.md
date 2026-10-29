@@ -40,7 +40,7 @@ Sınıf grupları: **G1** = 1-2. sınıf, **G2** = 3-4, **G3** = 5-6, **G4** = 7
 - **Ayarlar:** vurgu birimi (kelime ya da cümle; disleksi pilotunda cümle bandı daha iyiydi),
   ses hızı.
 - **Teknik not:** Kelimeyle eşzamanlı vurgu için kelime zamanlaması gerekir. Cihazdaki ses
-  motorunun kelime sınırı olaylarını verip vermediği SDK 57 belgelerinden kontrol edilmeli;
+  motorunun kelime sınırı olaylarını verip vermediği kullanılan SDK sürümünün belgelerinden kontrol edilmeli;
   vermiyorsa önceden üretilmiş ses ve zaman damgaları kullanılır.
 
 ### E4 · Öbek öbek oku

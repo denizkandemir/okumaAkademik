@@ -1,7 +1,13 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
+import {
+  ScrollView,
+  StyleSheet,
+  View,
+  useWindowDimensions,
+  type ScrollViewInstance,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BottomTabInset } from '@/constants/theme';
@@ -44,7 +50,7 @@ export default function HomeScreen() {
   }, [tip]);
 
   // Açılışta (ve şehir ya da şu anki ders değişince) şu anki düğüm görünür alanın ortasına gelsin.
-  const scrollRef = useRef<ScrollView>(null);
+  const scrollRef = useRef<ScrollViewInstance>(null);
   const scrolledFor = useRef<string | null>(null);
   /** Yol (iskelet ya da hata değil) çizilip ölçüldü mü. */
   const pathMeasured = useRef(false);

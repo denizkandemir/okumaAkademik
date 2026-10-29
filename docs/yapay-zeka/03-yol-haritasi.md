@@ -20,15 +20,19 @@
 
 ## 2. Sıralama
 
-Daha önce konuştuğumuz gibi yapay zekâ aşaması P06'dan sonra başlar:
+Yapay zekâ aşaması, yeni tasarımın (Pırıl'ın Atlası, `docs/tasarim/`) T00-T06 görevleri
+bittikten sonra başlar:
 
-**P06 → A0 → A1 → A2 → A3 → A4 → A5 → P07 → A6 → P08 → P09**
+**T00-T06 → A0 → A1 → A2 → A3 → A4 → A5 → A6**
+
+Eski planda yapay zekâ aşamaları arasına giren P07 (harita, rozetler, profil), P08 (bildirim,
+geri dönüş) ve P09 (son kontrol), yeni tasarımın T03-T06 görevlerine taşındı.
 
 A7 (kalite ve güvenlik) A2'den itibaren her aşamaya eşlik eder.
 
 | Aşama | Ad | Yapay zekâ var mı | Bağımlılık |
 |---|---|---|---|
-| A0 | Ölçüm ve veri temeli | Hayır | P06 |
+| A0 | Ölçüm ve veri temeli | Hayır | T00-T06 |
 | A1 | Egzersiz motoru | Hayır | A0 |
 | A2 | Yapay zekâ altyapısı | Evet (altyapı) | A0 |
 | A3 | Yapay zekâ ile içerik üretimi | Evet | A1, A2 |

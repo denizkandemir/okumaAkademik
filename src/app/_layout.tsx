@@ -70,9 +70,15 @@ function RootNavigator({ fontsReady }: { fontsReady: boolean }) {
           <Stack.Screen name="level-up" options={REWARD_SCREEN} />
           <Stack.Screen name="city-unlocked" options={REWARD_SCREEN} />
           <Stack.Screen name="finale" options={REWARD_SCREEN} />
+          {/* SDK 58'de iOS 26+ başlığı varsayılan saydam; SDK 57'deki opak görünüm korunur. */}
           <Stack.Screen
             name="journey-map"
-            options={{ headerShown: true, title: '', headerBackTitle: 'Geri' }}
+            options={{
+              headerShown: true,
+              headerTransparent: false,
+              title: '',
+              headerBackTitle: 'Geri',
+            }}
           />
         </Stack.Protected>
 

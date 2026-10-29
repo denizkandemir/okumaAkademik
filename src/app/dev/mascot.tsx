@@ -29,6 +29,8 @@ const BUBBLE_TEXTS = [
 
 const HEADER_OPTIONS = {
   headerShown: true,
+  // SDK 58'de iOS 26+ başlığı varsayılan saydam; opak kalsın.
+  headerTransparent: false,
   title: 'Maskot vitrini',
   // Geri butonunda önceki rotanın adı ("(tabs)") yerine "Geri" yazsın.
   headerBackTitle: 'Geri',

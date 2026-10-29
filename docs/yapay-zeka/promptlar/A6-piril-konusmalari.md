@@ -1,7 +1,7 @@
 # A6 — Pırıl's AI conversations
 
 Follow `docs/yapay-zeka/promptlar/A-kurallar.md`. Read `03-yol-haritasi.md` §3 A6. A2 and A5 must
-be merged (P07 too, if it touches the same screens).
+be merged.
 
 ## Goal
 

@@ -18,7 +18,7 @@ Gerçek değerler A2'deki `ai_requests` tablosundan ölçülüp bu belge güncel
 | Zamanlanmış işler | `pg-boss` (PostgreSQL üzerinde iş kuyruğu) ya da basit zamanlayıcı | Pazar gecesi toplu raporlar, toplu işlerin sonucunu toplama | Yok (ek sunucu gerektirmez) |
 | Doğrulama | zod (mevcut) | Gelen ve giden verinin kontrolü | Yok |
 | Okunabilirlik | Kendi Ateşman hesaplayıcımız (TypeScript) | Üretilen metnin sınıfa uygunluğu | Yok |
-| Uygulama | Expo SDK 57, React Native, Reanimated (mevcut) | Egzersizler, Pırıl'ın ışığı animasyonu | Yok |
+| Uygulama | Expo SDK 58, React Native, Reanimated (mevcut) | Egzersizler, Pırıl'ın ışığı animasyonu | Yok |
 | Grafikler | `react-native-svg` (mevcut) | "Gelişimim" ekranı | Yok |
 | Seslendirme | `expo-speech` (cihazdaki Türkçe ses) | Dinle-sonra-oku, dinlerken oku | Yok. Kalite yetmezse bulut seslendirme hizmeti gerekir; ayrı ücretlidir, bu hesaba dahil değil |
 | İzleme | `ai_requests` tablosu + SQL görünümü | Aylık harcama, hata ve ret oranı | Yok |

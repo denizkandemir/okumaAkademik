@@ -44,8 +44,9 @@ Opened from Profile and from the training card.
 
 ## 3. Notifications hook
 
-If P08's reminders exist, the weekly report can be announced with a local notification on Monday
-("Pırıl haftalık karneni hazırladı!"). Opt-in, the same settings as P08.
+The weekly report can be announced with a local notification on Monday ("Pırıl haftalık
+karneni hazırladı!"). Reuse the reminder code and settings screen from T04 (opt-in, its own
+switch on the "Yol arkadaşın" settings screen).
 
 ## Done when
 

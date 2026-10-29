@@ -9,6 +9,8 @@ import { CityScene } from '@/features/scenes/city-scene';
 
 const HEADER_OPTIONS = {
   headerShown: true,
+  // SDK 58'de iOS 26+ başlığı varsayılan saydam; opak kalsın.
+  headerTransparent: false,
   title: 'Şehir sahneleri',
   headerBackTitle: 'Geri',
 };

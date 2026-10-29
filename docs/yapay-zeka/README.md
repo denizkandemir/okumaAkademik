@@ -19,7 +19,8 @@ Okumatik'in yapay zekâ aşamasının istekleri, araştırması ve planı.
   anlama stratejileri, LGS tarzı paragraf ve sözel mantık, görsel okuma.
 - **Eklenmeyenler:** ortası soluk harfler (Bionic Reading benzeri), kelimelerin tek tek yanıp
   söndüğü gösterim (RSVP), göz egzersizleri. Kontrollü çalışmalarda faydaları gösterilemedi.
-- **Sıra:** P06 → A0 → A1 → A2 → A3 → A4 → A5 → P07 → A6 → P08 → P09.
+- **Sıra:** önce yeni tasarım (T00 → T06, `docs/tasarim/`), sonra A0 → A1 → A2 → A3 → A4 → A5 →
+  A6 → A7.
 - **Her aşamanın promptu,** bir önceki aşama bittikten sonra kodun son hali görülerek
   `promptlar/` klasörüne yazılacak.
 
@@ -40,8 +41,9 @@ Her biri ayrı bir Claude Code oturumunda, sırayla çalıştırılır. Ortak ku
 | A6 | `A6-piril-konusmalari.md` | Pırıl mesaj havuzları, özet geri bildirimi, "Sen sor" | Evet |
 | A7 | `A7-kalite-ve-guvenlik.md` | Değerlendirme setleri, egzersiz etkinliği, KVKK, maliyet paneli | Hayır |
 
-Sıra: **P06 → A0 → A1a → A1b → A2 → A3 → A4 → A5 → P07 → A6 → P08 → P09**, A7 en sonda ve
-istem ya da model her değiştiğinde. A2, A0'dan hemen sonra da yapılabilir (A1'e bağlı değil).
+Sıra: **T00-T06 (yeni tasarım) → A0 → A1a → A1b → A2 → A3 → A4 → A5 → A6**, A7 en sonda ve
+istem ya da model her değiştiğinde. Eski P07-P09 görevlerinin işi yeni tasarımın T03-T06
+görevlerine taşındı. A2, A0'dan hemen sonra da yapılabilir (A1'e bağlı değil).
 
 Claude Code'a yazılacak mesaj (örnek A0):
 

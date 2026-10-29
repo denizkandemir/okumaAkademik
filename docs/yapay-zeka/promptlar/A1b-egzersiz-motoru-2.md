@@ -5,7 +5,7 @@ E9, E10). A1a must be merged; reuse its framework, endpoints and shell.
 
 ## 1. E2 Dinle, sonra oku and E3 Dinlerken oku
 
-- Use `expo-speech` (install with `npx expo install`). First check the SDK 57 docs for:
+- Use `expo-speech` (install with `npx expo install`). First check the docs of the SDK in `package.json` for:
   - Turkish voice availability on iOS and Android
   - rate control
   - whether word-boundary events exist on each platform

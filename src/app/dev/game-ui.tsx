@@ -39,6 +39,8 @@ import { StatChip } from '@/features/game/ui/stat-chip';
 
 const HEADER_OPTIONS = {
   headerShown: true,
+  // SDK 58'de iOS 26+ başlığı varsayılan saydam; opak kalsın.
+  headerTransparent: false,
   title: 'Oyun arayüzü',
   // Geri butonunda önceki rotanın adı ("(tabs)") yerine "Geri" yazsın.
   headerBackTitle: 'Geri',

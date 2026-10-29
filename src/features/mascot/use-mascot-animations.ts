@@ -1,6 +1,6 @@
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { AppState, type AppStateStatus } from 'react-native';
+import { AppState } from 'react-native';
 import {
   cancelAnimation,
   Easing,
@@ -76,7 +76,8 @@ export function useMascotCanAnimate(): boolean {
   return focused && appActive;
 }
 
-function isActiveState(state: AppStateStatus | null | undefined) {
+// RN 0.88 tiplerinde AppState.currentState `string` olarak tanımlı (AppStateStatus değil).
+function isActiveState(state: string | null | undefined) {
   return state !== 'background' && state !== 'inactive';
 }
 

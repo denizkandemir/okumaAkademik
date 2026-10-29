@@ -59,7 +59,9 @@ function FloatingTabList({ children, style: _style, ...props }: ViewProps) {
   );
 }
 
-type TabButtonProps = TabTriggerSlotProps & {
+// TabTriggerSlotProps'taki ref tipi (RefAttributes<View>) RN 0.88'in katı tipleriyle uyuşmuyor;
+// ref çalışma zamanında yine Pressable'a geçer, yalnızca tipten çıkarılır.
+type TabButtonProps = Omit<TabTriggerSlotProps, 'ref'> & {
   label: string;
   Icon: ComponentType<IconProps>;
 };
