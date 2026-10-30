@@ -7,6 +7,8 @@ import '@/global.css';
 
 import { Platform } from 'react-native';
 
+import { size } from '@/design/tokens';
+
 export const Colors = {
   light: {
     text: '#111318',
@@ -94,15 +96,9 @@ export const ReadingFont = {
   lineHeightRatio: 1.6,
 } as const;
 
-/** Yüzen sekme çubuğu (tüm platformlarda altta; bkz. components/app-tabs.tsx). */
-export const TabBar = {
-  height: 70,
-  /** Çubuğun güvenli alanın altından ve kenarlardan uzaklığı. */
-  gap: 14,
-  /** Tablet ve web'de çubuk bu genişlikte ortalanır. */
-  maxWidth: 560,
-} as const;
-
-/** Sekme içindeki ekranların alt boşluğu (güvenli alana ek): içerik çubuğun altında kalmaz. */
-export const BottomTabInset = TabBar.height + TabBar.gap;
+/**
+ * Sekme içindeki ekranların alt boşluğu (güvenli alana ek): içerik alta sabit sekme çubuğunun
+ * (bkz. components/app-tabs.tsx) altında kalmaz.
+ */
+export const BottomTabInset = size.tabBar;
 export const MaxContentWidth = 720;

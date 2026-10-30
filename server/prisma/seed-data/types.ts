@@ -1,4 +1,9 @@
-import type { City, LessonKind, ReadingLevel } from '../../src/generated/prisma/enums.js';
+import type {
+  City,
+  LessonKind,
+  ReadingLevel,
+  TextTheme,
+} from '../../src/generated/prisma/enums.js';
 
 /** Okuma metni. Sınıf aralıkları (minGrade-maxGrade) metnin zorluğuna göre seçilir. */
 export type SeedText = {
@@ -6,6 +11,8 @@ export type SeedText = {
   title: string;
   level: ReadingLevel;
   estimatedMinutes: number;
+  /** Hikâye okunarak seçilen tema; migration'daki eşlemeyle aynı olmalı. */
+  theme: TextTheme;
   minGrade: number;
   maxGrade: number;
   paragraphs: string[];

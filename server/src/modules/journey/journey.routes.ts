@@ -12,6 +12,7 @@ import {
   streakFrom,
   weekFrom,
 } from '../../lib/journey.js';
+import { toApiTheme } from '../../lib/text-theme.js';
 import { startOfDayInTimeZone } from '../../lib/time.js';
 import { parse } from '../../lib/validation.js';
 import { requireAuth } from '../../plugins/auth.js';
@@ -44,6 +45,15 @@ export async function journeyRoutes(app: FastifyInstance) {
 
     const cityLessons = state.lessons.filter((lesson) => lesson.city === city);
     const streak = streakFrom(dates, new Date());
+    // Haritadaki "Arkadaşlık · 2 dk" etiketi için şehrin hikâye metinleri.
+    const texts = new Map(
+      (
+        await prisma.text.findMany({
+          where: { id: { in: cityLessons.flatMap((lesson) => lesson.textId ?? []) } },
+          select: { id: true, theme: true, estimatedMinutes: true },
+        })
+      ).map((text) => [text.id, text]),
+    );
 
     return {
       level: state.level,
@@ -57,14 +67,20 @@ export async function journeyRoutes(app: FastifyInstance) {
         lessonsDone: selected.lessonsDone,
         lessonsTotal: cityLessons.length,
       },
-      lessons: cityLessons.map((lesson) => ({
-        id: lesson.id,
-        position: lesson.position,
-        kind: lesson.kind === LessonKind.CHEST ? 'chest' : 'story',
-        title: lesson.title,
-        status: lesson.status,
-        stars: lesson.bestStars,
-      })),
+      lessons: cityLessons.map((lesson) => {
+        const text = lesson.textId ? texts.get(lesson.textId) : undefined;
+        return {
+          id: lesson.id,
+          position: lesson.position,
+          kind: lesson.kind === LessonKind.CHEST ? 'chest' : 'story',
+          title: lesson.title,
+          status: lesson.status,
+          stars: lesson.bestStars,
+          // Sandıkta metin yoktur: ikisi de null.
+          theme: text ? toApiTheme(text.theme) : null,
+          estimatedMinutes: text?.estimatedMinutes ?? null,
+        };
+      }),
       cities: cities.map(({ id, status, lessonsDone }) => ({ id, status, lessonsDone })),
       stats: { lokum, ...streak },
     };

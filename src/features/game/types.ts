@@ -24,6 +24,10 @@ export type JourneyLesson = {
   status: LessonStatus;
   /** En iyi yıldız (1-3); sandıkta ve bitmemiş derste `null`. */
   stars: number | null;
+  /** Hikâyenin teması, Türkçe adıyla (ör. "Arkadaşlık"); sandıkta `null`. */
+  theme: string | null;
+  /** Tahmini okuma süresi (dakika); sandıkta `null`. */
+  estimatedMinutes: number | null;
 };
 
 /** GET /me/journey?city=<id> */
@@ -65,6 +69,8 @@ export type LessonDetailResponse = {
     title: string;
     level: ApiReadingLevel;
     estimatedMinutes: number;
+    /** Hikâyenin teması, Türkçe adıyla (ör. "Arkadaşlık"). */
+    theme: string;
     paragraphs: string[];
   } | null;
   glossary: { word: string; meaning: string }[];

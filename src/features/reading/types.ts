@@ -13,6 +13,8 @@ export type TextSummary = {
   level: ReadingLevel;
   /** Dakika cinsinden tahmini okuma süresi. */
   estimatedMinutes: number;
+  /** Hikâyenin teması, Türkçe adıyla (ör. "Arkadaşlık"). */
+  theme: string;
 };
 
 /** GET /texts/:id */

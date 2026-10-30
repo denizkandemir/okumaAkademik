@@ -1,4 +1,4 @@
-import { City, ReadingLevel } from '../../src/generated/prisma/enums.js';
+import { City, ReadingLevel, TextTheme } from '../../src/generated/prisma/enums.js';
 import { chest, story } from './build.js';
 import type { SeedCity } from './types.js';
 
@@ -12,6 +12,7 @@ export const antalya: SeedCity = {
     story(city, {
       position: 1,
       slug: 'kaleicinde-ipucu-avi',
+      theme: TextTheme.KESIF,
       title: 'Kaleiçi’nde İpucu Avı',
       summary:
         'Kaan’ın babaannesinin hazırladığı ipuçlarını izleyerek Kaleiçi’ni keşfettiği hazine avı.',
@@ -59,6 +60,7 @@ export const antalya: SeedCity = {
     story(city, {
       position: 2,
       slug: 'guletle-mavi-yolculuk',
+      theme: TextTheme.KESIF,
       title: 'Guletle Mavi Yolculuk',
       summary:
         'Ela’nın guletle Akdeniz’e açılıp kaptandan denizci düğümü atmayı öğrendiği yolculuk.',
@@ -106,6 +108,7 @@ export const antalya: SeedCity = {
     story(city, {
       position: 3,
       slug: 'denize-dokulen-selale',
+      theme: TextTheme.DOGA,
       title: 'Denize Dökülen Şelale',
       summary:
         'Efe’nin Düden Şelalesi’nin arkasındaki mağaraya girip denize dökülen şelaleyi gördüğü gezi.',
@@ -157,6 +160,7 @@ export const antalya: SeedCity = {
     story(city, {
       position: 4,
       slug: 'portakal-bahcesi',
+      theme: TextTheme.PAYLASMAK,
       title: 'Portakal Bahçesi',
       summary:
         'Melis’in dedesinin bahçesinde portakal toplayıp çiçeğin meyveye dönüşmesini öğrendiği kış günü.',
@@ -209,6 +213,7 @@ export const antalya: SeedCity = {
     story(city, {
       position: 6,
       slug: 'ay-isiginda-yolculuk',
+      theme: TextTheme.DOGA,
       title: 'Ay Işığında Yolculuk',
       summary:
         'Can’ın bir yaz gecesi deniz kaplumbağası yavrularının ay ışığında denize ulaşmasını izlediği gece.',
@@ -262,6 +267,7 @@ export const antalya: SeedCity = {
     story(city, {
       position: 7,
       slug: 'deniz-feneri',
+      theme: TextTheme.SORUMLULUK,
       title: 'Deniz Feneri Bekçisi',
       summary:
         'Fırtınalı bir gecede elektrikler kesilince fenerin ışığını yeniden yakan Hasan Kaptan’ın hikâyesi.',
@@ -309,6 +315,7 @@ export const antalya: SeedCity = {
     story(city, {
       position: 8,
       slug: 'bir-gunde-kar-ve-deniz',
+      theme: TextTheme.KESIF,
       title: 'Bir Günde Kar ve Deniz',
       summary:
         'Arda’nın aynı gün Toros Dağları’nda karda kayıp Akdeniz’de ayaklarını suya soktuğu gün.',
@@ -363,6 +370,7 @@ export const antalya: SeedCity = {
     story(city, {
       position: 9,
       slug: 'piril-ve-ressam',
+      theme: TextTheme.MERAK,
       title: 'Pırıl ve Ressam',
       summary:
         'Pırıl’ın Kaleiçi’nde bir ressamın tuvalinde Kapadokya’nın balonlarını görüp yeni durağını seçtiği gün.',

@@ -159,7 +159,7 @@ export default function HomeScreen() {
               info={info}
               lessonsDone={data.city.lessonsDone}
               lessonsTotal={data.city.lessonsTotal}
-              onOpenMap={() => router.push('/journey-map')}
+              onOpenMap={() => router.navigate('/passport')}
             />
           ) : (
             <View style={styles.bannerSkeleton} />

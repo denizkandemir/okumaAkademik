@@ -1,4 +1,4 @@
-import { City, ReadingLevel } from '../../src/generated/prisma/enums.js';
+import { City, ReadingLevel, TextTheme } from '../../src/generated/prisma/enums.js';
 import { chest, story } from './build.js';
 import type { SeedCity } from './types.js';
 
@@ -11,6 +11,7 @@ export const van: SeedCity = {
     story(city, {
       position: 1,
       slug: 'van-golunun-sirri',
+      theme: TextTheme.DOGA,
       title: 'Van Gölü’nün Sırrı',
       summary:
         'Ayşe’nin anneannesiyle Van Gölü’nün sabun gibi köpüren sodalı suyunun sırrını keşfettiği sabah.',
@@ -60,6 +61,7 @@ export const van: SeedCity = {
     story(city, {
       position: 2,
       slug: 'akdamarin-badem-agaclari',
+      theme: TextTheme.KESIF,
       title: 'Akdamar’ın Badem Ağaçları',
       summary:
         'Emre’nin baharda Akdamar Adası’nda badem çiçekleri arasında taş oymalardaki hayvanları saydığı gün.',
@@ -108,6 +110,7 @@ export const van: SeedCity = {
     story(city, {
       position: 3,
       slug: 'van-kalesinde-gun-batimi',
+      theme: TextTheme.HATIRALAR,
       title: 'Van Kalesi’nde Gün Batımı',
       summary:
         'Kerim’in Van Kalesi’nde Urartulardan kalan çivi yazısını görüp göl üstünde gün batımını izlediği akşam.',
@@ -157,6 +160,7 @@ export const van: SeedCity = {
     story(city, {
       position: 4,
       slug: 'tabak-tabak-van-kahvaltisi',
+      theme: TextTheme.AILE,
       title: 'Tabak Tabak Van Kahvaltısı',
       summary:
         'Elif’in tabak tabak Van kahvaltısında sofranın en güzel yanının birlikte olmak olduğunu fark ettiği sabah.',
@@ -207,6 +211,7 @@ export const van: SeedCity = {
     story(city, {
       position: 6,
       slug: 'inci-kefalinin-yolculugu',
+      theme: TextTheme.DOGA,
       title: 'İnci Kefalinin Yolculuğu',
       summary:
         'Deniz’in dedesiyle inci kefallerinin akıntıya karşı yüzüp şelalelerden sıçradığı bahar göçünü izlediği gün.',
@@ -260,6 +265,7 @@ export const van: SeedCity = {
     story(city, {
       position: 7,
       slug: 'kedilerin-evinde',
+      theme: TextTheme.SORUMLULUK,
       title: 'Kedilerin Evinde',
       summary:
         'Berk’in Van Kedisi Evi’nde suyla oynamayı seven, iki gözü farklı renkte Fındık’la tanıştığı gün.',
@@ -308,6 +314,7 @@ export const van: SeedCity = {
     story(city, {
       position: 8,
       slug: 'ninemin-kilimi',
+      theme: TextTheme.AILE,
       title: 'Ninemin Kilimi',
       summary:
         'Zehra’nın ninesinden kilim desenlerinin anlamlarını öğrenip kilime kendi desenini dokuduğu günler.',
@@ -360,6 +367,7 @@ export const van: SeedCity = {
     story(city, {
       position: 9,
       slug: 'eve-donus',
+      theme: TextTheme.AILE,
       title: 'Eve Dönüş',
       summary:
         'Pırıl’ın Van Gölü kıyısında ailesine kavuşup yolculuk boyunca ona hikâye okuyan arkadaşına teşekkür ettiği mutlu son.',

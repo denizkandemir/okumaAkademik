@@ -1,4 +1,4 @@
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
@@ -7,6 +7,7 @@ import { Card } from '@/components/card';
 import { Screen } from '@/components/screen';
 import { ThemedText } from '@/components/themed-text';
 import { MinTouchSize, Radius, Spacing } from '@/constants/theme';
+import { Button as DesignButton } from '@/design/components/button';
 import { useAuth } from '@/features/auth/auth-context';
 import { Mascot } from '@/features/mascot/mascot';
 import { useTheme } from '@/hooks/use-theme';
@@ -44,6 +45,14 @@ export default function ProfileScreen() {
         <InfoRow label="Sınıf" value={`${user.grade}. sınıf`} />
       </Card>
 
+      {/* Rozetler sekme değil (docs/tasarim, karar 7); tam liste ayrı ekranda. */}
+      <DesignButton
+        title="ROZETLERİM"
+        accessibilityLabel="Rozetlerim"
+        variant="secondary"
+        onPress={() => router.push('/badges')}
+      />
+
       <Button
         title="Çıkış yap"
         variant="danger"
@@ -69,6 +78,11 @@ export default function ProfileScreen() {
           <Link href="/dev/scenes" asChild>
             <Pressable accessibilityRole="link" style={styles.devLink}>
               <ThemedText type="link">Şehir sahneleri vitrini (geliştirici)</ThemedText>
+            </Pressable>
+          </Link>
+          <Link href="/dev/design" asChild>
+            <Pressable accessibilityRole="link" style={styles.devLink}>
+              <ThemedText type="link">Tasarım vitrini (geliştirici)</ThemedText>
             </Pressable>
           </Link>
         </>

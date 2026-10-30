@@ -9,7 +9,7 @@ import { MascotBubble } from '@/features/mascot/mascot-bubble';
 // TODO(P07): şehir rozetleri ve başarılar (GET /me/stats). Şimdilik yer tutucu.
 export default function BadgesScreen() {
   return (
-    <Screen withTabBar>
+    <Screen>
       <GameText variant="title" color={GameColors.text} accessibilityRole="header">
         Rozetler
       </GameText>

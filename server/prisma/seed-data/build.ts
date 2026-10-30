@@ -1,4 +1,9 @@
-import { LessonKind, type City, type ReadingLevel } from '../../src/generated/prisma/enums.js';
+import {
+  LessonKind,
+  type City,
+  type ReadingLevel,
+  type TextTheme,
+} from '../../src/generated/prisma/enums.js';
 import { toApiCity } from '../../src/lib/city.js';
 import type { SeedChestLesson, SeedGlossary, SeedQuestion, SeedStoryLesson } from './types.js';
 
@@ -30,6 +35,8 @@ export function story(
     title: string;
     summary: string;
     level: ReadingLevel;
+    /** Hikâyenin teması (hikâye okunarak seçilir). */
+    theme: TextTheme;
     paragraphs: string[];
     questions: SeedQuestion[];
     glossary: SeedGlossary[];
@@ -46,6 +53,7 @@ export function story(
       title: input.title,
       level: input.level,
       estimatedMinutes: readingMinutes(input.paragraphs),
+      theme: input.theme,
       minGrade: 1,
       maxGrade: 8,
       paragraphs: input.paragraphs,
