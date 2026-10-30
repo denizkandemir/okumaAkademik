@@ -140,6 +140,7 @@ describe('GET /lessons/:id', () => {
       title: 'Minik Serçe',
       level: 1,
       estimatedMinutes: 2,
+      theme: 'Yardımlaşma',
     });
     expect(body.text.paragraphs).toHaveLength(5);
     expect(body.glossary).toContainEqual({

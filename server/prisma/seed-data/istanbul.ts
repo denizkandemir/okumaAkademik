@@ -1,4 +1,4 @@
-import { City, ReadingLevel } from '../../src/generated/prisma/enums.js';
+import { City, ReadingLevel, TextTheme } from '../../src/generated/prisma/enums.js';
 import { chest, story } from './build.js';
 import type { SeedCity } from './types.js';
 
@@ -12,6 +12,7 @@ export const istanbul: SeedCity = {
     story(city, {
       position: 1,
       slug: 'vapurda-simit',
+      theme: TextTheme.PAYLASMAK,
       title: 'Vapurda Simit',
       summary:
         'Ece’nin dedesiyle vapura binip martılarla simit paylaştığı neşeli bir Boğaz yolculuğu.',
@@ -59,6 +60,7 @@ export const istanbul: SeedCity = {
     story(city, {
       position: 2,
       slug: 'bahcedeki-domatesler',
+      theme: TextTheme.SABIR,
       title: 'Bahçedeki Domatesler',
       summary:
         'Elif ile dedesinin bahçeye diktiği fidelerin kıpkırmızı domateslere dönüşme hikâyesi.',
@@ -111,6 +113,7 @@ export const istanbul: SeedCity = {
     story(city, {
       position: 3,
       slug: 'minik-serce',
+      theme: TextTheme.YARDIMLASMA,
       title: 'Minik Serçe',
       summary:
         'Rüzgârda yuvası düşen minik serçe Pıtır’ın, arkadaşlarıyla yeni bir yuva kurma hikâyesi.',
@@ -157,6 +160,7 @@ export const istanbul: SeedCity = {
     story(city, {
       position: 4,
       slug: 'kiz-kulesinin-isiklari',
+      theme: TextTheme.MERAK,
       title: 'Kız Kulesi’nin Işıkları',
       summary:
         'Mert’in anneannesiyle Üsküdar sahilinde Kız Kulesi’nin ışıklarını izlediği bir akşam.',
@@ -212,6 +216,7 @@ export const istanbul: SeedCity = {
     story(city, {
       position: 6,
       slug: 'galatadan-bakinca',
+      theme: TextTheme.KESIF,
       title: 'Galata’dan Bakınca',
       summary:
         'Deniz’in babasıyla Galata Kulesi’ne çıkıp İstanbul’a kuşlar gibi yukarıdan baktığı gün.',
@@ -258,6 +263,7 @@ export const istanbul: SeedCity = {
     story(city, {
       position: 7,
       slug: 'kapalicarsida-bir-gun',
+      theme: TextTheme.SORUMLULUK,
       title: 'Kapalıçarşı’da Bir Gün',
       summary:
         'Kapalıçarşı’nın renkli lambaları arasında annesini bir an kaybeden Zeynep’in akıllıca beklediği gün.',
@@ -309,6 +315,7 @@ export const istanbul: SeedCity = {
     story(city, {
       position: 8,
       slug: 'iki-yakayi-baglayan-kopru',
+      theme: TextTheme.AILE,
       title: 'İki Yakayı Bağlayan Köprü',
       summary:
         'Ali’nin Boğaz Köprüsü’nden geçerken bir köprünün iki kıtayı bağladığını öğrendiği gün.',
@@ -355,6 +362,7 @@ export const istanbul: SeedCity = {
     story(city, {
       position: 9,
       slug: 'pirilin-istanbul-arkadaslari',
+      theme: TextTheme.ARKADASLIK,
       title: 'Pırıl’ın İstanbul Arkadaşları',
       summary:
         'Pırıl’ın İstanbul’un sokak kedileriyle tanışıp İzmir yolu öncesinde vedalaştığı gün.',

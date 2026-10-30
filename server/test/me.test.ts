@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { seedTexts } from '../prisma/seed-data/index.js';
 import { APP_TIME_ZONE, startOfDayInTimeZone } from '../src/lib/time.js';
 import {
   bearer,
@@ -73,7 +74,12 @@ describe('GET /me/journey', () => {
       title: storyAt('istanbul', 1).title,
       status: 'current',
       stars: null,
+      theme: 'Paylaşmak',
+      estimatedMinutes: seedTexts.find((text) => text.id === storyAt('istanbul', 1).textId)
+        ?.estimatedMinutes,
     });
+    // Sandıkta metin yok: tema ve süre null.
+    expect(body.lessons[4]).toMatchObject({ kind: 'chest', theme: null, estimatedMinutes: null });
     expect(
       body.lessons.slice(1).every((lesson: { status: string }) => lesson.status === 'locked'),
     ).toBe(true);

@@ -1,4 +1,4 @@
-import { City, ReadingLevel } from '../../src/generated/prisma/enums.js';
+import { City, ReadingLevel, TextTheme } from '../../src/generated/prisma/enums.js';
 import { chest, story } from './build.js';
 import type { SeedCity } from './types.js';
 
@@ -11,6 +11,7 @@ export const kapadokya: SeedCity = {
     story(city, {
       position: 1,
       slug: 'perilerin-bacalari',
+      theme: TextTheme.MERAK,
       title: 'Perilerin Bacaları',
       summary:
         'Nehir’in peri bacalarının hem masalını hem de yanardağ külünden nasıl oluştuğunu öğrendiği gün.',
@@ -59,6 +60,7 @@ export const kapadokya: SeedCity = {
     story(city, {
       position: 2,
       slug: 'ucan-balon',
+      theme: TextTheme.CESARET,
       title: 'Uçan Balon',
       summary:
         'Ali’nin Kapadokya’da gün doğarken ilk kez sıcak hava balonuna binip korkusunu yendiği sabah.',
@@ -110,6 +112,7 @@ export const kapadokya: SeedCity = {
     story(city, {
       position: 3,
       slug: 'yerin-altindaki-sehir',
+      theme: TextTheme.KESIF,
       title: 'Yerin Altındaki Şehir',
       summary:
         'Defne’nin Derinkuyu’daki yeraltı şehrinde taş kapıları ve havalandırma bacalarını keşfettiği gezi.',
@@ -161,6 +164,7 @@ export const kapadokya: SeedCity = {
     story(city, {
       position: 4,
       slug: 'avanosta-comlek',
+      theme: TextTheme.SABIR,
       title: 'Avanos’ta Çömlek',
       summary:
         'Mert’in Avanos’ta Kızılırmak’ın kırmızı çamuruyla, birkaç denemeden sonra ilk kâsesini yaptığı gün.',
@@ -214,6 +218,7 @@ export const kapadokya: SeedCity = {
     story(city, {
       position: 6,
       slug: 'guvercinlerin-evleri',
+      theme: TextTheme.DOGA,
       title: 'Güvercinlerin Evleri',
       summary:
         'Zeynep’in Güvercinlik Vadisi’nde kayalara oyulmuş güvercin evlerinin ne işe yaradığını öğrendiği yürüyüş.',
@@ -273,6 +278,7 @@ export const kapadokya: SeedCity = {
     story(city, {
       position: 7,
       slug: 'gokyuzundeki-haritalar',
+      theme: TextTheme.KESIF,
       title: 'Gökyüzündeki Haritalar',
       summary:
         'Pusula ve uydu yokken insanların yıldızlara bakarak yollarını nasıl bulduğunu anlatan hikâye.',
@@ -326,6 +332,7 @@ export const kapadokya: SeedCity = {
     story(city, {
       position: 8,
       slug: 'magara-evde-bir-gece',
+      theme: TextTheme.CESARET,
       title: 'Mağara Evde Bir Gece',
       summary:
         'Bora’nın Kapadokya’da kayaya oyulmuş bir odada ilk korkusunu huzura çevirdiği gece.',
@@ -373,6 +380,7 @@ export const kapadokya: SeedCity = {
     story(city, {
       position: 9,
       slug: 'piril-ve-balonlar',
+      theme: TextTheme.ARKADASLIK,
       title: 'Pırıl ve Balonlar',
       summary:
         'Pırıl’ın Göreme’de küçük Ayla’yla gün doğumunda balonları izleyip son durağı Van’a yola çıktığı sabah.',

@@ -43,6 +43,7 @@ describe('GET /texts', () => {
         title: 'Kitaplık Metni',
         level: 'ILERI',
         estimatedMinutes: 4,
+        theme: 'MERAK',
         minGrade: 5,
         maxGrade: 8,
         paragraphs: ['Yalnızca kitaplıkta okunan bir metin.'],
@@ -60,6 +61,7 @@ describe('GET /texts', () => {
       'estimatedMinutes',
       'id',
       'level',
+      'theme',
       'title',
     ]);
   });
@@ -82,7 +84,12 @@ describe('GET /texts/:id', () => {
 
     expect(response.statusCode).toBe(200);
     const { text } = response.json();
-    expect(text).toMatchObject({ id: 'kayip-anahtar', title: 'Kayıp Anahtar', level: 2 });
+    expect(text).toMatchObject({
+      id: 'kayip-anahtar',
+      title: 'Kayıp Anahtar',
+      level: 2,
+      theme: 'Sorumluluk',
+    });
     expect(text.paragraphs).toHaveLength(5);
   });
 

@@ -31,6 +31,37 @@ enum ReadingLevel {
   @@map("reading_level")
 }
 
+/// Hikâyenin teması; haritada, okuma ekranında ve kitaplıkta etiket olarak görünür. API'de
+/// Türkçe adıyla döner, ör. ARKADASLIK="Arkadaşlık" (bkz. src/lib/text-theme.ts).
+enum TextTheme {
+  /// Arkadaşlık
+  ARKADASLIK
+  /// Merak
+  MERAK
+  /// Keşif
+  KESIF
+  /// Paylaşmak
+  PAYLASMAK
+  /// Cesaret
+  CESARET
+  /// Yardımlaşma
+  YARDIMLASMA
+  /// Sabır
+  SABIR
+  /// Doğa
+  DOGA
+  /// Aile
+  AILE
+  /// Hatıralar
+  HATIRALAR
+  /// Sorumluluk
+  SORUMLULUK
+  /// İyilik
+  IYILIK
+
+  @@map("text_theme")
+}
+
 /// Uygulamaya kayıtlı öğrenci. Kişisel veri en aza indirilmiştir (e-posta, doğum tarihi yok).
 model User {
   /// Birincil anahtar (cuid), ör. "cmg8x1k2p0000abcd1234efgh"
@@ -95,6 +126,8 @@ model Text {
   level            ReadingLevel
   /// Tahmini okuma süresi (dakika), ör. 3
   estimatedMinutes Int              @map("estimated_minutes")
+  /// Hikâyenin teması, ör. ARKADASLIK
+  theme            TextTheme
   /// Metnin paragrafları, sırasıyla
   paragraphs       String[]
   /// Metnin uygun olduğu en küçük sınıf (1-8), ör. 1

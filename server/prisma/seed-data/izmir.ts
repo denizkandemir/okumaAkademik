@@ -1,4 +1,4 @@
-import { City, ReadingLevel } from '../../src/generated/prisma/enums.js';
+import { City, ReadingLevel, TextTheme } from '../../src/generated/prisma/enums.js';
 import { chest, story } from './build.js';
 import type { SeedCity } from './types.js';
 
@@ -12,6 +12,7 @@ export const izmir: SeedCity = {
     story(city, {
       position: 1,
       slug: 'saat-kulesinin-guvercinleri',
+      theme: TextTheme.MERAK,
       title: 'Saat Kulesi’nin Güvercinleri',
       summary:
         'Can’ın Konak’taki Saat Kulesi’nin önünde güvercinleri beslerken saati okumayı öğrendiği gün.',
@@ -55,6 +56,7 @@ export const izmir: SeedCity = {
     story(city, {
       position: 2,
       slug: 'boyoz-sabahi',
+      theme: TextTheme.KESIF,
       title: 'Boyoz Sabahı',
       summary: 'Defne’nin halasıyla İzmir’in meşhur boyozunu ilk kez tattığı lezzetli bir sabah.',
       level,
@@ -101,6 +103,7 @@ export const izmir: SeedCity = {
     story(city, {
       position: 3,
       slug: 'kordonda-bisiklet',
+      theme: TextTheme.CESARET,
       title: 'Kordon’da Bisiklet',
       summary: 'Elif’in Kordon’da düşe kalka, yan tekerleksiz bisiklet sürmeyi öğrendiği gün.',
       level,
@@ -151,6 +154,7 @@ export const izmir: SeedCity = {
     story(city, {
       position: 4,
       slug: 'kemeraltinin-kokulari',
+      theme: TextTheme.KESIF,
       title: 'Kemeraltı’nın Kokuları',
       summary:
         'Ali’nin Kemeraltı’ndaki baharatçıda gözleri kapalı bir koku tahmin oyunu oynadığı gün.',
@@ -202,6 +206,7 @@ export const izmir: SeedCity = {
     story(city, {
       position: 6,
       slug: 'ucurtma-ve-imbat',
+      theme: TextTheme.SABIR,
       title: 'Uçurtma ve İmbat',
       summary:
         'Mert ile Nehir’in uçurtmalarını uçurmak için Kordon’da serin imbat rüzgârını beklediği gün.',
@@ -248,6 +253,7 @@ export const izmir: SeedCity = {
     story(city, {
       position: 7,
       slug: 'tramvayda-bir-yer',
+      theme: TextTheme.IYILIK,
       title: 'Tramvayda Bir Yer',
       summary:
         'Ece’nin İzmir tramvayında yaşlı bir amcaya yer verip iyiliğin sevincini tattığı yolculuk.',
@@ -299,6 +305,7 @@ export const izmir: SeedCity = {
     story(city, {
       position: 8,
       slug: 'kordonun-martisi',
+      theme: TextTheme.YARDIMLASMA,
       title: 'Kordon’un Martısı',
       summary:
         'Zeynep’in Kordon’da ayağına misina dolanmış bir martının kurtarılmasına yardım ettiği gün.',
@@ -352,6 +359,7 @@ export const izmir: SeedCity = {
     story(city, {
       position: 9,
       slug: 'pirilin-korfez-yolculugu',
+      theme: TextTheme.MERAK,
       title: 'Pırıl’ın Körfez Yolculuğu',
       summary:
         'Pırıl’ın körfez vapurunda kitap okuyan bir kızdan Efes’i duyup yeni durağını seçtiği yolculuk.',

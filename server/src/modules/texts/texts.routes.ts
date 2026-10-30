@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 import { Errors } from '../../lib/errors.js';
 import { withApiLevel } from '../../lib/reading-level.js';
+import { withApiTheme } from '../../lib/text-theme.js';
 import { parse } from '../../lib/validation.js';
 import { requireAuth } from '../../plugins/auth.js';
 import { loadJourneyState, lockedTextIds } from '../journey/journey-state.js';
@@ -12,6 +13,7 @@ const textSummarySelect = {
   title: true,
   level: true,
   estimatedMinutes: true,
+  theme: true,
 } as const;
 
 const textParamsSchema = z.object({ id: z.string().min(1).max(100) });
@@ -37,7 +39,7 @@ export async function textsRoutes(app: FastifyInstance) {
       select: textSummarySelect,
       orderBy: [{ level: 'asc' }, { estimatedMinutes: 'asc' }, { title: 'asc' }],
     });
-    return { texts: texts.map(withApiLevel) };
+    return { texts: texts.map((text) => withApiTheme(withApiLevel(text))) };
   });
 
   app.get('/texts/:id', async (request) => {
@@ -51,6 +53,6 @@ export async function textsRoutes(app: FastifyInstance) {
     if (lockedTextIds(await loadJourneyState(prisma, user.id)).has(id)) {
       throw Errors.lessonLocked();
     }
-    return { text: withApiLevel(text) };
+    return { text: withApiTheme(withApiLevel(text)) };
   });
 }

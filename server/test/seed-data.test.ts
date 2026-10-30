@@ -1,3 +1,5 @@
+import { readdirSync, readFileSync } from 'node:fs';
+
 import { describe, expect, it } from 'vitest';
 
 import { readingMinutes, wordCount } from '../prisma/seed-data/build.js';
@@ -7,7 +9,7 @@ import {
   seedTexts,
   type SeedStoryLesson,
 } from '../prisma/seed-data/index.js';
-import { City, LessonKind, ReadingLevel } from '../src/generated/prisma/enums.js';
+import { City, LessonKind, ReadingLevel, TextTheme } from '../src/generated/prisma/enums.js';
 import { toApiCity } from '../src/lib/city.js';
 import { CHEST_POSITIONS, LESSONS_PER_CITY, TOTAL_LESSONS } from '../src/lib/journey.js';
 
@@ -122,6 +124,8 @@ describe('seed içeriği: hikâyeler', () => {
       expect(text.estimatedMinutes).toBe(readingMinutes(text.paragraphs));
       expect(text).toMatchObject({ minGrade: 1, maxGrade: 8, title: lesson.title });
       expect(LEVELS[city]).toContain(text.level);
+      // Tema: hikâye okunarak seçilir; her hikâyenin geçerli bir teması olmalı.
+      expect(Object.values(TextTheme)).toContain(text.theme);
 
       // Sorular: tam 3; her birinde 3 farklı şık ve 0-2 arası doğru cevap.
       expect(lesson.questions).toHaveLength(3);
@@ -148,4 +152,26 @@ describe('seed içeriği: hikâyeler', () => {
       }
     },
   );
+});
+
+describe('seed içeriği: hikâye temaları', () => {
+  it("migration'daki tema eşlemesi seed verisiyle aynıdır", () => {
+    // Mevcut veritabanlarındaki metinler bu migration'la doldurulur; seed ise yeni kurulumları
+    // doldurur. İkisi ayrışırsa aynı hikâye ortama göre farklı tema gösterir.
+    const migrationsDir = new URL('../prisma/migrations/', import.meta.url);
+    const dir = readdirSync(migrationsDir).find((name) => name.endsWith('_text_theme'));
+    expect(dir).toBeDefined();
+    const sql = readFileSync(new URL(`${dir}/migration.sql`, migrationsDir), 'utf8');
+
+    const fromMigration = new Map<string, string>();
+    for (const [, theme = '', ids = ''] of sql.matchAll(
+      /UPDATE "texts" SET "theme" = '(\w+)' WHERE "id" IN \(([^)]*)\)/g,
+    )) {
+      for (const [, id = ''] of ids.matchAll(/'([^']+)'/g)) fromMigration.set(id, theme);
+    }
+
+    expect(Object.fromEntries(fromMigration)).toEqual(
+      Object.fromEntries(seedTexts.map((text) => [text.id, text.theme])),
+    );
+  });
 });

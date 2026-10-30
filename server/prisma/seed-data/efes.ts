@@ -1,4 +1,4 @@
-import { City, ReadingLevel } from '../../src/generated/prisma/enums.js';
+import { City, ReadingLevel, TextTheme } from '../../src/generated/prisma/enums.js';
 import { chest, story } from './build.js';
 import type { SeedCity } from './types.js';
 
@@ -12,6 +12,7 @@ export const efes: SeedCity = {
     story(city, {
       position: 1,
       slug: 'celsus-kutuphanesinde',
+      theme: TextTheme.MERAK,
       title: 'Celsus Kütüphanesi’nde',
       summary:
         'Selin’in Efes’teki Celsus Kütüphanesi’nde iki bin yıl önceki rulo kitapları hayal ettiği gezi.',
@@ -66,6 +67,7 @@ export const efes: SeedCity = {
     story(city, {
       position: 2,
       slug: 'tiyatroda-bir-fisilti',
+      theme: TextTheme.KESIF,
       title: 'Tiyatroda Bir Fısıltı',
       summary:
         'Emir’in Efes’in antik tiyatrosunda sesini en üst sıradaki ablasına duyurduğu ilginç deney.',
@@ -118,6 +120,7 @@ export const efes: SeedCity = {
     story(city, {
       position: 3,
       slug: 'kayip-anahtar',
+      theme: TextTheme.SORUMLULUK,
       title: 'Kayıp Anahtar',
       summary: 'Anahtarını kaybeden Kerem’in bir dedektif gibi düşünerek onu bulma hikâyesi.',
       level,
@@ -169,6 +172,7 @@ export const efes: SeedCity = {
     story(city, {
       position: 4,
       slug: 'minik-taslardan-resim',
+      theme: TextTheme.SABIR,
       title: 'Minik Taşlardan Resim',
       summary:
         'Duru’nun Efes’teki Yamaç Evler’de mozaikleri görüp evde kendi mozaiğini yaptığı gün.',
@@ -220,6 +224,7 @@ export const efes: SeedCity = {
     story(city, {
       position: 6,
       slug: 'fircali-kazi',
+      theme: TextTheme.KESIF,
       title: 'Fırçalı Kazı',
       summary:
         'Nil’in arkeolog teyzesiyle Efes’teki kazıda fırçasıyla çok eski bir testi parçası bulduğu gün.',
@@ -274,6 +279,7 @@ export const efes: SeedCity = {
     story(city, {
       position: 7,
       slug: 'tasa-yazilmis-mesaj',
+      theme: TextTheme.HATIRALAR,
       title: 'Taşa Yazılmış Mesaj',
       summary:
         'Arda’nın Efes’te Eski Yunanca yazılmış bir taşın mesajını öğrenip kendi mesajını yazdığı gün.',
@@ -325,6 +331,7 @@ export const efes: SeedCity = {
     story(city, {
       position: 8,
       slug: 'kaybolan-liman',
+      theme: TextTheme.DOGA,
       title: 'Kaybolan Liman',
       summary:
         'Mete’nin Efes’te Liman Caddesi’ni görüp bir nehrin denizi nasıl geri çektiğini öğrendiği gün.',
@@ -376,6 +383,7 @@ export const efes: SeedCity = {
     story(city, {
       position: 9,
       slug: 'piril-ve-efesin-kedileri',
+      theme: TextTheme.HATIRALAR,
       title: 'Pırıl ve Efes’in Kedileri',
       summary:
         'Pırıl’ın Efes’in bilge kedisi Zeytin’le antik kenti gezip Antalya’ya yola çıktığı gün.',

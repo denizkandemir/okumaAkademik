@@ -17,6 +17,7 @@ import {
   type LessonRewards,
 } from '../../lib/journey.js';
 import { withApiLevel } from '../../lib/reading-level.js';
+import { toApiTheme } from '../../lib/text-theme.js';
 import { parse } from '../../lib/validation.js';
 import { requireAuth } from '../../plugins/auth.js';
 import {
@@ -179,6 +180,7 @@ export async function lessonsRoutes(app: FastifyInstance) {
             title: true,
             level: true,
             estimatedMinutes: true,
+            theme: true,
             paragraphs: true,
             glossaryEntries: { select: { word: true, meaning: true }, orderBy: { word: 'asc' } },
             questions: {
@@ -210,6 +212,7 @@ export async function lessonsRoutes(app: FastifyInstance) {
             title: text.title,
             level: text.level,
             estimatedMinutes: text.estimatedMinutes,
+            theme: toApiTheme(text.theme),
             paragraphs: text.paragraphs,
           })
         : null,

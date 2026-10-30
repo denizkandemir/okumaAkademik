@@ -70,9 +70,10 @@ function RootNavigator({ fontsReady }: { fontsReady: boolean }) {
           <Stack.Screen name="level-up" options={REWARD_SCREEN} />
           <Stack.Screen name="city-unlocked" options={REWARD_SCREEN} />
           <Stack.Screen name="finale" options={REWARD_SCREEN} />
-          {/* SDK 58'de iOS 26+ başlığı varsayılan saydam; SDK 57'deki opak görünüm korunur. */}
+          {/* Küçük başarılar: sekme değil, Profil'den açılır. SDK 58'de iOS 26+ başlığı varsayılan
+              saydam; opak görünüm korunur. */}
           <Stack.Screen
-            name="journey-map"
+            name="badges"
             options={{
               headerShown: true,
               headerTransparent: false,
@@ -80,6 +81,8 @@ function RootNavigator({ fontsReady }: { fontsReady: boolean }) {
               headerBackTitle: 'Geri',
             }}
           />
+          {/* Eski yolculuk haritası adresi; Pasaport sekmesine yönlendirir. */}
+          <Stack.Screen name="journey-map" />
         </Stack.Protected>
 
         <Stack.Protected guard={!user}>

@@ -70,6 +70,7 @@ erDiagram
         text title
         reading_level level "BASLANGIC | ORTA | ILERI"
         int estimated_minutes "dakika"
+        text_theme theme "ARKADASLIK | MERAK | ..."
         text_array paragraphs
         int min_grade "1-8"
         int max_grade "1-8"
@@ -195,12 +196,21 @@ yani veritabanını gören biri token'ı kullanamaz.
 | `id`                      | Okunabilir slug (ör. `minik-serce`)                                                 |
 | `level`                   | `reading_level` enum'u: `BASLANGIC`, `ORTA`, `ILERI`                                |
 | `estimated_minutes`       | Tahmini okuma süresi (dakika)                                                       |
+| `theme`                   | `text_theme` enum'u: hikâyenin teması (ör. `ARKADASLIK`)                            |
 | `paragraphs`              | Paragraflar, sırasıyla (`text[]`)                                                   |
 | `min_grade` / `max_grade` | Metnin uygun olduğu sınıf aralığı; kullanıcının `grade`'i bu aralıktaysa listelenir |
 
 API seviyeyi sayı olarak döner (`BASLANGIC`=1, `ORTA`=2, `ILERI`=3). Dönüşüm yalnızca
 [`src/lib/reading-level.ts`](../src/lib/reading-level.ts)'te yapılır. Enum değerlerinin sırası
 seviye sırasıdır; `ORDER BY level` kolaydan zora sıralar.
+
+Tema haritada ("Arkadaşlık · 2 dk"), okuma ekranında ve kitaplıkta etiket olarak görünür. Değerler:
+`ARKADASLIK`, `MERAK`, `KESIF`, `PAYLASMAK`, `CESARET`, `YARDIMLASMA`, `SABIR`, `DOGA`, `AILE`,
+`HATIRALAR`, `SORUMLULUK`, `IYILIK`. API Türkçe adını döner (ör. `"Arkadaşlık"`); dönüşüm yalnızca
+[`src/lib/text-theme.ts`](../src/lib/text-theme.ts)'te yapılır. Her hikâyenin teması hikâye
+okunarak seçilir ve seed verisinde (`prisma/seed-data/*.ts`) yazılıdır. Kolonu ekleyen
+`*_text_theme` migration'ı mevcut metinleri aynı eşlemeyle doldurur; `test/seed-data.test.ts`
+ikisinin aynı kaldığını denetler.
 
 Kısıtlar: `texts_estimated_minutes_positive_check` (> 0), `texts_grade_range_check`
 (1 ≤ `min_grade` ≤ `max_grade` ≤ 8).
