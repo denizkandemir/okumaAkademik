@@ -1,17 +1,19 @@
 import { useEffect } from 'react';
 
 import { useCurrentCity, useSetCurrentCity } from './current-city';
-import { CITY_INFO, CITY_THEMES } from './theme';
+import type { CityId } from './theme';
 import type { JourneyResponse } from './types';
 
 import { useApiQuery } from '@/hooks/use-api-query';
 
 /**
- * Ana sayfanın verisi (GET /me/journey). Ekrana her dönüldüğünde tazelenir; kullanıcının şehri
- * sekme çubuğu için ortak bağlama yazılır. Veri gelene kadar bağlamdaki son şehrin teması döner.
+ * Ana sayfanın verisi (GET /me/journey). Ekrana her dönüldüğünde tazelenir. `city` verilirse o
+ * şehrin yolu istenir (`?city=`; kilitli şehirde sunucu 403 döner), yoksa kullanıcının şu anki
+ * şehri. Kullanıcının şehri ortak bağlama yazılır; veri gelene kadar o şehir gösterilir.
  */
-export function useJourney() {
-  const query = useApiQuery<JourneyResponse>('/me/journey', { refetchOnFocus: true });
+export function useJourney(city?: CityId) {
+  const path = city ? `/me/journey?city=${encodeURIComponent(city)}` : '/me/journey';
+  const query = useApiQuery<JourneyResponse>(path, { refetchOnFocus: true });
   const knownCity = useCurrentCity();
   const setCurrentCity = useSetCurrentCity();
   const currentCity = query.data?.currentCity;
@@ -20,6 +22,6 @@ export function useJourney() {
     if (currentCity) setCurrentCity(currentCity);
   }, [currentCity, setCurrentCity]);
 
-  const cityId = query.data?.city.id ?? knownCity;
-  return { ...query, cityId, theme: CITY_THEMES[cityId], info: CITY_INFO[cityId] };
+  const cityId: CityId = query.data?.city.id ?? city ?? knownCity;
+  return { ...query, cityId, currentCity: currentCity ?? knownCity };
 }

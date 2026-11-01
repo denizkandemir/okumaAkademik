@@ -75,6 +75,16 @@ const PAIRS = [
   ['node.chest.icon', 'node.chest.fill', 'icon'],
   ['node.medal.icon', 'node.medal.fill', 'icon'],
 
+  // Yolculuk haritası (yarı saydam yüzeyler opak hâlleriyle ölçülür)
+  ['text', 'map.titleCard', 'text'],
+  ['textMuted', 'map.titleCard', 'text'],
+  ['eyebrow', 'map.titleCard', 'text'],
+  ['map.tagText', 'map.tag', 'text'],
+  ['text', 'map.nextStop', 'text'],
+  ['eyebrow', 'map.nextStop', 'text'],
+  ['accent', 'map.nextStop', 'text'],
+  ['landmark', 'map.ground', 'text'],
+
   // Ödüller ve sertifika
   ['medal.text', 'medal.face', 'text'],
   ['certificate.name', 'certificate.background', 'large'],
