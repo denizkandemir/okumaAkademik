@@ -1,29 +1,25 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import {
-  ActivityIndicator,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-  type StyleProp,
-  type TextStyle,
-} from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { GameColors, GameFonts } from '@/features/game/theme';
+import { CITIES } from '@/design/cities';
+import { AppText } from '@/design/components/app-text';
+import { Button } from '@/design/components/button';
+import { Chip } from '@/design/components/chip';
+import { Eyebrow } from '@/design/components/eyebrow';
+import { SheetHeader } from '@/design/components/sheet-header';
+import { StateView } from '@/design/components/state-view';
+import { GiftIcon, StarIcon } from '@/design/icons';
+import { colors, size } from '@/design/tokens';
 import type { LessonDetailResponse } from '@/features/game/types';
-import { GameButton } from '@/features/game/ui/game-button';
-import { ChestIcon } from '@/features/game/ui/icons';
-import { StarRow } from '@/features/game/ui/star-row';
 import { Mascot } from '@/features/mascot/mascot';
-import { MascotBubble } from '@/features/mascot/mascot-bubble';
 import { useApiQuery } from '@/hooks/use-api-query';
 import { ApiError } from '@/lib/api';
 import { getErrorMessage } from '@/lib/errors';
 
-/** Metin seviyesinin ders kartındaki adı (API: 1 Başlangıç, 2 Orta, 3 İleri). */
-const LEVEL_NAMES = { 1: 'Kolay', 2: 'Orta', 3: 'Zor' } as const;
-const STEPS = ['Hikâyeyi oku', "Pırıl'ın 3 sorusunu cevapla", 'Yıldızlarını topla'];
+/** Özet boşsa ders kartında gösterilen açıklama (07-ders-karti). */
+const DEFAULT_SUMMARY =
+  "Kısa bir hikâye oku. Pırıl'ın üç sorusunu yanıtla. Pasaportunda yeni bir iz bırak.";
 
 /** Kartı kapatır; derin bağlantıyla açıldıysa (geri gidilecek ekran yoksa) ana sayfaya gider. */
 function closeCard() {
@@ -31,7 +27,7 @@ function closeCard() {
   else router.replace('/');
 }
 
-/** Ders kartı (S03DersKarti): yolda bir derse dokununca alttan açılan sayfa. */
+/** Ders kartı (07-ders-karti): haritada bir derse dokununca alttan açılan sayfa. */
 export default function LessonCardScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
@@ -43,6 +39,7 @@ export default function LessonCardScreen() {
     <ScrollView
       style={styles.sheet}
       contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 24 }]}>
+      <SheetHeader onClose={closeCard} />
       {data ? (
         data.lesson.kind === 'chest' ? (
           <ChestCard data={data} />
@@ -51,17 +48,21 @@ export default function LessonCardScreen() {
         )
       ) : error ? (
         <CardError error={error} onRetry={refetch} />
-      ) : isLoading ? (
-        <View style={styles.loading} accessible accessibilityLabel="Ders yükleniyor">
-          <ActivityIndicator color={PURPLE} size="large" />
-        </View>
-      ) : null}
+      ) : (
+        <StateView
+          isLoading={isLoading}
+          error={null}
+          onRetry={refetch}
+          loadingLabel="Ders yükleniyor…"
+          mascot={false}
+        />
+      )}
     </ScrollView>
   );
 }
 
 function StoryCard({ data }: { data: LessonDetailResponse }) {
-  const { lesson, text } = data;
+  const { lesson, text, questions } = data;
   const done = lesson.status === 'done';
 
   const startReading = () => {
@@ -72,53 +73,22 @@ function StoryCard({ data }: { data: LessonDetailResponse }) {
 
   return (
     <>
-      <CardHeader
-        chip="OKUMA"
-        chipStyle={styles.chipPurple}
-        position={lesson.position}
-        title={lesson.title}
-        pose="read"
-      />
-      <Text style={styles.summary}>{lesson.summary}</Text>
+      <CardHeader data={data} />
+      <AppText color={colors.textMuted}>{lesson.summary.trim() || DEFAULT_SUMMARY}</AppText>
 
-      <View style={styles.tiles}>
-        <InfoTile
-          value={text ? `${text.estimatedMinutes} dk` : '–'}
-          label="süre"
-          colors={TILE_COLORS.time}
-        />
-        <InfoTile
-          value={text ? LEVEL_NAMES[text.level] : '–'}
-          label="seviye"
-          colors={TILE_COLORS.level}
-        />
-        <InfoTile
-          value={done ? 'Alındı' : `+${lesson.maxLokum}`}
-          label="lokum"
-          colors={TILE_COLORS.lokum}
+      <View style={styles.chips}>
+        {text ? <Chip label={`${text.estimatedMinutes} dakika`} /> : null}
+        <Chip label={`${questions.length || 3} soru`} />
+        <Chip
+          label={done ? 'Alındı' : `+${lesson.maxLokum} lokum`}
+          accessibilityLabel={done ? 'Lokum alındı' : `${lesson.maxLokum} lokum kazanabilirsin`}
+          accessible
         />
       </View>
 
-      {done ? (
-        <View style={styles.best}>
-          <Text style={styles.bestLabel}>En iyi yıldızın</Text>
-          <StarRow filled={lesson.bestStars ?? 0} size={34} />
-        </View>
-      ) : (
-        <View style={styles.steps} accessibilityRole="list">
-          {STEPS.map((step, index) => (
-            <View key={step} style={styles.step}>
-              <View style={styles.stepNumber}>
-                <Text style={styles.stepNumberText}>{index + 1}</Text>
-              </View>
-              <Text style={styles.stepText}>{step}</Text>
-            </View>
-          ))}
-        </View>
-      )}
+      {done ? <BestStars stars={lesson.bestStars ?? 0} /> : null}
 
-      <GameButton
-        variant="purple"
+      <Button
         title={done ? 'TEKRAR OKU' : 'OKUMAYA BAŞLA'}
         accessibilityLabel={done ? 'Tekrar oku' : 'Okumaya başla'}
         onPress={startReading}
@@ -132,40 +102,33 @@ function StoryCard({ data }: { data: LessonDetailResponse }) {
 function ChestCard({ data }: { data: LessonDetailResponse }) {
   const { lesson } = data;
   const done = lesson.status === 'done';
-  // Sandık kendi ekranında açılır (sallanma, kapak, lokumlar, ödül akışı).
+
   const openChest = () =>
     router.replace({ pathname: '/lesson/[id]/chest', params: { id: lesson.id } });
 
   return (
     <>
-      <CardHeader
-        chip="SANDIK"
-        chipStyle={styles.chipGold}
-        position={lesson.position}
-        title={lesson.title}
-        pose="happy"
-      />
+      <CardHeader data={data} />
       <View
         style={styles.chestArt}
         accessible
         accessibilityRole="image"
         accessibilityLabel="Hazine sandığı">
-        <ChestIcon size={64} color="#8A5A00" strokeWidth={1.8} />
+        <GiftIcon size={56} color={colors.node.chest.icon} strokeWidth={2.2} />
       </View>
-      <Text style={[styles.summary, styles.center]}>
+      <AppText color={colors.textMuted} align="center">
         {done ? 'Bu sandığı açtın! Lokumların kumbarada.' : 'Sandığı aç, lokumları topla!'}
-      </Text>
+      </AppText>
       {done ? (
-        <GameButton
-          variant="white"
-          size="md"
-          title="Tamam"
+        <Button
+          title="TAMAM"
+          accessibilityLabel="Tamam"
+          variant="secondary"
           onPress={closeCard}
           style={styles.action}
         />
       ) : (
-        <GameButton
-          variant="gold"
+        <Button
           title="SANDIĞI AÇ"
           accessibilityLabel="Sandığı aç"
           onPress={openChest}
@@ -176,242 +139,108 @@ function ChestCard({ data }: { data: LessonDetailResponse }) {
   );
 }
 
-function CardHeader({
-  chip,
-  chipStyle,
-  position,
-  title,
-  pose,
-}: {
-  chip: string;
-  chipStyle: StyleProp<TextStyle>;
-  position: number;
-  title: string;
-  pose: 'read' | 'happy';
-}) {
+/** "İSTANBUL · DERS 3", başlık ve yanında küçük Pırıl (okuyor). */
+function CardHeader({ data }: { data: LessonDetailResponse }) {
+  const { lesson } = data;
+  const cityName = CITIES[lesson.city].name.toLocaleUpperCase('tr-TR');
   return (
     <View style={styles.header}>
       <View style={styles.headerText}>
-        <View style={styles.chipRow}>
-          <Text style={[styles.chip, chipStyle]}>{chip}</Text>
-          <Text style={styles.lessonNo}>Ders {position} / 10</Text>
-        </View>
-        <Text style={styles.title} accessibilityRole="header" maxFontSizeMultiplier={1.3}>
-          {title}
-        </Text>
+        <Eyebrow>
+          {cityName} · DERS {lesson.position}
+        </Eyebrow>
+        <AppText variant="sheetTitle" accessibilityRole="header" maxFontSizeMultiplier={1.3}>
+          {lesson.title}
+        </AppText>
       </View>
-      {/* Tasarımda sayfanın üstüne taşar; native sayfa kırptığı için içeride, sağ üstte. */}
-      <Mascot pose={pose} size={104} />
+      <Mascot pose="read" size={72} />
     </View>
   );
 }
 
-type TileColors = { background: string; value: string; label: string };
-
-function InfoTile({ value, label, colors }: { value: string; label: string; colors: TileColors }) {
+/** Biten hikâyenin en iyi sonucu: 3 yıldızdan kaçı dolu. */
+function BestStars({ stars }: { stars: number }) {
   return (
-    <View
-      style={[styles.tile, { backgroundColor: colors.background }]}
-      accessible
-      accessibilityLabel={`${label}: ${value}`}>
-      <Text
-        style={[styles.tileValue, { color: colors.value }]}
-        numberOfLines={1}
-        adjustsFontSizeToFit>
-        {value}
-      </Text>
-      <Text style={[styles.tileLabel, { color: colors.label }]}>{label}</Text>
+    <View style={styles.stars} accessible accessibilityLabel={`En iyi sonucun: ${stars} yıldız`}>
+      {[1, 2, 3].map((index) =>
+        index <= stars ? (
+          <StarIcon key={index} size={30} />
+        ) : (
+          <StarIcon
+            key={index}
+            size={30}
+            color={colors.node.locked.fill}
+            stroke={colors.node.locked.lip}
+          />
+        ),
+      )}
     </View>
   );
 }
 
 function CardError({ error, onRetry }: { error: unknown; onRetry: () => void }) {
   const locked = error instanceof ApiError && (error.status === 403 || error.status === 404);
+  if (!locked) return <StateView isLoading={false} error={error} onRetry={onRetry} />;
   return (
-    <View style={styles.errorBox}>
-      <View style={styles.errorRow}>
-        <Mascot pose="think" size={110} />
-        <View style={styles.errorBubble}>
-          <MascotBubble
-            tone="game"
-            text={
-              locked ? getErrorMessage(error) : `Hımm, dersi açamadım. ${getErrorMessage(error)}`
-            }
-          />
-        </View>
-      </View>
-      {locked ? (
-        <GameButton variant="white" size="md" title="Tamam" onPress={closeCard} />
-      ) : (
-        <GameButton title="TEKRAR DENE" accessibilityLabel="Tekrar dene" onPress={onRetry} />
-      )}
+    <View style={styles.locked} accessibilityLiveRegion="polite">
+      <Mascot pose="think" size={96} />
+      <AppText variant="heading" align="center">
+        {getErrorMessage(error)}
+      </AppText>
+      <Button title="TAMAM" accessibilityLabel="Tamam" variant="secondary" onPress={closeCard} />
     </View>
   );
 }
 
-const PURPLE = '#5B34D6';
-const TILE_COLORS = {
-  time: { background: '#FFF4E8', value: '#C2541B', label: '#7A5A44' },
-  level: { background: '#ECFAF2', value: '#1B8A52', label: '#3D6B52' },
-  lokum: { background: '#FFEFF4', value: '#B23A62', label: '#7A4258' },
-} as const satisfies Record<string, TileColors>;
-
 const styles = StyleSheet.create({
   sheet: {
     flex: 1,
-    backgroundColor: GameColors.white,
+    backgroundColor: colors.surface,
   },
   content: {
     flexGrow: 1,
-    paddingTop: 22,
-    paddingHorizontal: 22,
     gap: 14,
-  },
-  loading: {
-    paddingVertical: 48,
-    alignItems: 'center',
+    paddingTop: 6,
+    paddingHorizontal: 24,
   },
   header: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 8,
+    alignItems: 'center',
+    gap: 12,
   },
   headerText: {
     flex: 1,
-    gap: 8,
-    paddingTop: 4,
+    gap: 4,
   },
-  chipRow: {
+  chips: {
     flexDirection: 'row',
-    alignItems: 'center',
+    flexWrap: 'wrap',
     gap: 8,
+    marginVertical: 6,
   },
-  chip: {
-    fontFamily: GameFonts.bodyHeavy,
-    fontSize: 13,
-    lineHeight: 18,
-    letterSpacing: 0.8,
-    borderRadius: 999,
-    overflow: 'hidden',
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-  },
-  chipPurple: {
-    backgroundColor: '#EDE5FF',
-    color: '#4A2BC2',
-  },
-  chipGold: {
-    backgroundColor: '#FFF1CC',
-    color: '#7A4E00',
-  },
-  lessonNo: {
-    fontFamily: GameFonts.bodyHeavy,
-    fontSize: 14,
-    lineHeight: 19,
-    color: GameColors.textLilacSecondary,
-  },
-  title: {
-    fontFamily: GameFonts.headingHeavy,
-    fontSize: 30,
-    lineHeight: 34,
-    color: GameColors.warm,
-  },
-  summary: {
-    fontFamily: GameFonts.body,
-    fontSize: 16,
-    lineHeight: 23,
-    color: '#4F4060',
-  },
-  center: {
-    textAlign: 'center',
-  },
-  tiles: {
+  stars: {
     flexDirection: 'row',
-    gap: 8,
-  },
-  tile: {
-    flex: 1,
-    borderRadius: 16,
-    paddingVertical: 10,
-    paddingHorizontal: 6,
-    alignItems: 'center',
-    gap: 2,
-  },
-  tileValue: {
-    fontFamily: GameFonts.headingHeavy,
-    fontSize: 22,
-    lineHeight: 28,
-  },
-  tileLabel: {
-    fontFamily: GameFonts.bodyHeavy,
-    fontSize: 12,
-    lineHeight: 16,
-  },
-  steps: {
-    gap: 8,
-  },
-  step: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  stepNumber: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: '#2453C9',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  stepNumberText: {
-    fontFamily: GameFonts.bodyHeavy,
-    fontSize: 14,
-    color: GameColors.white,
-  },
-  stepText: {
-    flex: 1,
-    fontFamily: GameFonts.bodyBold,
-    fontSize: 15,
-    lineHeight: 21,
-    color: GameColors.warm,
-  },
-  best: {
-    alignItems: 'center',
     gap: 6,
-  },
-  bestLabel: {
-    fontFamily: GameFonts.bodyHeavy,
-    fontSize: 14,
-    color: GameColors.textLilacSecondary,
   },
   chestArt: {
     alignSelf: 'center',
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: '#FFE7A8',
+    width: 112,
+    height: 100,
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: '0 6px 0 #E0B24A',
-  },
-  error: {
-    fontFamily: GameFonts.bodyBold,
-    fontSize: 14,
-    color: '#B42318',
-    textAlign: 'center',
+    borderRadius: 26,
+    backgroundColor: colors.node.chest.fill,
+    borderWidth: size.node.edge,
+    borderColor: colors.node.edge,
+    borderBottomWidth: size.node.chest.lip + 2,
+    borderBottomColor: colors.node.chest.lip,
   },
   action: {
     marginTop: 'auto',
   },
-  errorBox: {
-    paddingTop: 12,
-    gap: 16,
-  },
-  errorRow: {
-    flexDirection: 'row',
+  locked: {
     alignItems: 'center',
-  },
-  errorBubble: {
-    flex: 1,
+    gap: 16,
+    paddingVertical: 24,
   },
 });

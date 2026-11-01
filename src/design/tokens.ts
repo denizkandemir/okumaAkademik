@@ -83,7 +83,13 @@ export const colors = {
   },
   node: {
     done: { fill: '#71978B', lip: '#4A7165', icon: '#FFFFFF' },
-    current: { fill: '#D07E5E', lip: '#AA5B40', icon: '#FFFFFF', ring: '#FFFAF1' },
+    current: {
+      fill: '#D07E5E',
+      lip: '#AA5B40',
+      icon: '#FFFFFF',
+      ring: '#FFFAF1',
+      ringOutline: '#D99D7480',
+    },
     locked: { fill: '#E7E4D6', lip: '#C5CAB9', icon: '#808476' },
     chest: { fill: '#E6B966', lip: '#B68B44', icon: '#7D653E' },
     medal: { fill: '#F1D49B', lip: '#C0A06D', icon: '#9B713A' },
@@ -161,6 +167,24 @@ export const colors = {
   bubble: {
     background: '#FFFAF0',
     border: '#E4BDA1',
+  },
+  /** Yolculuk haritası (01-yolculuk). */
+  map: {
+    /** Arka planın en altında, görüntü yüklenirken görünen zemin. */
+    ground: '#F7F1E6',
+    /** Arka planın üstündeki açık renkli geçiş (üst, %25, %70, alt). */
+    wash: ['#F7F1E620', '#F7F1E600', '#F7F1E630', '#F7F1E6'],
+    road: '#FAF6E8',
+    roadDots: '#C8BDA2',
+    /** Sol/sağ üstteki bölüm kartı. */
+    titleCard: '#FFFDF3E8',
+    titleCardBorder: '#FFFFFF88',
+    /** Şu anki düğümün altındaki "Arkadaşlık · 2 dk" etiketi. */
+    tag: '#FFFAF0DC',
+    tagText: '#5B6F55',
+    /** Haritanın sonundaki "Sonraki durak" kartı. */
+    nextStop: '#FFFCF3C9',
+    nextStopBorder: '#E7DFCB',
   },
   white: '#FFFFFF',
 } as const;

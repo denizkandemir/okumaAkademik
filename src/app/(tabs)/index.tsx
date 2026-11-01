@@ -1,295 +1,211 @@
-import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  Pressable,
   ScrollView,
   StyleSheet,
   View,
   useWindowDimensions,
+  type LayoutChangeEvent,
   type ScrollViewInstance,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BottomTabInset } from '@/constants/theme';
-import { CityBanner } from '@/features/game/home/city-banner';
-import { LessonPath, focusIndex } from '@/features/game/home/lesson-path';
-import { NODE_SIZE, nodeCenters } from '@/features/game/home/path-layout';
-import { READABLE_BANNERS } from '@/features/game/theme';
-import type { JourneyResponse } from '@/features/game/types';
-import { GameButton } from '@/features/game/ui/game-button';
-import { StatChip } from '@/features/game/ui/stat-chip';
+import { CITIES } from '@/design/cities';
+import { AppHeader } from '@/design/components/app-header';
+import { AppText } from '@/design/components/app-text';
+import { StateView } from '@/design/components/state-view';
+import { colors, radius, size } from '@/design/tokens';
+import { ChapterBar } from '@/features/game/home/chapter-bar';
+import { CityPreviewSheet } from '@/features/game/home/city-preview-sheet';
+import { JourneyMap, focusIndex, type PirilMessage } from '@/features/game/home/journey-map';
+import { CITY_MAP_LAYOUTS, mapGeometry } from '@/features/game/home/map-layout';
+import type { NextStop } from '@/features/game/home/next-stop-card';
+import { CITY_IDS, type CityId } from '@/features/game/theme';
+import type { JourneyLesson, JourneyResponse } from '@/features/game/types';
 import { useJourney } from '@/features/game/use-journey';
-import { Mascot } from '@/features/mascot/mascot';
-import { MascotBubble } from '@/features/mascot/mascot-bubble';
-import type { MascotPose } from '@/features/mascot/types';
-import { CityScene } from '@/features/scenes/city-scene';
-import { SCENE_HEIGHT, SCENE_WIDTH } from '@/features/scenes/scene-kit';
-import { getErrorMessage } from '@/lib/errors';
 
-/** Tablet ve web'de ana sayfa bu genişlikte ortalanır. */
+/** Tablet ve web'de harita bu genişlikte ortalanır. */
 const MAX_WIDTH = 520;
-/** Başlık kartının sahnenin alt kenarından yukarı taşması (tasarımda 340 − 258). */
-const BANNER_OVERLAP = 82;
 /** Pırıl'ın kısa ipuçlarının ekranda kalma süresi. */
 const TIP_MS = 4000;
 
-type Tip = { text: string; pose: MascotPose };
+function isCityId(value: unknown): value is CityId {
+  return typeof value === 'string' && (CITY_IDS as readonly string[]).includes(value);
+}
 
+/**
+ * Yolculuk sekmesi (01-06-yolculuk): üst çubuk, bölüm çubuğu ve şehrin boyalı haritası.
+ * `?city=<id>` ile açılmış (ör. Pasaport'tan) başka bir şehrin haritası da gösterilebilir.
+ */
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const window = useWindowDimensions();
   const width = Math.min(window.width, MAX_WIDTH);
-  const sceneHeight = (width * SCENE_HEIGHT) / SCENE_WIDTH;
-  const { data, error, isLoading, refetch, cityId, theme, info } = useJourney();
 
-  const [tip, setTip] = useState<Tip | null>(null);
+  const params = useLocalSearchParams<{ city?: string }>();
+  const requested = isCityId(params.city) ? params.city : undefined;
+  const { data, error, isLoading, refetch, cityId, currentCity } = useJourney(requested);
+  const viewingOther = requested !== undefined && requested !== currentCity;
+  const city = CITIES[cityId];
+
+  const [tip, setTip] = useState<PirilMessage | null>(null);
   useEffect(() => {
     if (!tip) return;
     const timer = setTimeout(() => setTip(null), TIP_MS);
     return () => clearTimeout(timer);
   }, [tip]);
 
-  // Açılışta (ve şehir ya da şu anki ders değişince) şu anki düğüm görünür alanın ortasına gelsin.
+  const [preview, setPreview] = useState<CityId | null>(null);
+
+  // Açılışta (ve şehir ya da şu anki ders değişince) şu anki düğüm görünür alanın üst üçte
+  // birine gelsin.
   const scrollRef = useRef<ScrollViewInstance>(null);
+  const viewportHeight = useRef(0);
   const scrolledFor = useRef<string | null>(null);
-  /** Yol (iskelet ya da hata değil) çizilip ölçüldü mü. */
-  const pathMeasured = useRef(false);
+  /** Harita (yükleniyor ya da hata değil) çizilip ölçüldü mü. */
+  const mapMeasured = useRef(false);
+  const geometry = useMemo(
+    () => (data ? mapGeometry(CITY_MAP_LAYOUTS[data.city.id], width) : null),
+    [data, width],
+  );
   const focus = data ? focusIndex(data.lessons) : 0;
   const focusKey = data ? `${data.city.id}:${data.lessons[focus]?.id ?? ''}` : null;
   const scrollToFocus = useCallback(() => {
-    if (!data || !focusKey || scrolledFor.current === focusKey) return;
-    const point = nodeCenters(data.lessons.length, width)[focus];
-    if (!point) return;
-    const visibleTop = sceneHeight + NODE_SIZE / 2;
-    const visibleBottom = window.height - insets.bottom - BottomTabInset;
-    const y = sceneHeight + point.y - (visibleTop + visibleBottom) / 2;
+    if (!geometry || !focusKey || scrolledFor.current === focusKey) return;
+    const point = geometry.points[focus];
+    if (!point || viewportHeight.current === 0) return;
+    const y = point.y - viewportHeight.current / 3;
     scrollRef.current?.scrollTo({ y: Math.max(0, y), animated: false });
     scrolledFor.current = focusKey;
-  }, [data, focusKey, focus, width, sceneHeight, window.height, insets.bottom]);
+  }, [geometry, focusKey, focus]);
   // Her şehirde 10 ders olduğundan yeni şehirde ya da ders ilerleyince içerik boyu değişmez,
-  // onContentSizeChange tetiklenmez; odak değişince buradan kaydırılır. Yol henüz ölçülmediyse
-  // (ilk açılış, iskeletten yola geçiş) kaydırmayı onContentSizeChange yapar.
+  // onContentSizeChange tetiklenmez; odak değişince buradan kaydırılır (hata taraması, bulgu 9).
+  // Harita henüz ölçülmediyse (ilk açılış, yükleniyordan haritaya geçiş) onContentSizeChange
+  // kaydırır.
   useEffect(() => {
-    if (pathMeasured.current) scrollToFocus();
+    if (mapMeasured.current) scrollToFocus();
   }, [scrollToFocus]);
   const onContentSizeChange = () => {
-    pathMeasured.current = data !== undefined;
+    mapMeasured.current = data !== undefined;
+    scrollToFocus();
+  };
+  const onLayout = (event: LayoutChangeEvent) => {
+    viewportHeight.current = event.nativeEvent.layout.height;
     scrollToFocus();
   };
 
-  const message = tip ?? homeMessage(data, info.homeMessage, info.homePose);
-  const stats = data?.stats;
-  const lokumText = stats ? stats.lokum.toLocaleString('tr-TR') : '';
+  const openLesson = useCallback((lesson: JourneyLesson) => {
+    router.push({ pathname: '/lesson/[id]', params: { id: lesson.id } });
+  }, []);
+  const showLocked = useCallback(() => {
+    setTip({ text: 'Önce önceki dersi bitirelim.', pose: 'think' });
+  }, []);
+
+  const message = useMemo(() => tip ?? pirilMessage(data), [tip, data]);
+  const nextStop = useMemo(() => (data ? nextStopOf(data) : null), [data]);
+  const previewLocked =
+    preview !== null && data?.cities.find((entry) => entry.id === preview)?.status === 'locked';
 
   return (
-    <View style={styles.root}>
-      <LinearGradient {...theme.ground} style={StyleSheet.absoluteFill} />
+    <View style={[styles.root, { paddingTop: insets.top }]}>
+      <AppHeader />
+      <ChapterBar number={city.number} name={city.name} level={data?.level} />
+      {viewingOther ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Şu anki durağa dön"
+          onPress={() => router.setParams({ city: undefined })}
+          hitSlop={6}
+          style={styles.backChip}>
+          <AppText variant="mapLabel" color={colors.accent}>
+            Şu anki durağa dön
+          </AppText>
+        </Pressable>
+      ) : null}
 
       <ScrollView
         ref={scrollRef}
-        style={styles.root}
-        contentContainerStyle={[
-          styles.content,
-          { paddingTop: sceneHeight, paddingBottom: insets.bottom + BottomTabInset + 24 },
-        ]}
+        style={styles.scroll}
+        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + BottomTabInset }]}
+        onLayout={onLayout}
         onContentSizeChange={onContentSizeChange}>
-        {data ? (
-          <LessonPath
-            lessons={data.lessons}
-            theme={theme}
+        {data && nextStop ? (
+          <JourneyMap
+            city={data.city.id}
             width={width}
-            mascotPose={message.pose}
-            mascotMessage={message.text}
-            onOpenLesson={(lesson) =>
-              router.push({ pathname: '/lesson/[id]', params: { id: lesson.id } })
-            }
-            onLockedLesson={() => setTip({ text: 'Önce önceki dersi bitirelim!', pose: 'think' })}
+            lessons={data.lessons}
+            lessonsDone={data.city.lessonsDone}
+            lessonsTotal={data.city.lessonsTotal}
+            message={message}
+            nextStop={nextStop}
+            onOpenLesson={openLesson}
+            onLockedLesson={showLocked}
+            onPreviewCity={setPreview}
           />
-        ) : error ? (
-          <LoadError message={getErrorMessage(error)} onRetry={refetch} width={width} />
-        ) : isLoading ? (
-          <PathSkeleton width={width} color={theme.l3} />
-        ) : null}
+        ) : (
+          <View style={[styles.state, { width }]}>
+            <StateView
+              isLoading={isLoading}
+              error={error}
+              onRetry={refetch}
+              loadingLabel="Yolun hazırlanıyor…"
+            />
+          </View>
+        )}
       </ScrollView>
 
-      {/* Sabit üst kısım: yol bunun altından kayar. */}
-      <View style={[styles.header, { width, height: sceneHeight }]}>
-        <CityScene city={cityId} width={width} />
-
-        <View style={[styles.chips, { top: insets.top + 14 }]}>
-          {stats && data ? (
-            <>
-              <StatChip kind="level" value={data.level} />
-              <View style={styles.chipGroup}>
-                <StatChip
-                  kind="streak"
-                  value={stats.streak}
-                  accessibilityHint="Pırıl serini anlatır"
-                  onPress={() =>
-                    setTip({
-                      text:
-                        stats.streak > 0
-                          ? `${stats.streak} gündür her gün okuyorsun. Harikasın!`
-                          : 'Bugün bir hikâye oku, serin başlasın!',
-                      pose: 'happy',
-                    })
-                  }
-                />
-                <StatChip
-                  kind="lokum"
-                  value={lokumText}
-                  accessibilityHint="Pırıl lokumlarını anlatır"
-                  onPress={() =>
-                    setTip({
-                      text: `${lokumText} lokumun var! Her hikâye sana yeni lokum kazandırır.`,
-                      pose: 'happy',
-                    })
-                  }
-                />
-              </View>
-            </>
-          ) : null}
-        </View>
-
-        <View style={[styles.banner, { top: sceneHeight - BANNER_OVERLAP }]}>
-          {data ? (
-            <CityBanner
-              theme={theme}
-              gradient={READABLE_BANNERS[cityId]}
-              info={info}
-              lessonsDone={data.city.lessonsDone}
-              lessonsTotal={data.city.lessonsTotal}
-              onOpenMap={() => router.navigate('/passport')}
-            />
-          ) : (
-            <View style={styles.bannerSkeleton} />
-          )}
-        </View>
-      </View>
+      <CityPreviewSheet city={preview} locked={previewLocked} onClose={() => setPreview(null)} />
     </View>
   );
 }
 
-/** Pırıl'ın ana sayfa mesajı: bitmiş yolculuk, bugün okudu, seri tehlikede, yoksa şehrin mesajı. */
-function homeMessage(
-  data: JourneyResponse | undefined,
-  cityMessage: string,
-  cityPose: MascotPose,
-): Tip {
-  if (data?.finished) {
-    return { text: 'Yolculuğu tamamladın! Hikâyeleri yeniden okuyabilirsin.', pose: 'happy' };
+/** Pırıl'ın haritadaki cümlesi ve pozu (T01-yolculuk). */
+function pirilMessage(data: JourneyResponse | undefined): PirilMessage {
+  if (!data) return { text: 'Yeni bir hikâye bizi bekliyor.', pose: 'idle' };
+  const pose = CITIES[data.city.id].homePose;
+  if (data.finished) {
+    return { text: 'Yolculuğu tamamladık! Sertifikan seni bekliyor.', pose: 'celebrate' };
   }
-  if (data?.stats.readToday) return { text: 'Bugün harika okudun!', pose: 'happy' };
-  if (data?.stats.streakAtRisk) {
-    return { text: 'Serini korumak için bir hikâye yeter!', pose: cityPose };
-  }
-  return { text: cityMessage, pose: cityPose };
+  const current = data.lessons.find((lesson) => lesson.status === 'current');
+  if (!current) return { text: 'Bu şehri bitirdin! Sıradaki durak seni bekliyor.', pose };
+  if (current.kind === 'chest') return { text: 'Bir sandık buldum! Hadi açalım.', pose };
+  return { text: 'Yeni bir hikâye bizi bekliyor.', pose };
 }
 
-/** Yükleniyor: gri düğümler ve düşünen Pırıl (başlık kartının iskeleti üstte). */
-function PathSkeleton({ width, color }: { width: number; color: string }) {
-  const points = nodeCenters(4, width);
-  const height = (points[points.length - 1]?.y ?? 0) + NODE_SIZE;
-  return (
-    <View
-      style={{ width, height }}
-      accessible
-      accessibilityLabel="Yolun yükleniyor"
-      accessibilityRole="progressbar">
-      {points.map((point, index) => (
-        <View
-          key={index}
-          style={[
-            styles.skeletonNode,
-            { left: point.x - NODE_SIZE / 2, top: point.y - NODE_SIZE / 2, backgroundColor: color },
-          ]}
-        />
-      ))}
-      <View style={styles.skeletonMascot}>
-        <Mascot pose="think" size={130} />
-      </View>
-    </View>
-  );
-}
-
-function LoadError({
-  message,
-  onRetry,
-  width,
-}: {
-  message: string;
-  onRetry: () => void;
-  width: number;
-}) {
-  return (
-    <View style={[styles.error, { width }]}>
-      <View style={styles.errorRow}>
-        <Mascot pose="think" size={120} />
-        <View style={styles.errorBubble}>
-          <MascotBubble tone="game" text={`Hımm, yolu açamadım. ${message}`} />
-        </View>
-      </View>
-      <GameButton title="TEKRAR DENE" accessibilityLabel="Tekrar dene" onPress={onRetry} />
-    </View>
-  );
+/** Haritanın sonundaki kart: sonraki şehir, Van'da son durak, yolculuk bitince bitti. */
+function nextStopOf(data: JourneyResponse): NextStop {
+  const next = CITY_IDS[CITY_IDS.indexOf(data.city.id) + 1];
+  if (data.finished) return { kind: 'finished', city: next ?? null };
+  return next ? { kind: 'next', city: next } : { kind: 'last' };
 }
 
 const styles = StyleSheet.create({
   root: {
     flex: 1,
+    backgroundColor: colors.background,
+  },
+  scroll: {
+    flex: 1,
+    backgroundColor: colors.map.ground,
   },
   content: {
     alignItems: 'center',
   },
-  header: {
-    position: 'absolute',
-    top: 0,
-    alignSelf: 'center',
-  },
-  chips: {
-    position: 'absolute',
-    left: 14,
-    right: 14,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  chipGroup: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  banner: {
-    position: 'absolute',
-    left: 14,
-    right: 14,
-  },
-  bannerSkeleton: {
-    height: 92,
-    borderRadius: 24,
-    backgroundColor: 'rgba(255,255,255,0.45)',
-  },
-  skeletonNode: {
-    position: 'absolute',
-    width: NODE_SIZE,
-    height: NODE_SIZE,
-    borderRadius: NODE_SIZE / 2,
-    opacity: 0.6,
-  },
-  skeletonMascot: {
-    position: 'absolute',
-    left: 14,
-    top: 120,
-  },
-  error: {
-    paddingTop: 48,
+  state: {
     paddingHorizontal: 22,
-    gap: 20,
+    paddingTop: 24,
   },
-  errorRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  errorBubble: {
-    flex: 1,
+  backChip: {
+    alignSelf: 'center',
+    minHeight: size.touch - 12,
+    justifyContent: 'center',
+    marginVertical: 6,
+    paddingHorizontal: 14,
+    borderRadius: radius.full,
+    backgroundColor: colors.bubble.background,
+    borderWidth: 1,
+    borderColor: colors.bubble.border,
   },
 });

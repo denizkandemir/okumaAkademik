@@ -2,6 +2,7 @@ import { DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Platform } from 'react-native';
 
+import { radius } from '@/design/tokens';
 import { AuthProvider, useAuth } from '@/features/auth/auth-context';
 import { SplashScreenController } from '@/features/auth/splash-screen-controller';
 import { useGameFonts } from '@/features/game/fonts';
@@ -52,14 +53,15 @@ function RootNavigator({ fontsReady }: { fontsReady: boolean }) {
           <Stack.Screen name="(tabs)" />
           {/* Okuma ekranı kendi üst çubuğunu çizer (kapat, ilerleme, yazı boyutu). */}
           <Stack.Screen name="reading/[id]" />
-          {/* Ders kartı alttan açılan sayfa; web'de modal (formSheet yalnızca native). */}
+          {/* Ders kartı alttan açılan sayfa; web'de modal (formSheet yalnızca native). Tutamacı
+              ve kapat düğmesini kartın kendi SheetHeader'ı çizer (07-ders-karti). */}
           <Stack.Screen
             name="lesson/[id]/index"
             options={{
               presentation: Platform.OS === 'web' ? 'modal' : 'formSheet',
               sheetAllowedDetents: [0.62, 0.92],
-              sheetGrabberVisible: true,
-              sheetCornerRadius: 30,
+              sheetGrabberVisible: false,
+              sheetCornerRadius: radius.sheet,
             }}
           />
           {/* Ders akışı: soru sırasında kaydırarak geri dönülmez (kapat düğmesi onay sorar). */}
