@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'react';
 
-import type { CityId } from './theme';
+import type { CityId } from '@/design/cities';
 import type { CompleteLessonResponse, LessonKind } from './types';
 
 /**

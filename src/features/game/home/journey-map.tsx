@@ -4,13 +4,12 @@ import { memo, useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
-import type { CityId } from '../theme';
+import { CITIES, type CityId } from '@/design/cities';
 import type { JourneyLesson } from '../types';
 import { CITY_MAP_LAYOUTS, mapGeometry, toPixels } from './map-layout';
 import { MapNode } from './map-node';
 import { NextStopCard, type NextStop } from './next-stop-card';
 
-import { CITIES } from '@/design/cities';
 import { AppText } from '@/design/components/app-text';
 import { Eyebrow } from '@/design/components/eyebrow';
 import { ProgressBar } from '@/design/components/progress-bar';
@@ -195,7 +194,7 @@ function Piril({
         <SpeechBubble text={message.text} tail="bottom" />
       </View>
       <View style={[styles.piril, { left, top }]}>
-        <Mascot pose={message.pose} size={mascotSize} />
+        <Mascot pose={message.pose} size={mascotSize} decorative />
       </View>
     </>
   );
@@ -264,10 +263,11 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     backgroundColor: colors.map.ground,
   },
+  // .maptitle: üstten 23, kenardan 24, en fazla 225 geniş.
   titleCard: {
     position: 'absolute',
-    top: 20,
-    maxWidth: 230,
+    top: 23,
+    maxWidth: 225,
     gap: 4,
     paddingVertical: 12,
     paddingHorizontal: 15,
@@ -278,10 +278,10 @@ const styles = StyleSheet.create({
     zIndex: 4,
   },
   titleLeft: {
-    left: 20,
+    left: 24,
   },
   titleRight: {
-    right: 20,
+    right: 24,
   },
   titleProgress: {
     marginVertical: 4,

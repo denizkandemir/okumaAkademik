@@ -7,7 +7,7 @@ import { AwardIcon, BookIcon, MapIcon, UserIcon } from '@/design/icons';
 /**
  * Alt sekme çubuğu (docs/tasarim, 01-yolculuk): Yolculuk, Kitaplık, Pasaport, Profil. Tüm
  * platformlarda aynı (expo-router/ui'nin başsız sekmeleri). Çubuk ekranın altına sabitlenir;
- * sekme ekranları altta `BottomTabInset` kadar boşluk bırakır.
+ * sekme ekranları altta `size.tabBar` kadar boşluk bırakır.
  */
 export default function AppTabs() {
   return (

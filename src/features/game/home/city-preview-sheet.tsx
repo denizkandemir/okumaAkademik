@@ -2,9 +2,8 @@ import { Image } from 'expo-image';
 import { Modal, Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { CITY_IDS, type CityId } from '../theme';
+import { CITIES, CITY_IDS, type CityId } from '@/design/cities';
 
-import { CITIES } from '@/design/cities';
 import { AppText } from '@/design/components/app-text';
 import { Button } from '@/design/components/button';
 import { Eyebrow } from '@/design/components/eyebrow';

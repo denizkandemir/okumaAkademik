@@ -38,7 +38,7 @@ export function OptionCard({
       accessibilityRole="radio"
       accessibilityLabel={accessibilityLabel ?? `${letter}: ${text}${suffix ? `, ${suffix}` : ''}`}
       accessibilityState={{
-        selected: state === 'selected' || state === 'correct' || state === 'wrong',
+        checked: state === 'selected' || state === 'correct' || state === 'wrong',
         disabled,
       }}
       disabled={disabled}
@@ -76,9 +76,11 @@ const styles = StyleSheet.create({
   pressed: {
     transform: [{ translateY: 2 }],
   },
+  // Büyük yazıda harf sığsın diye en küçük ölçü; kutu yazıyla büyür.
   badge: {
-    width: 30,
-    height: 30,
+    minWidth: 30,
+    minHeight: 30,
+    paddingHorizontal: 4,
     borderRadius: radius.badge,
     backgroundColor: colors.option.badge,
     alignItems: 'center',

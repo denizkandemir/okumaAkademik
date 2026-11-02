@@ -38,7 +38,10 @@ const VARIANTS = {
 export type ButtonVariant = keyof typeof VARIANTS;
 
 export type ButtonProps = Omit<PressableProps, 'children' | 'style'> & {
-  /** Büyük harfle verin (ör. "TEKRAR DENE"); ekran okuyucu için `accessibilityLabel` verilebilir. */
+  /**
+   * Büyük harfle verin (ör. "TEKRAR DENE"). Ekran okuyucu harf harf okumasın diye etiket
+   * varsayılan olarak küçük harfe çevrilir; `accessibilityLabel` ile değiştirilebilir.
+   */
   title: string;
   /** Varsayılan `primary`. */
   variant?: ButtonVariant;
@@ -98,7 +101,7 @@ export function Button({
   return (
     <Pressable
       accessibilityRole={accessibilityRole}
-      accessibilityLabel={accessibilityLabel ?? title}
+      accessibilityLabel={accessibilityLabel ?? title.toLocaleLowerCase('tr-TR')}
       accessibilityState={{ ...accessibilityState, disabled: isDisabled, busy: loading }}
       disabled={isDisabled}
       onPress={handlePress}

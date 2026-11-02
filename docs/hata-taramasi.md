@@ -112,20 +112,22 @@ bekletir, uygulama 15 sn sonra "Sunucuya ulaşılamadı" der.
 1. **Kaybolan tamamlama yanıtı (1):** `demo.sehir` ile girin.
    - 10. dersi (sandık) açın, sandık ekranına geçin, `docker pause` → sandığa dokunun.
    - 15 sn sonra hata görünür. `docker unpause` → tekrar dokunun.
-   - "+30 lokum" görünmeli, "daha önce açmıştın" görünmemeli. DEVAM ET → seviye atladı → İzmir
-     açıldı ekranları gelmeli.
-   - Aynısını bir hikâyenin son sorusunda DEVAM ET ile deneyin: ders sonunda lokum görünmeli.
+   - "+30 lokum" görünmeli, "daha önce açmıştın" görünmemeli. DEVAM ET → seviye ödülü ("Bir adım
+     daha ileri!") → SONRAKİ ŞEHRİ KEŞFET → şehir açılışı ("Merhaba, İzmir!") gelmeli.
+   - Aynısını bir hikâyenin son sorusunda DEVAM ET ile deneyin: ders sonucunda ("Hikâyeye iz
+     bıraktın!") lokum kutusu görünmeli.
 2. **Sandık yükleme hatası (2):** `demo.istanbul` ile 5. ders (sandık) kartını açın, uçak modunu
    açın, SANDIĞI AÇ.
-   - Sandık ekranında "sandığı getiremedim" balonu ve TEKRAR DENE görünmeli.
+   - Sandık ekranında "Hımm, sandığı getiremedim." yazısı ve TEKRAR DENE görünmeli.
    - Uçak modunu kapatıp TEKRAR DENE → SANDIĞI AÇ düğmesi gelmeli, sandık açılmalı.
 3. **Android geri, ödül akışı (3, D2):** `demo.sehir` ile 10. sandığı açın.
    - Açılırken geri → hiçbir şey olmamalı.
-   - Açıldıktan sonra geri (ya da X) → seviye atladı ekranı gelmeli. Geri → yeni şehir ekranı.
-     Geri → ana sayfa.
-   - Bir hikâye bitince "Ders tamamlandı"da geri, DEVAM ET gibi davranmalı.
+   - Açıldıktan sonra geri (ya da X) → seviye ödülü gelmeli. Geri → şehir açılışı. Geri → ana
+     sayfa.
+   - Bir hikâye bitince ders sonucunda ("Hikâyeye iz bıraktın!") geri, ana düğme (ÖDÜLÜMÜ GÖR ya
+     da HARİTAYA DÖN) gibi davranmalı.
    - Sandık açılmadan X ya da geri → ana sayfa.
-4. **Finale geri ve istatistik hatası (3, D7):** `demo.final` kullanıcısının son sandığını geri
+4. **Eve dönüş geri ve sertifika istatistik hatası (3, D7):** `demo.final` kullanıcısının son sandığını geri
    alın:
    ```sql
    DELETE FROM lokum_entries
@@ -133,23 +135,25 @@ bekletir, uygulama 15 sn sonra "Sunucuya ulaşılamadı" der.
    DELETE FROM lesson_completions
    WHERE user_id = (SELECT id FROM users WHERE username = 'demo.final') AND lesson_id = 'van-10-sandik';
    ```
-   - Van'ın 10. sandığını açın, DEVAM ET'e basmadan uçak modunu açın, sonra DEVAM ET.
-   - Finalde "Hikâye ve dakika sayılarını getiremedim" ve TEKRAR DENE görünmeli. Uçak modunu
-     kapatıp TEKRAR DENE → sayılar gelmeli.
-   - Android geri → ana sayfa (akış biter).
+   - Van'ın 10. sandığını açın, DEVAM ET → EVE DÖNELİM → eve dönüş ("PIRIL EVE DÖNDÜ").
+   - Uçak modunu açıp KEŞİF SERTİFİKAM → sertifikada "Bir şeyler ters gitti. Tekrar deneyelim
+     mi?" ve TEKRAR DENE görünmeli. Uçak modunu kapatıp TEKRAR DENE → sertifika gelmeli.
+   - Sertifikadan geri → eve dönüş; Android geri → ana sayfa (akış biter).
 5. **Android geri, sorular (4, D1):** bir hikâyeyi bitirin, bir soruyu cevaplayın.
    - Geri → "Soruları bırakmak istiyor musun?" penceresi. Tekrar geri → pencere kapanmalı, sorular
      kalmalı.
-   - Son soruda `docker pause` → DEVAM ET → yüklenirken X ve geri hiçbir şey yapmamalı.
+   - Son soruda `docker pause` → DEVAM ET → yüklenirken geri düğmesi ve Android geri hiçbir şey
+     yapmamalı.
      `docker unpause` sonrası ders sonu ekranı gelmeli; 15 sn dolup hata çıktıysa DEVAM ET'e tekrar
      basın, lokumlu ders sonu ekranı gelmeli.
 6. **Okuma ekranı (D1):**
    - Biraz kaydırıp Android geri → "Okumayı bırakmak istiyor musun?" penceresi.
    - Hiç kaydırmadan geri → doğrudan çıkış.
-   - `docker pause` → BİTİRDİM → yüklenirken X ve geri hiçbir şey yapmamalı.
+   - `docker pause` → OKUDUM, HAZIRIM → yüklenirken geri düğmesi ve Android geri hiçbir şey
+     yapmamalı.
    - Serbest okumada bitiş ekranında geri → kitaplık.
 7. **Cihaz saati (6):** bir hikâyeyi 1 dakika okuyun.
-   - Ayarlardan otomatik saati kapatıp saati 1 saat geri alın → BİTİRDİM hata vermemeli.
+   - Ayarlardan otomatik saati kapatıp saati 1 saat geri alın → OKUDUM, HAZIRIM hata vermemeli.
    - Sonra saati düzeltin.
 8. **Tazeleme hatası (7):** ana sayfa açıkken uçak modunu açın, Kitaplık sekmesine geçip geri
    dönün.
@@ -166,7 +170,7 @@ bekletir, uygulama 15 sn sonra "Sunucuya ulaşılamadı" der.
     adb shell am start -a android.intent.action.VIEW -d "exp://<bilgisayar-IP>:8081/--/lesson/istanbul-05-sandik"
     ```
     Yeni bir hesapla açın. Kartta "kilitli" mesajı → Tamam → ana sayfa açılmalı.
-12. **Çift giriş (D3):** giriş ekranında GİRİŞ'e basıp hemen klavyede "git"e basın → sunucu
+12. **Çift giriş (D3):** giriş ekranında YOLA DEVAM ET'e basıp hemen klavyede "git"e basın → sunucu
     kaydında tek bir `POST /auth/login` görünmeli.
 13. **Yeni ilk deneme kuralı (S1):** yeni bir hesapla 1. hikâyeyi okuyun.
     - İlk soruya yanlış cevap verin, X → Bırak.
@@ -174,12 +178,12 @@ bekletir, uygulama 15 sn sonra "Sunucuya ulaşılamadı" der.
       sonunda 2 yıldız ve 15 lokum olmalı.
 14. **S2:** `demo.izmir` ile bir ders bitirip akışı DEVAM ET ile tamamlayın. Ana sayfaya dönerken
     şunlara bakın:
-    - Sekme hapı bir an İstanbul rengine dönüyor mu?
+    - Bölüm çubuğu ve harita bir an İstanbul'a dönüyor mu?
     - Sayfa başa sarılıp yeniden yükleniyor mu?
     - Olursa not edin; ayrı bir düzeltme gerekir.
 15. **S3:** yeni bir hesap açın (1. ders şu anki ders).
     - Ana sayfada Pırıl'ın balonu görünüyor mu?
-    - Kilitli bir derse dokununca "Önce önceki dersi bitirelim!" balonu görünüyor mu?
+    - Kilitli bir derse dokununca "Önce önceki dersi bitirelim." balonu görünüyor mu?
     - Görünmüyorsa not edin.
 
 ## A0 için not

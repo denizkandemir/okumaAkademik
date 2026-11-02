@@ -62,6 +62,7 @@ export function Mascot({
   animated = true,
   onPress,
   accessibilityLabel = 'Pırıl',
+  decorative = false,
   reduceMotion: reduceMotionOverride,
 }: MascotProps) {
   useCountCommit();
@@ -109,7 +110,9 @@ export function Mascot({
   return (
     <Pressable
       onPress={handlePress}
-      accessible
+      accessible={!decorative}
+      accessibilityElementsHidden={decorative}
+      importantForAccessibility={decorative ? 'no-hide-descendants' : 'auto'}
       accessibilityRole={onPress ? 'button' : 'image'}
       accessibilityLabel={accessibilityLabel}
       style={{ width: size, height: size }}>

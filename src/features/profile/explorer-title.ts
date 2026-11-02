@@ -1,4 +1,4 @@
-import type { CityId } from '@/features/game/theme';
+import type { CityId } from '@/design/cities';
 import type { StatsResponse } from '@/features/game/types';
 
 /** Profildeki unvan, şu anki şehre göre (T05, "Profile"). */

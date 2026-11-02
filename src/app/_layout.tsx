@@ -2,12 +2,11 @@ import { DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Platform } from 'react-native';
 
-import { radius } from '@/design/tokens';
+import { colors, radius } from '@/design/tokens';
 import { AuthProvider, useAuth } from '@/features/auth/auth-context';
 import { SplashScreenController } from '@/features/auth/splash-screen-controller';
 import { useGameFonts } from '@/features/game/fonts';
 import { WelcomeBackGate } from '@/features/welcome-back/welcome-back-gate';
-import { useTheme } from '@/hooks/use-theme';
 
 /** Ödül ekranları: tam ekran, başlıksız, kaydırarak kapanmaz. */
 const REWARD_SCREEN = { presentation: 'fullScreenModal', gestureEnabled: false } as const;
@@ -27,18 +26,17 @@ export default function RootLayout() {
 
 function RootNavigator({ fontsReady }: { fontsReady: boolean }) {
   const { user, isLoading } = useAuth();
-  const colors = useTheme();
 
   // Oturum okunmadan guard'lar değerlendirilirse açılan derin bağlantı (ör. /reading/x)
   // login'e yönlendirilip kaybolur. Bu sürede açılış ekranı görünür kalır.
   if (isLoading || !fontsReady) return null;
 
-  // Oyun tasarımı yalnızca açık temadır.
+  // Tasarım yalnızca açık temadır (docs/tasarim/README.md, karar 15).
   const navigationTheme = {
     ...DefaultTheme,
     colors: {
       ...DefaultTheme.colors,
-      primary: colors.primary,
+      primary: colors.accent,
       background: colors.background,
       card: colors.background,
       text: colors.text,

@@ -2,9 +2,9 @@ import { router } from 'expo-router';
 
 import { AppText } from '@/design/components/app-text';
 import { Button } from '@/design/components/button';
+import { CityHeroLayout } from '@/design/components/city-hero-layout';
 import { TextLink } from '@/design/components/text-link';
 import { colors } from '@/design/tokens';
-import { CityHeroLayout } from '@/features/game/rewards/city-hero-layout';
 
 /** Karşılama (15-karsilama): uygulamanın ilk ekranı; kayıt ya da girişe götürür. */
 export default function WelcomeScreen() {

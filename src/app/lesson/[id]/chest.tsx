@@ -1,6 +1,6 @@
 import * as Haptics from 'expo-haptics';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, {
   Easing,
@@ -9,6 +9,7 @@ import Animated, {
   useSharedValue,
   withSequence,
   withTiming,
+  ZoomIn,
 } from 'react-native-reanimated';
 import Svg, { Path, Rect } from 'react-native-svg';
 
@@ -34,14 +35,12 @@ import { api, ApiError } from '@/lib/api';
 import { getErrorMessage } from '@/lib/errors';
 
 const CHEST_WIDTH = 150;
-/** Lokum sayacının sürdüğü süre (ms). */
-const COUNT_MS = 700;
 
 type Phase = 'closed' | 'opening' | 'open';
 
 /**
  * Sandık (5. ve 10. ders; panoda yok, seviye ödülünün diliyle): dokun, sandık sallansın, kapak
- * kalksın, lokumlar sayılsın; sonra ödül akışı sürer.
+ * kalksın, lokumlar belirsin; sonra ödül akışı sürer.
  */
 export default function ChestScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -118,7 +117,7 @@ export default function ChestScreen() {
   const result = reward?.result;
   const firstTime = result?.firstTime ?? data?.lesson.status !== 'done';
   const amount = result?.firstTime ? result.lokum.lesson : 0;
-  const counted = useCountUp(phase === 'open' ? amount : 0, reduceMotion);
+  const showCount = phase === 'open' && amount > 0;
   const next = reward ? nextRewardStep('chest', reward) : null;
   const nextLabel = nextStepLabel(next);
 
@@ -148,14 +147,21 @@ export default function ChestScreen() {
             size={120}
           />
           <View style={styles.chestColumn}>
-            <AppText
-              color={colors.resultNumber}
-              style={[styles.count, phase !== 'open' || amount === 0 ? styles.hidden : null]}
-              accessibilityElementsHidden
-              importantForAccessibility="no-hide-descendants"
-              maxFontSizeMultiplier={1.3}>
-              +{counted}
-            </AppText>
+            {/* Kapalıyken görünmez yer tutucu (sandık açılınca zıplamasın); açılınca UI thread'de
+                büyüyerek belirir. */}
+            <Animated.View
+              key={showCount ? 'shown' : 'hidden'}
+              entering={showCount && !reduceMotion ? ZoomIn.springify().damping(12) : undefined}
+              style={showCount ? null : styles.hidden}>
+              <AppText
+                color={colors.resultNumber}
+                style={styles.count}
+                accessibilityElementsHidden
+                importantForAccessibility="no-hide-descendants"
+                maxFontSizeMultiplier={1.3}>
+                +{amount}
+              </AppText>
+            </Animated.View>
             <Pressable
               accessibilityRole="button"
               accessibilityLabel={phase === 'open' ? 'Açık hazine sandığı' : 'Sandığı aç'}
@@ -217,23 +223,6 @@ export default function ChestScreen() {
       {error ? <FeedbackPanel tone="wrong" title="Sandık açılmadı" text={error} /> : null}
     </RewardLayout>
   );
-}
-
-/** 0'dan `target`'a kısa sürede sayar; hareketi azalt açıksa doğrudan son değeri verir. */
-function useCountUp(target: number, reduceMotion: boolean) {
-  const [value, setValue] = useState(0);
-  const animate = !reduceMotion && target > 0;
-  useEffect(() => {
-    if (!animate) return;
-    const start = Date.now();
-    const timer = setInterval(() => {
-      const t = Math.min(1, (Date.now() - start) / COUNT_MS);
-      setValue(Math.round(target * t));
-      if (t === 1) clearInterval(timer);
-    }, 40);
-    return () => clearInterval(timer);
-  }, [target, animate]);
-  return animate ? value : target;
 }
 
 /** Sandığın gövdesi: hardal kutu, ortasından geçen hediye kurdelesi. */

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 import { useCurrentCity, useSetCurrentCity } from './current-city';
-import type { CityId } from './theme';
+import type { CityId } from '@/design/cities';
 import type { JourneyResponse } from './types';
 
 import { useApiQuery } from '@/hooks/use-api-query';

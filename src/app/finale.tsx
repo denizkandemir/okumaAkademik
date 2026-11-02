@@ -1,9 +1,9 @@
 import { router } from 'expo-router';
 
 import { Button } from '@/design/components/button';
+import { CityHeroLayout } from '@/design/components/city-hero-layout';
 import { continueRewardFlow } from '@/features/game/reward-flow';
 import { useReward } from '@/features/game/reward-store';
-import { CityHeroLayout } from '@/features/game/rewards/city-hero-layout';
 import { useHardwareBack } from '@/hooks/use-hardware-back';
 
 /**

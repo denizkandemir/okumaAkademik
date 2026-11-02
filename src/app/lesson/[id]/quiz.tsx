@@ -94,11 +94,11 @@ function Quiz({
   const [showText, setShowText] = useState(false);
   const [confirmLeave, setConfirmLeave] = useState(false);
 
-  // Sonucu ekran okuyucuya söyle ve odağı geri bildirim paneline taşı.
+  // Odağı geri bildirim paneline taşı; ekran okuyucu paneli okur (iki platformda da). Panelin
+  // canlı bölgesi kapalı: Android'de aynı metin iki kez okunmasın.
   const feedbackRef = useRef<ViewInstance>(null);
   useEffect(() => {
     if (!feedback) return;
-    AccessibilityInfo.announceForAccessibility(feedback.correct ? 'Doğru!' : 'Tekrar deneyelim');
     const timer = setTimeout(() => {
       if (feedbackRef.current) {
         AccessibilityInfo.sendAccessibilityEvent(feedbackRef.current, 'focus');
@@ -216,7 +216,11 @@ function Quiz({
           accessibilityLabel={`${questions.length} sorudan ${answered} tanesi yanıtlandı`}
           style={styles.grow}
         />
-        <AppText variant="mapLabel" color={colors.textMuted} accessibilityElementsHidden>
+        <AppText
+          variant="mapLabel"
+          color={colors.textMuted}
+          accessibilityElementsHidden
+          importantForAccessibility="no">
           {index + 1} / {questions.length}
         </AppText>
       </View>
@@ -227,7 +231,7 @@ function Quiz({
         <View style={styles.column}>
           <Eyebrow>PIRIL MERAK EDİYOR</Eyebrow>
           <View style={styles.questionRow}>
-            <Mascot pose={feedback?.correct ? 'happy' : 'think'} size={MASCOT_SIZE} />
+            <Mascot pose={feedback?.correct ? 'happy' : 'think'} size={MASCOT_SIZE} decorative />
             <AppText
               variant="question"
               accessibilityRole="header"
@@ -250,9 +254,11 @@ function Quiz({
           </View>
 
           {feedback ? (
-            <View ref={feedbackRef} accessible={false} style={styles.feedback}>
+            <View style={styles.feedback}>
               {feedback.correct ? (
                 <FeedbackPanel
+                  ref={feedbackRef}
+                  accessibilityLiveRegion="none"
                   tone="right"
                   title="Evet, tam da öyle!"
                   text={feedback.explanation}
@@ -260,6 +266,8 @@ function Quiz({
                 />
               ) : (
                 <FeedbackPanel
+                  ref={feedbackRef}
+                  accessibilityLiveRegion="none"
                   tone="wrong"
                   title="Bir daha bakalım mı?"
                   text={feedback.hint.trim() || DEFAULT_HINT}
@@ -353,7 +361,7 @@ function QuizState({
           />
         ) : (
           <View style={styles.message} accessibilityLiveRegion="polite">
-            <Mascot pose="think" size={MASCOT_SIZE} />
+            <Mascot pose="think" size={MASCOT_SIZE} decorative />
             <AppText variant="heading" align="center">
               {message ?? ''}
             </AppText>
@@ -384,13 +392,15 @@ const styles = StyleSheet.create({
   toolbar: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 14,
+    gap: 15,
     paddingHorizontal: screenPadding,
-    paddingVertical: 12,
+    // .screen üst boşluğu 24, .screenhead alt boşluğu 25 (12 + içeriğin 13'ü).
+    paddingTop: 24,
+    paddingBottom: 12,
   },
   content: {
     paddingHorizontal: screenPadding,
-    paddingTop: 8,
+    paddingTop: 13,
   },
   column: {
     width: '100%',
@@ -402,7 +412,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    marginBottom: 6,
+    marginBottom: 11,
   },
   options: {
     gap: 12,

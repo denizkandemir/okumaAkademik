@@ -1,6 +1,6 @@
 import { createContext, use, useState, type PropsWithChildren } from 'react';
 
-import type { CityId } from './theme';
+import type { CityId } from '@/design/cities';
 
 type CurrentCityValue = {
   city: CityId;

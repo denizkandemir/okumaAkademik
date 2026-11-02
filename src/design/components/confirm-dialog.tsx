@@ -39,7 +39,7 @@ export function ConfirmDialog({
       <View style={styles.backdrop}>
         <View style={styles.dialog} accessibilityViewIsModal>
           <View style={styles.mascot}>
-            <Mascot pose="think" size={96} />
+            <Mascot pose="think" size={96} decorative />
           </View>
           <AppText variant="heading" align="center" accessibilityRole="header">
             {title}

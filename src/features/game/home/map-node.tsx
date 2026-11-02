@@ -111,8 +111,8 @@ export const MapNode = memo(function MapNode({ lesson, x, y, onOpen, onLocked }:
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={nodeLabel(lesson)}
-        accessibilityHint={locked ? undefined : 'Ders kartını açar'}
-        accessibilityState={{ disabled: locked }}
+        // Kilitli düğüm de dokunulabilir (Pırıl nedenini söyler); bu yüzden 'disabled' değil.
+        accessibilityHint={locked ? 'Neden kilitli olduğunu söyler' : 'Ders kartını açar'}
         hitSlop={8}
         onPress={press}
         style={styles.fill}>

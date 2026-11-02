@@ -4,12 +4,12 @@ import type { ReactNode } from 'react';
 import { ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { CITIES } from '@/design/cities';
-import { AppHeader } from '@/design/components/app-header';
-import { AppText } from '@/design/components/app-text';
-import { Eyebrow } from '@/design/components/eyebrow';
-import { colors, screenPadding, size } from '@/design/tokens';
-import type { CityId } from '@/features/game/theme';
+import { CITIES, type CityId } from '../cities';
+import { colors, size } from '../tokens';
+import { AppHeader } from './app-header';
+import { AppText } from './app-text';
+import { Eyebrow } from './eyebrow';
+
 import { Mascot } from '@/features/mascot/mascot';
 import type { MascotPose } from '@/features/mascot/types';
 
@@ -122,16 +122,17 @@ const styles = StyleSheet.create({
     bottom: 0,
     alignSelf: 'center',
   },
+  // .onboardcopy: yanlarda 28, üstte 12; metinden düğmelere 23.
   copy: {
     width: '100%',
     maxWidth: size.maxContentWidth,
     alignSelf: 'center',
-    paddingHorizontal: screenPadding,
-    paddingTop: 8,
+    paddingHorizontal: 28,
+    paddingTop: 12,
     gap: 12,
   },
   actions: {
     gap: 12,
-    marginTop: 16,
+    marginTop: 11,
   },
 });

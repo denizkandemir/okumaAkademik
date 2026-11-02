@@ -1,4 +1,4 @@
-import type { CityId } from '@/features/game/theme';
+import type { CityId } from '@/design/cities';
 
 export type ReadingLevel = 1 | 2 | 3;
 

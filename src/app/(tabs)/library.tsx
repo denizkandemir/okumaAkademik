@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { CITIES } from '@/design/cities';
+import { CITIES, CITY_IDS } from '@/design/cities';
 import { AppHeader } from '@/design/components/app-header';
 import { AppText } from '@/design/components/app-text';
 import { Button } from '@/design/components/button';
@@ -15,7 +15,6 @@ import { StateView } from '@/design/components/state-view';
 import { ThemeTag } from '@/design/components/theme-tag';
 import { CheckIcon } from '@/design/icons';
 import { colors } from '@/design/tokens';
-import { CITY_IDS } from '@/features/game/theme';
 import { Mascot } from '@/features/mascot/mascot';
 import type { LibraryText } from '@/features/reading/types';
 import { useApiQuery } from '@/hooks/use-api-query';
@@ -78,7 +77,7 @@ export default function LibraryScreen() {
       {data && texts.length === 0 ? (
         filter === 'read' ? (
           <View style={styles.empty}>
-            <Mascot pose="read" size={120} />
+            <Mascot pose="read" size={120} decorative />
             <AppText align="center">
               Henüz bitirdiğin bir hikâye yok. Haritadan ilk hikâyeni seçelim mi?
             </AppText>

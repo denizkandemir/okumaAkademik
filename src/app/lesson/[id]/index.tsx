@@ -153,7 +153,7 @@ function CardHeader({ data }: { data: LessonDetailResponse }) {
           {lesson.title}
         </AppText>
       </View>
-      <Mascot pose="read" size={72} />
+      <Mascot pose="read" size={72} decorative />
     </View>
   );
 }
@@ -183,7 +183,7 @@ function CardError({ error, onRetry }: { error: unknown; onRetry: () => void }) 
   if (!locked) return <StateView isLoading={false} error={error} onRetry={onRetry} />;
   return (
     <View style={styles.locked} accessibilityLiveRegion="polite">
-      <Mascot pose="think" size={96} />
+      <Mascot pose="think" size={96} decorative />
       <AppText variant="heading" align="center">
         {getErrorMessage(error)}
       </AppText>
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     gap: 14,
     paddingTop: 6,
-    paddingHorizontal: 24,
+    paddingHorizontal: 25,
   },
   header: {
     flexDirection: 'row',
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
-    marginVertical: 6,
+    marginVertical: 8,
   },
   stars: {
     flexDirection: 'row',

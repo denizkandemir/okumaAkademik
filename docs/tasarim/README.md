@@ -46,27 +46,45 @@ Her görev için:
 
 | # | Ekran | Görüntü / HTML | Uygulamadaki yeri | Pırıl | Prompt |
 |---|---|---|---|---|---|
-| 1-6 | Yolculuk (6 şehir) | `01`-`06-yolculuk-*` | `src/app/(tabs)/index.tsx` | şehre göre (aşağıda) | T01 |
+| 1-6 | Yolculuk (6 şehir) | `01`-`06-yolculuk-*` | `src/app/(tabs)/index.tsx` + `src/features/game/home/*` | şehre göre (aşağıda) | T01 |
 | 7 | Ders kartı | `07-ders-karti` | `src/app/lesson/[id]/index.tsx` (alt sayfa) | `read` | T01 |
-| 8 | Okuma | `08-okuma` | `src/app/reading/[id].tsx` | sözlük kartında `talk` | T02 |
+| 8 | Okuma | `08-okuma` | `src/app/reading/[id].tsx` + `src/features/reading/*` | sözlük kartında `talk` | T02 |
 | 9 | Anlama sorusu | `09-soru` | `src/app/lesson/[id]/quiz.tsx` | `think` | T02 |
 | 10 | Yanlış yanıt | `10-yanlis-cevap` | aynı ekran | `think` | T02 |
 | 11 | Doğru yanıt | `11-dogru-cevap` | aynı ekran | `happy` | T02 |
-| 12 | Ders sonucu | `12-ders-sonucu` | `src/app/lesson/[id]/complete.tsx` | 3 yıldızda `celebrate`, diğer durumda `happy` | T03 |
+| 12 | Ders sonucu | `12-ders-sonucu` | `src/app/lesson/[id]/complete.tsx` + `src/features/game/rewards/lesson-result-view.tsx` | 3 yıldızda `celebrate`, diğer durumda `happy` | T03 |
 | 13 | Seviye ödülü | `13-seviye-odulu` | `src/app/level-up.tsx` | (madalya, kedi yok) | T03 |
 | 14 | Şehir açılışı | `14-sehir-acilisi` | `src/app/city-unlocked.tsx` | `wave` | T03 |
 | — | Sandık (panoda yok) | 13'ün diliyle | `src/app/lesson/[id]/chest.tsx` | `happy` → `celebrate` | T03 |
 | 24 | Eve dönüş | `24-eve-donus` | `src/app/finale.tsx` | `celebrate` | T03 |
-| 25 | Sertifika | `25-sertifika` | `src/app/certificate.tsx` (yeni) | — | T03 |
+| 25 | Sertifika | `25-sertifika` | `src/app/certificate.tsx` | — | T03 |
 | 15 | Karşılama | `15-karsilama` | `src/app/(auth)/welcome.tsx` | `wave` | T04 |
-| 16 | Kayıt | `16-kayit` | `src/app/(auth)/register.tsx` (+ `login.tsx` aynı dille) | `wave` | T04 |
-| 19 | Ayarlar | `19-ayarlar` | `src/app/settings.tsx` (yeni) | — | T04 |
-| 18 | Bildirim | `18-bildirim` | gerçek yerel bildirim (ekran yapılmaz) | — | T04 |
-| 17 | Geri dönüş | `17-geri-donus` | `src/app/welcome-back.tsx` (yeni) | `happy` | T04 |
+| 16 | Kayıt | `16-kayit` | `src/app/(auth)/register.tsx` (+ `login.tsx` aynı dille), `src/features/auth/auth-form-layout.tsx` | `wave` | T04 |
+| 19 | Ayarlar | `19-ayarlar` | `src/app/settings.tsx` | — | T04 |
+| 18 | Bildirim | `18-bildirim` | gerçek yerel bildirim (ekran yapılmaz): `src/features/reminder/reminder.ts` | — | T04 |
+| 17 | Geri dönüş | `17-geri-donus` | `src/app/welcome-back.tsx` | `happy` | T04 |
 | 20 | Kitaplık | `20-kitaplik` | `src/app/(tabs)/library.tsx` | boş durumda `read` | T05 |
-| 21 | Pasaport | `21-pasaport` | `src/app/(tabs)/passport.tsx` (yeni sekme) | — | T05 |
-| 22 | Profil | `22-profil` | `src/app/(tabs)/profile.tsx` | `idle` | T05 |
+| 21 | Pasaport | `21-pasaport` | `src/app/(tabs)/passport.tsx` | — | T05 |
+| 22 | Profil | `22-profil` | `src/app/(tabs)/profile.tsx` + `src/features/profile/*` | `idle` | T05 |
 | 23 | Küçük başarılar | `23-rozetler` | `src/app/badges.tsx` (sekme değil) | `idle` | T05 |
+
+**Durum (T06):** 25 ekranın hepsi uygulamada. Ortak bileşenler `src/design/` altında: şehir
+arka planlı ekranların düzeni (14, 15, 24) `src/design/components/city-hero-layout.tsx`, ödül
+ekranlarınınki (12, 13, sandık) `src/features/game/rewards/reward-layout.tsx`. İlk "oyun"
+tasarımının kodu (SVG şehir sahneleri, `GameButton` ve diğer eski bileşenler, eski renk ve yazı
+tipleri) silindi. Bilinçli farklar:
+
+- Aşağıdaki kararlar (10 ders, 1-8 sınıf, kullanıcı adı ve şifre, demo notlarının olmaması,
+  sandık ekranı, en küçük yazı boyutları, kontrast renkleri).
+- Panodaki küçük kare düğmeler (37 px geri, A−/A+, kapat) uygulamada en az 48 dp dokunma
+  alanıyla çizilir.
+- Ders sonucunda sırada ödül varsa yalnızca "ÖDÜLÜMÜ GÖR" görünür; "HARİTAYA DÖN" ödülün
+  atlanmaması için yalnızca son adımdadır.
+- Seviye ödülündeki satırlar gerçek veriyi gösterir: seviye atlama lokumu ve şehir bitince o
+  şehrin mührü (panodaki "İstanbul hatırası" ve "+20 lokum" örnek metinlerdir).
+- Profildeki üçüncü kutu "günlük seri" (panoda "örnek gün serisi").
+- Okuma ekranında sözlüklü metinlerde "Altı noktalı kelimelere dokun…" satırı ve sözlük kartı
+  vardır (panoda yok).
 
 ## Kararlar (tasarımdan farklı olan ya da tasarımda olmayan)
 
@@ -82,7 +100,7 @@ Her görev için:
    - arayüz için **Nunito Sans** (400, 600, 700, 800, 900)
    - okuma metni, yer notları ve sertifika adı için **Literata** (400, 400 italik, 600)
 
-   Eski Baloo 2 ve Nunito, T06'da kaldırılır.
+   Eski Baloo 2 ve Nunito T06'da kaldırıldı.
 4. **Erişilebilirlik için renk düzeltmeleri.** Panodaki bazı açık renkler çocukların okuması
    için yetersiz kontrastta (WCAG: metin ≥ 4,5:1, büyük metin ve ikon ≥ 3:1). Tasarıma en
    yakın, yeterli tonlar aşağıdaki tabloda. Örneğin ana düğme `#D67F5D` üstünde beyaz yazı

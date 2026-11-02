@@ -88,14 +88,6 @@ export default function ProfileScreen() {
             onPress={() => router.push('/dev/mascot')}
           />
           <TextLink
-            title="Oyun arayüzü vitrini (geliştirici)"
-            onPress={() => router.push('/dev/game-ui')}
-          />
-          <TextLink
-            title="Şehir sahneleri vitrini (geliştirici)"
-            onPress={() => router.push('/dev/scenes')}
-          />
-          <TextLink
             title="Tasarım vitrini (geliştirici)"
             onPress={() => router.push('/dev/design')}
           />
