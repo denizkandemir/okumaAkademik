@@ -212,7 +212,16 @@ export function rewardsFor(input: {
   };
 }
 
-export type Achievement = { id: string; title: string; description: string; earned: boolean };
+export type AchievementProgress = { current: number; target: number; unit: string };
+
+export type Achievement = {
+  id: string;
+  title: string;
+  description: string;
+  earned: boolean;
+  /** Hedefe ilerleme, ör. 3 / 10 hikâye; `current` hedefi aşmaz. */
+  progress: AchievementProgress;
+};
 
 /** Başarılar (v1): tabloda saklanmaz, istatistiklerden hesaplanır. */
 export function achievementsFor(stats: {
@@ -221,36 +230,40 @@ export function achievementsFor(stats: {
   threeStarLessons: number;
   completedLessons: number;
 }): Achievement[] {
+  const goal = (
+    id: string,
+    title: string,
+    description: string,
+    value: number,
+    target: number,
+    unit: string,
+  ): Achievement => ({
+    id,
+    title,
+    description,
+    earned: value >= target,
+    progress: { current: Math.min(value, target), target, unit },
+  });
+
   return [
-    {
-      id: 'ilk-hikaye',
-      title: 'İlk hikâye',
-      description: 'İlk hikâyeni oku',
-      earned: stats.storiesDone >= 1,
-    },
-    {
-      id: 'seri-7',
-      title: '7 gün seri',
-      description: '7 gün art arda oku',
-      earned: stats.bestStreak >= 7,
-    },
-    {
-      id: 'hikaye-10',
-      title: '10 hikâye',
-      description: '10 hikâye oku',
-      earned: stats.storiesDone >= 10,
-    },
-    {
-      id: 'uc-yildiz-5',
-      title: '5 kez 3 yıldız',
-      description: '5 hikâyede 3 yıldız topla',
-      earned: stats.threeStarLessons >= 5,
-    },
-    {
-      id: 'yeni-sehir',
-      title: 'İlk yeni şehir',
-      description: "İzmir'e ulaş",
-      earned: stats.completedLessons >= LESSONS_PER_CITY,
-    },
+    goal('ilk-hikaye', 'İlk hikâye', 'İlk hikâyeni oku', stats.storiesDone, 1, 'hikâye'),
+    goal('seri-7', '7 gün seri', '7 gün art arda oku', stats.bestStreak, 7, 'gün'),
+    goal('hikaye-10', '10 hikâye', '10 hikâye oku', stats.storiesDone, 10, 'hikâye'),
+    goal(
+      'uc-yildiz-5',
+      '5 kez 3 yıldız',
+      '5 hikâyede 3 yıldız topla',
+      stats.threeStarLessons,
+      5,
+      '3 yıldızlı hikâye',
+    ),
+    goal(
+      'yeni-sehir',
+      'İlk yeni şehir',
+      "İzmir'e ulaş",
+      stats.completedLessons,
+      LESSONS_PER_CITY,
+      'İstanbul dersi',
+    ),
   ];
 }

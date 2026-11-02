@@ -61,6 +61,17 @@ const PAIRS = [
   ['themeTag.text', 'themeTag.background', 'text'],
   ['notification.text', 'notification.background', 'text'],
 
+  // Kitaplık süzgeç hapları, Pasaport mührü
+  ['filterChip.text', 'filterChip.background', 'text'],
+  ['filterChip.selected.text', 'filterChip.selected.background', 'text'],
+  ['medal.text', 'medal.face', 'icon'],
+
+  // Profil: pasaport kartı, kazanılmamış başarı ikonu
+  ['text', 'passport.background', 'text'],
+  ['eyebrow', 'passport.background', 'text'],
+  ['textMuted', 'passport.background', 'text'],
+  ['rewardRow.iconMuted', 'surfaceRaised', 'icon'],
+
   // Metin alanı ve onay kutusu
   ['input.text', 'input.background', 'text'],
   ['input.placeholder', 'input.background', 'text'],

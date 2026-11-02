@@ -1,135 +1,121 @@
-import { Link, router } from 'expo-router';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { router } from 'expo-router';
+import { StyleSheet, View } from 'react-native';
 
-import { Card } from '@/components/card';
-import { Screen } from '@/components/screen';
-import { ThemedText } from '@/components/themed-text';
-import { MinTouchSize, Radius, Spacing } from '@/constants/theme';
-import { Button as DesignButton } from '@/design/components/button';
+import { AppHeader } from '@/design/components/app-header';
+import { AppText } from '@/design/components/app-text';
+import { Button } from '@/design/components/button';
+import { Eyebrow } from '@/design/components/eyebrow';
+import { IconButton } from '@/design/components/icon-button';
+import { Screen } from '@/design/components/screen';
+import { StateView } from '@/design/components/state-view';
+import { TextLink } from '@/design/components/text-link';
+import { SlidersIcon } from '@/design/icons';
 import { useAuth } from '@/features/auth/auth-context';
-import { Mascot } from '@/features/mascot/mascot';
-import { useTheme } from '@/hooks/use-theme';
+import type { StatsResponse } from '@/features/game/types';
+import { AchievementRow, sortAchievements } from '@/features/profile/achievement-row';
+import { CitySeals } from '@/features/profile/city-seals';
+import { ProfileSummary } from '@/features/profile/profile-summary';
+import { useApiQuery } from '@/hooks/use-api-query';
 
+/** Profilde gösterilen başarı sayısı; tamamı Küçük başarılar ekranında. */
+const ACHIEVEMENT_PREVIEW = 3;
+
+/** Profil sekmesi (22-profil): pasaport kartı, istatistikler, şehir mühürleri, başarılar. */
 export default function ProfileScreen() {
   const { user } = useAuth();
-  const theme = useTheme();
+  // Ders bitip dönünce yeni mühür ve başarılar görünsün diye her odaklanmada tazelenir.
+  const { data, error, isLoading, refetch } = useApiQuery<StatsResponse>(
+    user ? '/me/stats' : null,
+    { refetchOnFocus: true },
+  );
 
   if (!user) return null;
 
-  const initial = user.name.trim().charAt(0).toLocaleUpperCase('tr-TR') || '?';
-
   return (
-    <Screen withTabBar>
-      <ThemedText type="title">Profil</ThemedText>
-
-      <View style={styles.identityRow}>
-        <View style={styles.identity}>
-          <View
-            accessibilityElementsHidden
-            importantForAccessibility="no-hide-descendants"
-            style={[styles.avatar, { backgroundColor: theme.primary }]}>
-            <ThemedText type="title" style={{ color: theme.onPrimary }}>
-              {initial}
-            </ThemedText>
-          </View>
-          <ThemedText type="subtitle">{user.name}</ThemedText>
+    <Screen withTabBar header={<AppHeader />}>
+      <View style={styles.head}>
+        <View style={styles.headText}>
+          <Eyebrow>SENİN YOLCULUĞUN</Eyebrow>
+          <AppText variant="title" accessibilityRole="header">
+            Merhaba, {user.name}!
+          </AppText>
         </View>
-        <Mascot pose="happy" size={120} />
+        <IconButton accessibilityLabel="Ayarlar" onPress={() => router.push('/settings')}>
+          <SlidersIcon />
+        </IconButton>
       </View>
 
-      <Card>
-        <InfoRow label="Kullanıcı adı" value={user.username} />
-        <InfoRow label="Sınıf" value={`${user.grade}. sınıf`} />
-      </Card>
-
-      {/* Rozetler sekme değil (docs/tasarim, karar 7); tam liste ayrı ekranda. */}
-      <DesignButton
-        title="ROZETLERİM"
-        accessibilityLabel="Rozetlerim"
-        variant="secondary"
-        onPress={() => router.push('/badges')}
+      {/* Tazeleme başarısız olsa da eldeki veri gösterilir; hata yalnızca veri yokken. */}
+      <StateView
+        isLoading={isLoading}
+        error={data ? undefined : error}
+        onRetry={refetch}
+        loadingLabel="Pasaportun hazırlanıyor…"
       />
 
-      {/* Geçici giriş: T05 Profil'i yeniden kurarken buraya ayarlar (sürgü) düğmesini yerleştirir.
-          Çıkış artık Ayarlar'da. */}
-      <DesignButton
-        title="AYARLAR"
-        accessibilityLabel="Ayarlar"
-        variant="secondary"
-        onPress={() => router.push('/settings')}
-      />
+      {data ? (
+        <>
+          <ProfileSummary name={user.name} grade={user.grade} stats={data} />
+
+          <AppText variant="heading" accessibilityRole="header" style={styles.section}>
+            Şehir mühürlerin
+          </AppText>
+          <CitySeals cities={data.cities} />
+
+          <AppText variant="heading" accessibilityRole="header" style={styles.section}>
+            Küçük büyük başarılar
+          </AppText>
+          {sortAchievements(data.achievements)
+            .slice(0, ACHIEVEMENT_PREVIEW)
+            .map((achievement) => (
+              <AchievementRow key={achievement.id} achievement={achievement} />
+            ))}
+          <TextLink title="Tümünü gör" onPress={() => router.push('/badges')} />
+
+          <Button
+            title="SERTİFİKAYI ÖNİZLE"
+            accessibilityLabel="Sertifikayı önizle"
+            variant="secondary"
+            onPress={() => router.push('/certificate')}
+          />
+        </>
+      ) : null}
 
       {__DEV__ ? (
-        <>
-          <Link href="/dev/mascot" asChild>
-            <Pressable accessibilityRole="link" style={styles.devLink}>
-              <ThemedText type="link">Maskot vitrini (geliştirici)</ThemedText>
-            </Pressable>
-          </Link>
-          <Link href="/dev/game-ui" asChild>
-            <Pressable accessibilityRole="link" style={styles.devLink}>
-              <ThemedText type="link">Oyun arayüzü vitrini (geliştirici)</ThemedText>
-            </Pressable>
-          </Link>
-          <Link href="/dev/scenes" asChild>
-            <Pressable accessibilityRole="link" style={styles.devLink}>
-              <ThemedText type="link">Şehir sahneleri vitrini (geliştirici)</ThemedText>
-            </Pressable>
-          </Link>
-          <Link href="/dev/design" asChild>
-            <Pressable accessibilityRole="link" style={styles.devLink}>
-              <ThemedText type="link">Tasarım vitrini (geliştirici)</ThemedText>
-            </Pressable>
-          </Link>
-        </>
+        <View>
+          <TextLink
+            title="Maskot vitrini (geliştirici)"
+            onPress={() => router.push('/dev/mascot')}
+          />
+          <TextLink
+            title="Oyun arayüzü vitrini (geliştirici)"
+            onPress={() => router.push('/dev/game-ui')}
+          />
+          <TextLink
+            title="Şehir sahneleri vitrini (geliştirici)"
+            onPress={() => router.push('/dev/scenes')}
+          />
+          <TextLink
+            title="Tasarım vitrini (geliştirici)"
+            onPress={() => router.push('/dev/design')}
+          />
+        </View>
       ) : null}
     </Screen>
   );
 }
 
-function InfoRow({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={styles.row}>
-      <ThemedText themeColor="textSecondary">{label}</ThemedText>
-      <ThemedText type="smallBold" style={styles.value}>
-        {value}
-      </ThemedText>
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
-  identityRow: {
+  head: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    flexWrap: 'wrap',
-    gap: Spacing.four,
+    gap: 12,
   },
-  identity: {
-    alignItems: 'center',
-    gap: Spacing.two,
+  headText: {
+    flex: 1,
+    gap: 8,
   },
-  avatar: {
-    width: 96,
-    height: 96,
-    borderRadius: Radius.full,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: Spacing.two,
-  },
-  value: {
-    fontSize: 18,
-  },
-  devLink: {
-    minHeight: MinTouchSize,
-    alignItems: 'center',
-    justifyContent: 'center',
+  section: {
+    marginTop: 8,
   },
 });

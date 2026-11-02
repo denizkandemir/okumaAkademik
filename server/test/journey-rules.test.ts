@@ -242,4 +242,28 @@ describe('başarılar', () => {
       earned({ storiesDone: 10, bestStreak: 7, threeStarLessons: 5, completedLessons: 12 }),
     ).toEqual(['ilk-hikaye', 'seri-7', 'hikaye-10', 'uc-yildiz-5', 'yeni-sehir']);
   });
+
+  it('ilerleme hedefe kadar sayılır, hedefi aşmaz', () => {
+    const progress = (stats: Parameters<typeof achievementsFor>[0]) =>
+      achievementsFor(stats).map(({ id, progress }) => [id, progress.current, progress.target]);
+
+    expect(
+      progress({ storiesDone: 3, bestStreak: 2, threeStarLessons: 1, completedLessons: 4 }),
+    ).toEqual([
+      ['ilk-hikaye', 1, 1],
+      ['seri-7', 2, 7],
+      ['hikaye-10', 3, 10],
+      ['uc-yildiz-5', 1, 5],
+      ['yeni-sehir', 4, 10],
+    ]);
+    expect(
+      progress({ storiesDone: 40, bestStreak: 20, threeStarLessons: 30, completedLessons: 60 }),
+    ).toEqual([
+      ['ilk-hikaye', 1, 1],
+      ['seri-7', 7, 7],
+      ['hikaye-10', 10, 10],
+      ['uc-yildiz-5', 5, 5],
+      ['yeni-sehir', 10, 10],
+    ]);
+  });
 });
