@@ -10,8 +10,11 @@ import { usePlayerSummary } from '@/features/game/use-player-summary';
 /**
  * Üst çubuk: solda logo; sağda seri (alev), lokum (altıgen) ve ad baş harfli avatar. Avatara
  * dokununca Profil sekmesi açılır. Sayılar gelene kadar yalnızca logo ve avatar görünür.
+ *
+ * `profileLink={false}`: avatar yalnızca görünür (okuma ve soru ekranları; oradan onaysız
+ * ayrılıp ilerleme kaybedilmesin).
  */
-export function AppHeader() {
+export function AppHeader({ profileLink = true }: { profileLink?: boolean }) {
   const { name, streak, lokum } = usePlayerSummary();
   const initial = name.trim().charAt(0).toLocaleUpperCase('tr-TR') || '?';
 
@@ -42,8 +45,9 @@ export function AppHeader() {
           </View>
         ) : null}
         <Pressable
-          accessibilityRole="button"
+          accessibilityRole={profileLink ? 'button' : 'image'}
           accessibilityLabel={name ? `Profil, ${name}` : 'Profil'}
+          disabled={!profileLink}
           onPress={() => router.navigate('/profile')}
           style={styles.avatarTouch}>
           <View style={styles.avatar}>

@@ -89,8 +89,33 @@ describe('GET /texts/:id', () => {
       title: 'Kayıp Anahtar',
       level: 2,
       theme: 'Sorumluluk',
+      city: 'efes',
     });
     expect(text.paragraphs).toHaveLength(5);
+  });
+
+  it('yolculukta olmayan metnin şehri null döner', async () => {
+    const { token } = await registerUser(ctx.app);
+    await ctx.prisma.text.create({
+      data: {
+        id: 'kitaplik-metni',
+        title: 'Kitaplık Metni',
+        level: 'ILERI',
+        estimatedMinutes: 4,
+        theme: 'MERAK',
+        minGrade: 1,
+        maxGrade: 8,
+        paragraphs: ['Yalnızca kitaplıkta okunan bir metin.'],
+      },
+    });
+    const response = await ctx.app.inject({
+      method: 'GET',
+      url: '/texts/kitaplik-metni',
+      headers: bearer(token),
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json().text).toMatchObject({ id: 'kitaplik-metni', city: null });
   });
 
   it('kilitli dersin metni için 403 döner', async () => {

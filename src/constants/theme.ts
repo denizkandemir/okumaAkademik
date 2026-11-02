@@ -87,15 +87,6 @@ export const MinTouchSize = 48;
 /** Birincil butonlar ve form alanları için yükseklik. */
 export const ControlHeight = 56;
 
-/** Okuma ekranındaki yazı boyutu sınırları. */
-export const ReadingFont = {
-  min: 18,
-  max: 36,
-  default: 22,
-  step: 2,
-  lineHeightRatio: 1.6,
-} as const;
-
 /**
  * Sekme içindeki ekranların alt boşluğu (güvenli alana ek): içerik alta sabit sekme çubuğunun
  * (bkz. components/app-tabs.tsx) altında kalmaz.

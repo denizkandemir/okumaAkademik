@@ -186,6 +186,8 @@ export const colors = {
     nextStop: '#FFFCF3C9',
     nextStopBorder: '#E7DFCB',
   },
+  /** Yüzen kartların yumuşak gölgesi (ör. sözlük kartı). */
+  shadow: '#303B4229',
   white: '#FFFFFF',
 } as const;
 
@@ -250,8 +252,8 @@ export const type = {
   tab: { fontFamily: fonts.sansExtraBold, fontSize: 12, lineHeight: 16 },
   /** Harita etiketleri ("Arkadaşlık · 2 dk"). */
   mapLabel: { fontFamily: fonts.sansExtraBold, fontSize: 12, lineHeight: 16 },
-  /** Okuma metni; A−/A+ ile 18-28 arası değişir (bkz. readingSize). */
-  reading: { fontFamily: fonts.serif, fontSize: 21, lineHeight: 39 },
+  /** Okuma metni; boyutu A−/A+ ile değişir (bkz. readingSize), satır aralığı 1,85. */
+  reading: { fontFamily: fonts.serif, fontSize: 22, lineHeight: 41 },
   /** Haritadaki italik yer notu. */
   landmark: { fontFamily: fonts.serifItalic, fontSize: 13, lineHeight: 17 },
   certificateName: { fontFamily: fonts.serifItalic, fontSize: 31, lineHeight: 40 },
@@ -259,12 +261,15 @@ export const type = {
 
 export type TypeVariant = keyof typeof type;
 
-/** Okuma metni boyutu ve satır yüksekliği oranı. */
+/**
+ * Okuma metni boyutu (A−/A+): önceki okuma ekranının sınırları ve 2'şer adım (T02). Satır
+ * yüksekliği oranı panodan (`.reader` 21/1,85).
+ */
 export const readingSize = {
   min: 18,
-  max: 28,
-  default: 21,
-  step: 1,
+  max: 36,
+  default: 22,
+  step: 2,
   lineHeightRatio: 1.85,
 } as const;
 

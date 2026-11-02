@@ -1,15 +1,30 @@
 import * as Haptics from 'expo-haptics';
-import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import {
+  AccessibilityInfo,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View,
+  type ViewInstance,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { AnswerOption, type AnswerState } from '@/features/game/quiz/answer-option';
-import { FeedbackPanel } from '@/features/game/quiz/feedback-panel';
+import { AppHeader } from '@/design/components/app-header';
+import { AppText } from '@/design/components/app-text';
+import { Button } from '@/design/components/button';
+import { ConfirmDialog } from '@/design/components/confirm-dialog';
+import { Eyebrow } from '@/design/components/eyebrow';
+import { FeedbackPanel } from '@/design/components/feedback-panel';
+import { IconButton } from '@/design/components/icon-button';
+import { OptionCard, type OptionState } from '@/design/components/option-card';
+import { ProgressBar } from '@/design/components/progress-bar';
+import { StateView } from '@/design/components/state-view';
+import { BackIcon } from '@/design/icons';
+import { colors, screenPadding, size } from '@/design/tokens';
 import { TextSheet } from '@/features/game/quiz/text-sheet';
 import { setReward } from '@/features/game/reward-store';
-import { GameBackgrounds, GameColors, GameFonts } from '@/features/game/theme';
 import type {
   AnswerRequest,
   AnswerResponse,
@@ -17,22 +32,18 @@ import type {
   CompleteLessonResponse,
   LessonDetailResponse,
 } from '@/features/game/types';
-import { ConfirmDialog } from '@/features/game/ui/confirm-dialog';
-import { GameButton } from '@/features/game/ui/game-button';
-import { CloseIcon } from '@/features/game/ui/icons';
-import { SquareButton } from '@/features/game/ui/square-button';
 import { Mascot } from '@/features/mascot/mascot';
-import { MascotBubble } from '@/features/mascot/mascot-bubble';
-import type { MascotPose } from '@/features/mascot/types';
 import { useApiQuery } from '@/hooks/use-api-query';
 import { useHardwareBack } from '@/hooks/use-hardware-back';
 import { api } from '@/lib/api';
 import { getErrorMessage } from '@/lib/errors';
 
-const LETTERS = ['A', 'B', 'C'];
-const LIP = '#E6DCF5';
+const LETTERS = ['A', 'B', 'C', 'D'];
+/** API ipucu boşsa yanlış cevaptan sonra gösterilir (10-yanlis-cevap). */
+const DEFAULT_HINT = 'İpucunu metinde bulabilirsin. Her deneme öğrenmenin bir parçası.';
+const MASCOT_SIZE = 96;
 
-/** Anlama soruları (S05Soru, S06Yanlis, S07Dogru). */
+/** Anlama soruları (09-11): okuma bitince açılır; okuma oturumu kimliği olmadan açılmaz. */
 export default function QuizScreen() {
   const { id, readingSessionId } = useLocalSearchParams<{
     id: string;
@@ -70,10 +81,11 @@ function Quiz({
   readingSessionId: string;
 }) {
   const insets = useSafeAreaInsets();
-  const window = useWindowDimensions();
   const questions = [...data.questions].sort((a, b) => a.position - b.position);
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
+  /** Bu soruda yanlış bulunan şıklar: işaretli ve dokunulamaz kalır. */
+  const [wrongChoices, setWrongChoices] = useState<ReadonlySet<number>>(new Set());
   const [feedback, setFeedback] = useState<AnswerResponse | null>(null);
   const [checking, setChecking] = useState(false);
   const [checkError, setCheckError] = useState<string | null>(null);
@@ -82,7 +94,20 @@ function Quiz({
   const [showText, setShowText] = useState(false);
   const [confirmLeave, setConfirmLeave] = useState(false);
 
-  // Kapat (X ve Android geri) onay sorar; ders bitirilirken yok sayılır, yoksa yanıt gelince
+  // Sonucu ekran okuyucuya söyle ve odağı geri bildirim paneline taşı.
+  const feedbackRef = useRef<ViewInstance>(null);
+  useEffect(() => {
+    if (!feedback) return;
+    AccessibilityInfo.announceForAccessibility(feedback.correct ? 'Doğru!' : 'Tekrar deneyelim');
+    const timer = setTimeout(() => {
+      if (feedbackRef.current) {
+        AccessibilityInfo.sendAccessibilityEvent(feedbackRef.current, 'focus');
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [feedback]);
+
+  // Geri (düğme ve Android geri) onay sorar; ders bitirilirken yok sayılır, yoksa yanıt gelince
   // uygulama kendiliğinden ders sonu ekranına gider.
   const requestLeave = () => {
     if (!completing) setConfirmLeave(true);
@@ -95,8 +120,7 @@ function Quiz({
   const question = questions[index];
   if (!question) return null;
   const isLast = index === questions.length - 1;
-  const mascotSize = Math.min(180, Math.round(window.width * 0.42));
-  const pose: MascotPose = feedback ? (feedback.correct ? 'happy' : 'think') : 'talk';
+  const answered = index + (feedback?.correct ? 1 : 0);
 
   const check = async () => {
     if (selected == null || checking) return;
@@ -114,6 +138,8 @@ function Quiz({
       );
       if (result.correct) {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+      } else {
+        setWrongChoices((previous) => new Set(previous).add(selected));
       }
       setFeedback(result);
     } catch (error) {
@@ -128,11 +154,18 @@ function Quiz({
     setSelected(null);
   };
 
+  const choose = (choice: number) => {
+    // Yanlış cevaptan sonra başka bir şık seçmek de yeniden denemektir.
+    if (feedback && !feedback.correct) setFeedback(null);
+    setSelected(choice);
+  };
+
   const next = async () => {
     if (!isLast) {
       setIndex(index + 1);
       setSelected(null);
       setFeedback(null);
+      setWrongChoices(new Set());
       return;
     }
     if (completing) return;
@@ -164,108 +197,118 @@ function Quiz({
     router.dismissTo('/');
   };
 
-  const optionState = (choice: number): AnswerState => {
-    if (feedback?.correct) return choice === selected ? 'correct' : 'faded';
-    if (feedback && choice === selected) return 'wrong';
-    return choice === selected ? 'selected' : 'idle';
+  const optionState = (choice: number): OptionState => {
+    if (wrongChoices.has(choice)) return 'wrong';
+    if (feedback?.correct) return choice === selected ? 'correct' : 'disabled';
+    if (checking) return choice === selected ? 'selected' : 'disabled';
+    return choice === selected ? 'selected' : 'default';
   };
 
   return (
-    <View style={styles.root}>
-      <LinearGradient {...GameBackgrounds.lilacCream} style={StyleSheet.absoluteFill} />
-
-      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-        <SquareButton accessibilityLabel="Kapat" lip={LIP} onPress={requestLeave}>
-          <CloseIcon size={20} color={GameColors.textLilacSecondary} />
-        </SquareButton>
-        <View
-          style={styles.segments}
-          accessible
-          accessibilityRole="progressbar"
-          accessibilityLabel={`Soru ${index + 1} / ${questions.length}`}>
-          {questions.map((item, segment) => {
-            const done = segment < index || (segment === index && feedback?.correct);
-            const current = segment === index;
-            return (
-              <View
-                key={item.id}
-                style={[
-                  styles.segment,
-                  { backgroundColor: done ? '#2FB86B' : current ? '#7B4DFF' : '#E3D9F2' },
-                ]}
-              />
-            );
-          })}
-        </View>
-        <Text style={styles.counter} importantForAccessibility="no">
-          {index + 1}/{questions.length}
-        </Text>
+    <View style={[styles.root, { paddingTop: insets.top }]}>
+      <AppHeader profileLink={false} />
+      <View style={styles.toolbar}>
+        <IconButton accessibilityLabel="Geri" onPress={requestLeave}>
+          <BackIcon />
+        </IconButton>
+        <ProgressBar
+          progress={answered / questions.length}
+          accessibilityLabel={`${questions.length} sorudan ${answered} tanesi yanıtlandı`}
+          style={styles.grow}
+        />
+        <AppText variant="mapLabel" color={colors.textMuted} accessibilityElementsHidden>
+          {index + 1} / {questions.length}
+        </AppText>
       </View>
 
-      <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.askRow}>
-          <Mascot pose={pose} size={mascotSize} />
-          <View style={[styles.ask, { marginTop: mascotSize * 0.11 }]}>
-            <View style={styles.askTail} />
-            <Text style={styles.askLabel}>PIRIL SORUYOR</Text>
-            <Text style={styles.prompt} accessibilityRole="header">
+      <ScrollView
+        style={styles.grow}
+        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 30 }]}>
+        <View style={styles.column}>
+          <Eyebrow>PIRIL MERAK EDİYOR</Eyebrow>
+          <View style={styles.questionRow}>
+            <Mascot pose={feedback?.correct ? 'happy' : 'think'} size={MASCOT_SIZE} />
+            <AppText
+              variant="question"
+              accessibilityRole="header"
+              accessibilityLabel={`Soru ${index + 1} / ${questions.length}: ${question.prompt}`}
+              style={styles.grow}>
               {question.prompt}
-            </Text>
+            </AppText>
           </View>
-        </View>
 
-        <View style={styles.options} accessibilityRole="radiogroup" accessibilityLabel="Cevaplar">
-          {question.options.map((option, choice) => (
-            <AnswerOption
-              key={choice}
-              letter={LETTERS[choice] ?? String(choice + 1)}
-              label={option}
-              state={optionState(choice)}
-              disabled={!!feedback || checking}
-              onPress={() => setSelected(choice)}
-            />
-          ))}
+          <View style={styles.options} accessibilityRole="radiogroup">
+            {question.options.map((option, choice) => (
+              <OptionCard
+                key={choice}
+                letter={LETTERS[choice] ?? String(choice + 1)}
+                text={option}
+                state={optionState(choice)}
+                onPress={() => choose(choice)}
+              />
+            ))}
+          </View>
+
+          {feedback ? (
+            <View ref={feedbackRef} accessible={false} style={styles.feedback}>
+              {feedback.correct ? (
+                <FeedbackPanel
+                  tone="right"
+                  title="Evet, tam da öyle!"
+                  text={feedback.explanation}
+                  extra={feedback.lokum > 0 ? `+${feedback.lokum} lokum` : undefined}
+                />
+              ) : (
+                <FeedbackPanel
+                  tone="wrong"
+                  title="Bir daha bakalım mı?"
+                  text={feedback.hint.trim() || DEFAULT_HINT}
+                />
+              )}
+            </View>
+          ) : null}
+
+          {feedback?.correct ? (
+            <>
+              {completeError ? (
+                <FeedbackPanel tone="wrong" title="Dersi kaydedemedim" text={completeError} />
+              ) : null}
+              <Button
+                title={isLast ? 'DEVAM ET' : 'SONRAKİ SORU'}
+                accessibilityLabel={isLast ? 'Devam et' : 'Sonraki soru'}
+                loading={completing}
+                onPress={next}
+              />
+            </>
+          ) : feedback ? (
+            <>
+              <Button title="TEKRAR DENE" accessibilityLabel="Tekrar dene" onPress={retry} />
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Metne bak"
+                onPress={() => setShowText(true)}
+                style={styles.link}>
+                <AppText color={colors.textMuted} style={styles.linkText}>
+                  Metne bak
+                </AppText>
+              </Pressable>
+            </>
+          ) : (
+            <>
+              {checkError ? (
+                <FeedbackPanel tone="wrong" title="Cevabını gönderemedim" text={checkError} />
+              ) : null}
+              <Button
+                title="KONTROL ET"
+                accessibilityLabel="Kontrol et"
+                disabled={selected == null}
+                loading={checking}
+                onPress={check}
+              />
+            </>
+          )}
         </View>
       </ScrollView>
-
-      {feedback ? (
-        feedback.correct ? (
-          <FeedbackPanel
-            kind="correct"
-            explanation={feedback.explanation}
-            lokum={feedback.lokum}
-            continueLabel="DEVAM ET"
-            loading={completing}
-            error={completeError}
-            onContinue={next}
-            bottomInset={insets.bottom}
-          />
-        ) : (
-          <FeedbackPanel
-            kind="wrong"
-            hint={feedback.hint}
-            onShowText={() => setShowText(true)}
-            onRetry={retry}
-            bottomInset={insets.bottom}
-          />
-        )
-      ) : (
-        <View style={[styles.footer, { paddingBottom: insets.bottom + 24 }]}>
-          {checkError ? (
-            <Text style={styles.error} accessibilityRole="alert">
-              {checkError}
-            </Text>
-          ) : null}
-          <GameButton
-            variant="purple"
-            title="KONTROL ET"
-            accessibilityLabel="Kontrol et"
-            disabled={selected == null}
-            loading={checking}
-            onPress={check}
-          />
-        </View>
-      )}
 
       <TextSheet
         visible={showText}
@@ -277,8 +320,8 @@ function Quiz({
         visible={confirmLeave}
         title="Soruları bırakmak istiyor musun?"
         message="Dersi bitirmek için hikâyeyi yeniden okuman gerekecek."
-        stayLabel="Devam et"
-        leaveLabel="Bırak"
+        stayLabel="DEVAM ET"
+        leaveLabel="BIRAK"
         onStay={() => setConfirmLeave(false)}
         onLeave={leave}
       />
@@ -286,6 +329,7 @@ function Quiz({
   );
 }
 
+/** Sorular yüklenirken, yüklenemediğinde ya da açılamadığında. */
 function QuizState({
   loading,
   message,
@@ -297,26 +341,34 @@ function QuizState({
 }) {
   const insets = useSafeAreaInsets();
   return (
-    <View style={[styles.root, styles.state, { paddingTop: insets.top + 24 }]}>
-      <LinearGradient {...GameBackgrounds.lilacCream} style={StyleSheet.absoluteFill} />
-      <Mascot pose="think" size={140} />
-      <MascotBubble
-        tone="game"
-        side="top"
-        align="center"
-        text={loading ? 'Sorularımı hazırlıyorum…' : (message ?? '')}
-      />
-      {onRetry ? (
-        <GameButton title="TEKRAR DENE" accessibilityLabel="Tekrar dene" onPress={onRetry} />
-      ) : null}
-      {!loading ? (
-        <GameButton
-          variant="white"
-          size="md"
-          title="Ana sayfaya dön"
-          onPress={() => router.dismissTo('/')}
-        />
-      ) : null}
+    <View style={[styles.root, { paddingTop: insets.top }]}>
+      <AppHeader profileLink={false} />
+      <View style={styles.state}>
+        {loading ? (
+          <StateView
+            isLoading
+            error={null}
+            onRetry={() => {}}
+            loadingLabel="Sorularımı hazırlıyorum…"
+          />
+        ) : (
+          <View style={styles.message} accessibilityLiveRegion="polite">
+            <Mascot pose="think" size={MASCOT_SIZE} />
+            <AppText variant="heading" align="center">
+              {message ?? ''}
+            </AppText>
+            {onRetry ? (
+              <Button title="TEKRAR DENE" accessibilityLabel="Tekrar dene" onPress={onRetry} />
+            ) : null}
+            <Button
+              title="ANA SAYFAYA DÖN"
+              accessibilityLabel="Ana sayfaya dön"
+              variant="secondary"
+              onPress={() => router.dismissTo('/')}
+            />
+          </View>
+        )}
+      </View>
     </View>
   );
 }
@@ -324,89 +376,57 @@ function QuizState({
 const styles = StyleSheet.create({
   root: {
     flex: 1,
+    backgroundColor: colors.background,
   },
-  header: {
+  grow: {
+    flex: 1,
+  },
+  toolbar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    paddingHorizontal: screenPadding,
+    paddingVertical: 12,
+  },
+  content: {
+    paddingHorizontal: screenPadding,
+    paddingTop: 8,
+  },
+  column: {
+    width: '100%',
+    maxWidth: size.maxContentWidth,
+    alignSelf: 'center',
+    gap: 14,
+  },
+  questionRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    paddingHorizontal: 16,
-  },
-  segments: {
-    flex: 1,
-    flexDirection: 'row',
-    gap: 6,
-  },
-  segment: {
-    flex: 1,
-    height: 12,
-    borderRadius: 6,
-  },
-  counter: {
-    fontFamily: GameFonts.bodyHeavy,
-    fontSize: 15,
-    color: '#5B4A75',
-  },
-  content: {
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 24,
-    gap: 20,
-  },
-  askRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginLeft: -20,
-  },
-  ask: {
-    flex: 1,
-    marginLeft: -8,
-    borderRadius: 22,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    backgroundColor: GameColors.white,
-    boxShadow: GameColors.panelShadow,
-  },
-  askTail: {
-    position: 'absolute',
-    left: -8,
-    top: 40,
-    width: 16,
-    height: 16,
-    borderRadius: 3,
-    backgroundColor: GameColors.white,
-    transform: [{ rotate: '45deg' }],
-  },
-  askLabel: {
-    fontFamily: GameFonts.bodyHeavy,
-    fontSize: 12,
-    letterSpacing: 0.7,
-    color: '#5B34D6',
-  },
-  prompt: {
-    marginTop: 4,
-    fontFamily: GameFonts.heading,
-    fontSize: 21,
-    lineHeight: 26,
-    color: GameColors.warm,
+    marginBottom: 6,
   },
   options: {
     gap: 12,
   },
-  footer: {
-    paddingHorizontal: 20,
-    paddingTop: 8,
-    gap: 8,
+  feedback: {
+    marginTop: 6,
   },
-  error: {
-    fontFamily: GameFonts.bodyBold,
-    fontSize: 14,
-    color: '#B42318',
-    textAlign: 'center',
+  link: {
+    alignSelf: 'center',
+    minHeight: size.touch,
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+  },
+  linkText: {
+    textDecorationLine: 'underline',
   },
   state: {
+    flex: 1,
+    paddingHorizontal: screenPadding,
+    paddingTop: 24,
+  },
+  message: {
     alignItems: 'center',
-    justifyContent: 'center',
     gap: 16,
-    paddingHorizontal: 24,
+    paddingTop: 24,
   },
 });
