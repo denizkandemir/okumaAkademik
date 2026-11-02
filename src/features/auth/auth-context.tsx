@@ -95,6 +95,10 @@ export function AuthProvider({ children }: PropsWithChildren) {
     await clearStoredSession().catch((error) => console.warn('Oturum silinemedi:', error));
     // Hatırlatma çocuğun adını taşır; bir sonraki kullanıcıya kalmasın.
     await clearReminder().catch((error) => console.warn('Hatırlatma silinemedi:', error));
+    // "Yeniden merhaba" günde bir kez kuralı hesaba bağlı; sonraki kullanıcı da görebilsin.
+    await storage
+      .removeItem(storage.StorageKeys.welcomeBackShownOn)
+      .catch((error) => console.warn('Geri dönüş işareti silinemedi:', error));
   };
 
   const signOut = async () => {

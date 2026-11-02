@@ -193,3 +193,56 @@ kimliklerini siler; bu silme, kullanıcıların o dersteki tamamlamalarını da 
 - Yolculuk zincirinde boşluk oluşur.
 - Ders yeniden bitirilince ödüller ikinci kez verilebilir.
 - Metin içeriği değişebilir; kimlik aynı kalmalı.
+
+## 2. tarama (T00–T06 sonrası)
+
+Yeni tasarımdan sonra `src/` ve `server/src/` yeniden tarandı. Kritik ve yüksek önemde bulgu
+çıkmadı: ödül iki kez yazılmıyor ya da atlanmıyor, başka kullanıcının verisi ve kilitli metin
+içeriği görünmüyor.
+
+**Gerileme:** ilk taramanın bütün düzeltmeleri korunuyor (1–9, D1–D3, D6–D8, D10, D11, S1, S5).
+Ayrıca:
+- D7'deki yeniden deneme artık sertifika ekranında.
+- Sunucudaki ilgili dosyalar (`progress.routes.ts`, `rate-limit.ts`, `error-handler.ts`)
+  değişmemiş.
+- Düzeltme: yukarıdaki 6. telefon adımındaki "hiç kaydırmadan geri → doğrudan çıkış" hiçbir zaman
+  çalışmıyordu. İlerleme ilk ölçümde sıfırdan büyük olduğu için onay her seferinde sorulur.
+
+### Düzeltilenler
+
+| No | Önem | Dosya | Sorun | Durum |
+|---|---|---|---|---|
+| 1 | Orta | `features/welcome-back/welcome-back-gate.tsx` | Hatırlatma bildirimine dokunmak her ekranda ana sayfaya götürüyordu. Okuma, sorular ve ödül akışı onaysız kapanıyor, seviye, şehir ve eve dönüş ekranları atlanıyordu. | **Düzeltildi.** `isFlowScreen`: okuma, ders, soru ve ödül ekranlarında dokunuş temizleniyor, yönlendirme yapılmıyor. |
+| D14 | Düşük | aynı dosya | "Yeniden merhaba" akış ekranlarının üstüne açılabiliyordu. | **Düzeltildi.** Akış ekranındayken açılmıyor. Gün yalnızca ekran gerçekten açılınca kaydediliyor; sonraki öne gelişte yeniden deneniyor. |
+| D16 | Düşük | `features/auth/auth-context.tsx` | "Günde bir kez" işareti hesaba bağlı değildi; A çıkınca B o gün ekranı göremiyordu. | **Düzeltildi.** Çıkışta işaret siliniyor. |
+
+Sunucu değişmedi, yeni test yok. Kontroller: `npx expo lint` ve `npx tsc --noEmit` temiz.
+
+### Ertelenenler
+
+| No | Konu |
+|---|---|
+| D15 | `settings.tsx`: bildirim kurulamazsa anahtar açık kalıyor ama bildirim yok. Kapatırken kayıt yazılamazsa bildirim sürüyor. |
+| D17 | `settings.tsx`: hatırlatma ayarı okunamazsa ad değişince bildirim eski adla kalıyor. |
+| D18 | Çift dokunma: iki sertifika ekranı açılıyor, bir ekran fazla geri gidiliyor, boş ikinci okuma oturumu oluşuyor (D13 kalıbı). |
+| D19 | `reading-session.ts`: 403/404'te de "İnternet bağlantını kontrol et" yazıyor. |
+| D20 | Sunucu `nameSchema`: sıfır genişlikli ve kontrol karakterleri kabul ediliyor. |
+| S8 | SDK 58 `.env` yüklemesini bu projeyi etkileyecek biçimde değiştirmedi. Ama yerel `.env`'deki sabit IP (`172.20.10.3`) Metro adresini eziyor; başka ağda her istek "Sunucuya ulaşılamadı" der. Satırı kaldırmak yeterli. |
+| S9 | iOS'ta sertifika, eve dönüş modalının üstünde mi açılıyor? |
+| S10 | `?city=` ile açılan haritada ders bitince `dismissTo('/')` parametreyi koruyor mu? |
+| S11 | "Şu anki durağa dön" (`setParams({ city: undefined })`) parametreyi siliyor mu? |
+
+### Telefonda denenecekler
+
+1. **Bulgu 1:**
+   - Ayarlar → hatırlatmayı aç → BİLDİRİMİ GÖR → 5 sn içinde bir hikâye açıp okumaya başla.
+     Afişe dokun: okuma ekranı yerinde kalmalı.
+   - Aynısını soru ekranında ve "Ders tamamlandı" ekranında dene.
+   - Profil'deyken afişe dokun: Yolculuk açılmalı.
+   - Uygulama kapalıyken bildirime dokun: Yolculuk açılmalı.
+2. **D14:** 3+ gündür okumamış bir hesapta (ör. `reading_sessions.started_at`'i geri al) uygulamayı
+   aç: "Yeniden merhaba" görünmeli. Kapatıp tekrar öne getir: aynı gün yeniden görünmemeli.
+3. **D16:** A hesabında "Yeniden merhaba"yı gör → çık → 3+ gündür okumamış B hesabıyla gir: B de
+   görmeli.
+4. **S9–S11:** sırasıyla eve dönüş → KEŞİF SERTİFİKAM (iOS); Pasaport → bitmiş bir şehir → ders
+   bitir → harita hangi şehirde?; Pasaport → bitmiş şehir → "Şu anki durağa dön".

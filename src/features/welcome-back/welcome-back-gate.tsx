@@ -13,8 +13,22 @@ import { turkeyDayKey, turkeyDayNumber } from '@/lib/turkey-day';
 const AWAY_DAYS = 2;
 
 /**
+ * Ders ve ödül akışı ekranları: bildirim ya da geri dönüş ekranı bunların üstünden eve götürmez,
+ * yoksa okuma, sorular ya da ödül akışı onaysız kapanır (2. hata taraması, bulgu 1).
+ */
+function isFlowScreen(pathname: string) {
+  return (
+    pathname.startsWith('/reading/') ||
+    pathname.startsWith('/lesson/') ||
+    pathname === '/level-up' ||
+    pathname === '/city-unlocked' ||
+    pathname === '/finale'
+  );
+}
+
+/**
  * "Yeniden merhaba" gösterilmeli mi? Günde en fazla bir kez; çocuk daha önce okumuş ve son okuması
- * 2+ Türkiye günü önceyse. Gösterilecekse günü kaydeder.
+ * 2+ Türkiye günü önceyse. Gün, ekran gerçekten açılınca kaydedilir (bkz. `WelcomeBackGate`).
  */
 async function shouldShowWelcomeBack(): Promise<boolean> {
   const now = new Date();
@@ -23,10 +37,7 @@ async function shouldShowWelcomeBack(): Promise<boolean> {
 
   const stats = await api.get<StatsResponse>('/me/stats', { timeoutMs: 8_000 });
   if (!stats.lastReadAt) return false;
-  if (turkeyDayNumber(now) - turkeyDayNumber(new Date(stats.lastReadAt)) < AWAY_DAYS) return false;
-
-  await storage.setItem(storage.StorageKeys.welcomeBackShownOn, today);
-  return true;
+  return turkeyDayNumber(now) - turkeyDayNumber(new Date(stats.lastReadAt)) >= AWAY_DAYS;
 }
 
 /**
@@ -47,8 +58,12 @@ export function WelcomeBackGate() {
       if (checking.current) return;
       checking.current = true;
       shouldShowWelcomeBack()
-        .then((show) => {
-          if (show && pathnameRef.current !== '/welcome-back') router.push('/welcome-back');
+        .then(async (show) => {
+          const current = pathnameRef.current;
+          // Akış ekranındaysa gösterilmez; gün kaydedilmediği için sonraki öne gelişte yeniden denenir.
+          if (!show || current === '/welcome-back' || isFlowScreen(current)) return;
+          await storage.setItem(storage.StorageKeys.welcomeBackShownOn, turkeyDayKey(new Date()));
+          router.push('/welcome-back');
         })
         .catch(() => {})
         .finally(() => {
@@ -74,8 +89,10 @@ function ReminderTapHandler({ pathnameRef }: { pathnameRef: { current: string } 
     if (!response || response.actionIdentifier !== Notifications.DEFAULT_ACTION_IDENTIFIER) return;
     // Bir sonraki açılışta aynı dokunuş yeniden işlenmesin.
     Notifications.clearLastNotificationResponse();
-    // Geri dönüş ekranı zaten açıldıysa onun üstünden eve dönülmez; o da eve götürür.
-    if (pathnameRef.current !== '/' && pathnameRef.current !== '/welcome-back') {
+    // Geri dönüş ekranı zaten açıldıysa onun üstünden eve dönülmez; o da eve götürür. Çocuk
+    // okuyor, soru çözüyor ya da ödül akışındaysa yerinde kalır.
+    const current = pathnameRef.current;
+    if (current !== '/' && current !== '/welcome-back' && !isFlowScreen(current)) {
       router.navigate('/');
     }
   }, [response, pathnameRef]);
