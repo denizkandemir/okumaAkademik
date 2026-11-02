@@ -75,19 +75,8 @@ function RootNavigator({ fontsReady }: { fontsReady: boolean }) {
           <Stack.Screen name="finale" options={REWARD_SCREEN} />
           {/* Sertifika kendi geri düğmesini çizer; eve dönüşten ve haritadan açılır. */}
           <Stack.Screen name="certificate" />
-          {/* Küçük başarılar: sekme değil, Profil'den açılır. SDK 58'de iOS 26+ başlığı varsayılan
-              saydam; opak görünüm korunur. */}
-          <Stack.Screen
-            name="badges"
-            options={{
-              headerShown: true,
-              headerTransparent: false,
-              title: '',
-              headerBackTitle: 'Geri',
-            }}
-          />
-          {/* Eski yolculuk haritası adresi; Pasaport sekmesine yönlendirir. */}
-          <Stack.Screen name="journey-map" />
+          {/* Küçük başarılar: sekme değil, Profil'den açılır; kendi geri düğmesini çizer. */}
+          <Stack.Screen name="badges" />
           {/* Ayarlar kendi geri düğmesini çizer; Profil'den açılır. */}
           <Stack.Screen name="settings" />
           {/* Yeniden merhaba: tam ekran; kapat ve Android geri tuşu Yolculuk'a döner. */}

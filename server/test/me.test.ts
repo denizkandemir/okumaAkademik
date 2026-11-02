@@ -212,16 +212,41 @@ describe('GET /me/stats', () => {
 
     expect(body.cities[0]).toEqual({ id: 'istanbul', status: 'current' });
     expect(body.achievements).toEqual([
-      { id: 'ilk-hikaye', title: 'İlk hikâye', description: 'İlk hikâyeni oku', earned: true },
-      { id: 'seri-7', title: '7 gün seri', description: '7 gün art arda oku', earned: true },
-      { id: 'hikaye-10', title: '10 hikâye', description: '10 hikâye oku', earned: false },
+      {
+        id: 'ilk-hikaye',
+        title: 'İlk hikâye',
+        description: 'İlk hikâyeni oku',
+        earned: true,
+        progress: { current: 1, target: 1, unit: 'hikâye' },
+      },
+      {
+        id: 'seri-7',
+        title: '7 gün seri',
+        description: '7 gün art arda oku',
+        earned: true,
+        progress: { current: 7, target: 7, unit: 'gün' },
+      },
+      {
+        id: 'hikaye-10',
+        title: '10 hikâye',
+        description: '10 hikâye oku',
+        earned: false,
+        progress: { current: 8, target: 10, unit: 'hikâye' },
+      },
       {
         id: 'uc-yildiz-5',
         title: '5 kez 3 yıldız',
         description: '5 hikâyede 3 yıldız topla',
         earned: true,
+        progress: { current: 5, target: 5, unit: '3 yıldızlı hikâye' },
       },
-      { id: 'yeni-sehir', title: 'İlk yeni şehir', description: "İzmir'e ulaş", earned: false },
+      {
+        id: 'yeni-sehir',
+        title: 'İlk yeni şehir',
+        description: "İzmir'e ulaş",
+        earned: false,
+        progress: { current: 9, target: 10, unit: 'İstanbul dersi' },
+      },
     ]);
   });
 

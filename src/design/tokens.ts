@@ -100,6 +100,17 @@ export const colors = {
     background: '#E8EEE0',
     text: '#5B6F55',
   },
+  /** Kitaplıktaki süzgeç hapları ("Tüm hikâyeler" / "Okuduklarım"). */
+  filterChip: {
+    background: '#FFFFFF',
+    border: '#DFE2D3',
+    text: '#303B42',
+    selected: { background: '#DFEBDA', border: '#A7B9A0', text: '#4D6B49' },
+  },
+  /** Pasaport şehir kartı: şu anki şehrin kenarı. */
+  cityCard: {
+    activeBorder: '#D9A082',
+  },
   feedback: {
     wrong: { background: '#F8EBD2', text: '#856633' },
     right: { background: '#E8F0DD', text: '#58734F' },
@@ -131,6 +142,20 @@ export const colors = {
   rewardRow: {
     border: '#E3E3D3',
     icon: '#9B713A',
+    /** Henüz kazanılmamış başarının ikonu (soluk ama ≥ 3:1). */
+    iconMuted: '#808476',
+  },
+  /** Profildeki keşif pasaportu kartı (çift çerçeve). */
+  passport: {
+    background: '#F7F3E8',
+    border: '#DDD9C7',
+    innerBorder: '#DED7BD',
+  },
+  /** Şehir mührü: iç açık halka ve altın dış halka; kazanılmamışta gri. */
+  seal: {
+    ring: '#FFF8E6',
+    outline: '#D5BB88',
+    outlineMuted: '#D0D4C8',
   },
   star: {
     fill: '#D6A04B',

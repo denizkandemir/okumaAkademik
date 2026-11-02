@@ -93,7 +93,14 @@ export type StatsResponse = {
   /** Bugün dahil son 7 gün, eskiden yeniye; `day` ör. "Pzt". */
   week: { day: string; done: boolean }[];
   cities: { id: CityId; status: CityStatus }[];
-  achievements: { id: string; title: string; description: string; earned: boolean }[];
+  achievements: {
+    id: string;
+    title: string;
+    description: string;
+    earned: boolean;
+    /** Hedefe ilerleme, ör. 3 / 10 "hikâye"; `current` hedefi aşmaz. */
+    progress: { current: number; target: number; unit: string };
+  }[];
   /** ISO zaman; hiç okumadıysa `null`. */
   lastReadAt: string | null;
   finished: boolean;

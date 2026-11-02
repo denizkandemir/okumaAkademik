@@ -26,7 +26,8 @@ export async function textsRoutes(app: FastifyInstance) {
 
   /**
    * Kullanıcının sınıfına uygun metinler (paragraflar hariç). Yolculukta henüz kilitli olan
-   * derslerin metinleri listelenmez.
+   * derslerin metinleri listelenmez. `city`: metni okutan dersin şehri (dersi yoksa `null`);
+   * `read`: kullanıcının bu metinde tamamlanmış bir okuması var mı.
    */
   app.get('/texts', async (request) => {
     const { user } = requireAuth(request);
@@ -37,10 +38,22 @@ export async function textsRoutes(app: FastifyInstance) {
         maxGrade: { gte: user.grade },
         id: { notIn: [...locked] },
       },
-      select: textSummarySelect,
+      select: { ...textSummarySelect, lesson: { select: { city: true } } },
       orderBy: [{ level: 'asc' }, { estimatedMinutes: 'asc' }, { title: 'asc' }],
     });
-    return { texts: texts.map((text) => withApiTheme(withApiLevel(text))) };
+    const readRows = await prisma.readingSession.findMany({
+      where: { userId: user.id, completed: true },
+      select: { textId: true },
+      distinct: ['textId'],
+    });
+    const read = new Set(readRows.map((row) => row.textId));
+    return {
+      texts: texts.map(({ lesson, ...text }) => ({
+        ...withApiTheme(withApiLevel(text)),
+        city: lesson ? toApiCity(lesson.city) : null,
+        read: read.has(text.id),
+      })),
+    };
   });
 
   /** Metnin tamamı. `city`: metni okutan yolculuk dersinin şehri (dersi yoksa `null`). */

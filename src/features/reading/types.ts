@@ -2,12 +2,6 @@ import type { CityId } from '@/features/game/theme';
 
 export type ReadingLevel = 1 | 2 | 3;
 
-export const LevelLabels: Record<ReadingLevel, string> = {
-  1: 'Başlangıç',
-  2: 'Orta',
-  3: 'İleri',
-};
-
 /** GET /texts listesindeki öğe (paragraflar hariç). */
 export type TextSummary = {
   id: string;
@@ -17,6 +11,14 @@ export type TextSummary = {
   estimatedMinutes: number;
   /** Hikâyenin teması, Türkçe adıyla (ör. "Arkadaşlık"). */
   theme: string;
+};
+
+/** GET /texts listesindeki öğe (server/src/modules/texts/texts.routes.ts). */
+export type LibraryText = TextSummary & {
+  /** Metni okutan yolculuk dersinin şehri; dersi olmayan metinde `null`. */
+  city: CityId | null;
+  /** Kullanıcının bu metinde tamamlanmış bir okuması var mı. */
+  read: boolean;
 };
 
 /** GET /texts/:id */

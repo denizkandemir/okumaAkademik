@@ -20,7 +20,7 @@ const MASCOT_SIZE = 96;
 
 /**
  * Yükleniyor (Pırıl okuyor) ve hata (Pırıl düşünüyor, TEKRAR DENE) durumları. İkisi de yoksa hiçbir
- * şey çizmez; ekran kendi içeriğini gösterir. `QueryState` ile aynı API, ekranlar doğrudan geçebilir.
+ * şey çizmez; ekran kendi içeriğini gösterir.
  */
 export function StateView({
   isLoading,

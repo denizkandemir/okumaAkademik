@@ -58,12 +58,39 @@ describe('GET /texts', () => {
     const order = texts.map((text) => [text.level, text.estimatedMinutes]);
     expect(order).toEqual([...order].sort(([a = 0, b = 0], [c = 0, d = 0]) => a - c || b - d));
     expect(Object.keys(texts[0] ?? {}).sort()).toEqual([
+      'city',
       'estimatedMinutes',
       'id',
       'level',
+      'read',
       'theme',
       'title',
     ]);
+  });
+
+  it('read: yalnızca tamamlanmış okuması olan metinlerde true; city dersin şehridir', async () => {
+    const { token, user } = await registerUser(ctx.app);
+    await completeLessonsDirectly(ctx.prisma, user.id, 3);
+    const first = storyAt('istanbul', 1).textId;
+    const second = storyAt('istanbul', 2).textId;
+    await ctx.prisma.readingSession.createMany({
+      data: [
+        { userId: user.id, textId: first, completed: true, progress: 1 },
+        { userId: user.id, textId: first, completed: false, progress: 0.2 },
+        { userId: user.id, textId: second, completed: false, progress: 0.5 },
+      ],
+    });
+    // Başka bir kullanıcının okuması sayılmaz.
+    const other = await registerUser(ctx.app, { username: 'baska' });
+    await ctx.prisma.readingSession.create({
+      data: { userId: other.user.id, textId: second, completed: true, progress: 1 },
+    });
+
+    const response = await ctx.app.inject({ method: 'GET', url: '/texts', headers: bearer(token) });
+    const texts = response.json<{ texts: { id: string; read: boolean; city: string | null }[] }>()
+      .texts;
+    expect(texts.find((text) => text.id === first)).toMatchObject({ read: true, city: 'istanbul' });
+    expect(texts.find((text) => text.id === second)).toMatchObject({ read: false });
   });
 
   it('token olmadan 401 döner', async () => {
