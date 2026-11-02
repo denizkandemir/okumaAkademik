@@ -72,6 +72,8 @@ function RootNavigator({ fontsReady }: { fontsReady: boolean }) {
           <Stack.Screen name="level-up" options={REWARD_SCREEN} />
           <Stack.Screen name="city-unlocked" options={REWARD_SCREEN} />
           <Stack.Screen name="finale" options={REWARD_SCREEN} />
+          {/* Sertifika kendi geri düğmesini çizer; eve dönüşten ve haritadan açılır. */}
+          <Stack.Screen name="certificate" />
           {/* Küçük başarılar: sekme değil, Profil'den açılır. SDK 58'de iOS 26+ başlığı varsayılan
               saydam; opak görünüm korunur. */}
           <Stack.Screen

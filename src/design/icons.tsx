@@ -188,6 +188,27 @@ export function StarIcon({
   );
 }
 
+/**
+ * Dört köşeli parıltı — sertifika (panoda "✧" ve "✦" karakterleri; her yazı tipinde bulunmadığı
+ * için SVG). `filled` ise dolu.
+ */
+export function SparkleIcon({
+  filled = false,
+  color = colors.text,
+  ...props
+}: IconProps & {
+  filled?: boolean;
+}) {
+  return (
+    <LineIcon color={color} {...props}>
+      <Path
+        d="M12 2c.8 5.5 4.5 9.2 10 10-5.5.8-9.2 4.5-10 10-.8-5.5-4.5-9.2-10-10 5.5-.8 9.2-4.5 10-10z"
+        fill={filled ? color : 'none'}
+      />
+    </LineIcon>
+  );
+}
+
 /** Dolu alev — seri. Panoda 24×28 viewBox, 20×24 çizilir. */
 export function FlameIcon({ size = 20, color = colors.flame }: Omit<IconProps, 'strokeWidth'>) {
   return (

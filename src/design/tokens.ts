@@ -188,6 +188,8 @@ export const colors = {
   },
   /** Yüzen kartların yumuşak gölgesi (ör. sözlük kartı). */
   shadow: '#303B4229',
+  /** Geçişlerin saydam ucu (zemin renginin saydamı). */
+  transparent: '#FBF7EF00',
   white: '#FFFFFF',
 } as const;
 

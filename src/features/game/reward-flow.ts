@@ -18,14 +18,26 @@ function isDue(step: RewardScreen, reward: Reward) {
   return false;
 }
 
+/** `from` ekranından sonra açılacak ödül ekranı; yoksa `null` (akış ana sayfada biter). */
+export function nextRewardStep(from: RewardStep, reward: Reward): RewardScreen | null {
+  const start = from === 'complete' || from === 'chest' ? 0 : ORDER.indexOf(from) + 1;
+  return ORDER.slice(start).find((step) => isDue(step, reward)) ?? null;
+}
+
+/** Ödül ekranlarının ana düğmesi, sıradaki adıma göre (13-seviye-odulu). */
+export function nextStepLabel(next: RewardScreen | null): string {
+  if (next === 'city-unlocked') return 'SONRAKİ ŞEHRİ KEŞFET';
+  if (next === 'finale') return 'EVE DÖNELİM';
+  return 'DEVAM ET';
+}
+
 /**
  * Ödül akışında `from` ekranından sonrasına geçer: ders sonu ya da sandık → [seviye atladı] →
  * [yeni şehir açıldı] → [final] → ana sayfa. Akış bitince ödül temizlenir, ana sayfaya dönülür
  * (yol odaklanınca tazelenir).
  */
 export function continueRewardFlow(from: RewardStep, reward: Reward) {
-  const start = from === 'complete' || from === 'chest' ? 0 : ORDER.indexOf(from) + 1;
-  const next = ORDER.slice(start).find((step) => isDue(step, reward));
+  const next = nextRewardStep(from, reward);
   if (next) {
     router.replace(`/${next}`);
     return;

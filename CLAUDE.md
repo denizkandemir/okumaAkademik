@@ -7,6 +7,10 @@
 - Never force-push, never rewrite history, never delete branches
   without asking me.
 
+## Agents
+
+- Do not use subagents unless I ask. Work in one session, read only the files you need.
+
 ## Language
 
 - Reply to me and write reports in Turkish. Match the language of existing code comments.

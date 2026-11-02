@@ -183,7 +183,7 @@ function Quiz({
         kind: 'story',
         city: data.lesson.city,
         result,
-        note: feedback?.correct ? feedback.explanation : undefined,
+        bestStars: Math.max(data.lesson.bestStars ?? 0, result.stars ?? 0) || null,
       });
       router.replace({ pathname: '/lesson/[id]/complete', params: { id: data.lesson.id } });
     } catch (error) {

@@ -23,7 +23,7 @@ import { StateView } from '@/design/components/state-view';
 import { ThemeTag } from '@/design/components/theme-tag';
 import { BackIcon } from '@/design/icons';
 import { colors, readingSize, screenPadding, size, type } from '@/design/tokens';
-import { LessonCompleteView } from '@/features/game/rewards/lesson-complete-view';
+import { LessonResultView, formatDuration } from '@/features/game/rewards/lesson-result-view';
 import type { CityId } from '@/features/game/theme';
 import type { LessonDetailResponse } from '@/features/game/types';
 import { GlossaryCard } from '@/features/reading/glossary-card';
@@ -194,13 +194,13 @@ function ReadingView({
 
   if (freeResult) {
     return (
-      <LessonCompleteView
-        title={text.title}
-        durationSeconds={freeResult.durationSeconds}
-        lokum={null}
-        correct={null}
+      <LessonResultView
+        storyTitle={text.title}
+        heading="Bir hikâye daha bitti!"
         stars={null}
-        note={null}
+        tiles={[{ value: formatDuration(freeResult.durationSeconds), label: 'okuma süresi' }]}
+        buttonTitle="KİTAPLIĞA DÖN"
+        buttonLabel="Kitaplığa dön"
         onContinue={leave}
       />
     );
