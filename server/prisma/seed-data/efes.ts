@@ -1,4 +1,10 @@
-import { City, ReadingLevel, TextTheme } from '../../src/generated/prisma/enums.js';
+import {
+  City,
+  CognitiveLevel,
+  QuestionType,
+  ReadingLevel,
+  TextTheme,
+} from '../../src/generated/prisma/enums.js';
 import { chest, story } from './build.js';
 import type { SeedCity } from './types.js';
 
@@ -26,6 +32,8 @@ export const efes: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'O zamanlar kitaplar nasıl saklanırdı?',
           options: ['Rulo yapılarak', 'Kutulara gömülerek', 'Duvarlara asılarak'],
           correctIndex: 0,
@@ -33,6 +41,8 @@ export const efes: SeedCity = {
           explanation: 'Doğru! O zamanlar kitaplar rulo yapılıp saklanırdı.',
         },
         {
+          type: QuestionType.SOZCUK_ANLAMI,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Hikâyedeki “rehber” kimdir?',
           options: [
             'Kütüphanenin bekçisi',
@@ -44,6 +54,8 @@ export const efes: SeedCity = {
           explanation: 'Aferin! Rehber, gezilen yeri tanıtan ve bilgi veren kişidir.',
         },
         {
+          type: QuestionType.ANA_FIKIR,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Selin hikâyenin sonunda ne düşündü?',
           options: [
             'Kütüphanelerin sıkıcı olduğunu',
@@ -81,6 +93,8 @@ export const efes: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Antik tiyatro yaklaşık kaç kişi alıyordu?',
           options: ['İki yüz', 'Yirmi beş bin', 'Beş yüz'],
           correctIndex: 1,
@@ -88,6 +102,8 @@ export const efes: SeedCity = {
           explanation: 'Doğru! Tiyatro yaklaşık yirmi beş bin kişi alıyordu.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Ece, Emir’in sesini neden duyabildi?',
           options: [
             'Emir çok yüksek sesle bağırdığı için',
@@ -100,6 +116,8 @@ export const efes: SeedCity = {
             'Aferin! Tiyatro, sahnedeki ses en üst sıralara ulaşacak şekilde yapılmıştı.',
         },
         {
+          type: QuestionType.DUYGU_KARAKTER,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Emir eski ustalar için ne düşündü?',
           options: [
             'Çok akıllıca iş yaptıklarını',
@@ -133,6 +151,8 @@ export const efes: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Kerem eve geldiğinde neyi bulamadı?',
           options: ['Çantasını', 'Anahtarını', 'Ceketini'],
           correctIndex: 1,
@@ -140,6 +160,8 @@ export const efes: SeedCity = {
           explanation: 'Doğru! Kerem anahtarını bulamadı.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Kerem neden okula geri döndü?',
           options: [
             'Anahtarın teneffüste bankın yanında düşmüş olabileceğini düşündüğü için',
@@ -152,6 +174,8 @@ export const efes: SeedCity = {
             'Aferin! Kerem ipuçlarını birleştirip anahtarın bankın yanında olabileceğini buldu.',
         },
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Kerem bu olaydan sonra ne yapmaya başladı?',
           options: [
             'Okula ceket götürmemeye',
@@ -186,6 +210,8 @@ export const efes: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Yamaç Evler’deki resimler neyden yapılmıştı?',
           options: ['Boyalı kumaşlardan', 'Minicik taşlardan', 'Tahta parçalarından'],
           correctIndex: 1,
@@ -193,6 +219,8 @@ export const efes: SeedCity = {
           explanation: 'Doğru! Resimler minicik taşlardan yapılmıştı.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Duru’nun mozaiği neden sandığından uzun sürdü?',
           options: [
             'Küçük parçaları tek tek kesip yapıştırmak zaman aldığı için',
@@ -204,6 +232,8 @@ export const efes: SeedCity = {
           explanation: 'Aferin! Küçük parçaları tek tek yerleştirmek çok zaman alır.',
         },
         {
+          type: QuestionType.DUYGU_KARAKTER,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Duru mozaiğini bitirince nasıl hissetti?',
           options: ['Kızgın', 'Sıkılmış', 'Yorgun ama mutlu'],
           correctIndex: 2,
@@ -238,6 +268,8 @@ export const efes: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Nil topraktan ne buldu?',
           options: ['Altın bir yüzük', 'Eski bir testinin parçası', 'Taş bir heykel'],
           correctIndex: 1,
@@ -245,6 +277,8 @@ export const efes: SeedCity = {
           explanation: 'Doğru! Nil eski bir testinin parçasını buldu.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Teyzesi Nil’e neden toprağı yavaşça süpürmesini söyledi?',
           options: [
             'Topraktaki eski eşyalar kırılmasın diye',
@@ -256,6 +290,8 @@ export const efes: SeedCity = {
           explanation: 'Aferin! Eski eşyalar çok kırılgandır; acele edersek zarar görebilirler.',
         },
         {
+          type: QuestionType.ANA_FIKIR,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Bu hikâyeden ne öğreniyoruz?',
           options: [
             'Kazıda bulduğumuzu eve götürebileceğimizi',
@@ -293,6 +329,8 @@ export const efes: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Taştaki yazı hangi dildeydi?',
           options: ['Türkçe', 'Eski Yunanca', 'İngilizce'],
           correctIndex: 1,
@@ -300,6 +338,8 @@ export const efes: SeedCity = {
           explanation: 'Doğru! Taştaki yazı Eski Yunancaydı.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Eskiden insanlar bazı mesajları neden taşa yazarmış?',
           options: [
             'Kâğıt çok pahalı olduğu için',
@@ -311,6 +351,8 @@ export const efes: SeedCity = {
           explanation: 'Aferin! Taş kolay yok olmaz; mesaj yüzlerce yıl sonra bile okunabilir.',
         },
         {
+          type: QuestionType.DUYGU_KARAKTER,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Arda defterine mesaj yazarken ne umuyordu?',
           options: [
             'Bir gün birinin onu okumasını',
@@ -345,6 +387,8 @@ export const efes: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Mete etrafına bakınca neyi göremedi?',
           options: ['Ağaçları', 'Tarlaları', 'Denizi'],
           correctIndex: 2,
@@ -352,6 +396,8 @@ export const efes: SeedCity = {
           explanation: 'Doğru! Etrafta ne deniz vardı ne de gemi.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Deniz neden geri çekildi?',
           options: [
             'Nehrin taşıdığı toprak limanı doldurduğu için',
@@ -363,6 +409,8 @@ export const efes: SeedCity = {
           explanation: 'Aferin! Nehrin yüzyıllarca taşıdığı toprak limanı doldurdu.',
         },
         {
+          type: QuestionType.ANA_FIKIR,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Mete hikâyenin sonunda doğa için ne düşündü?',
           options: [
             'Doğanın hiç değişmediğini',
@@ -397,6 +445,8 @@ export const efes: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Pırıl’a Efes’i kim gezdirdi?',
           options: ['Yaşlı kedi Zeytin', 'Bir rehber', 'Küçük bir kız'],
           correctIndex: 0,
@@ -404,6 +454,8 @@ export const efes: SeedCity = {
           explanation: 'Doğru! Bilge kedi Zeytin, Pırıl’a Efes’i gezdirdi.',
         },
         {
+          type: QuestionType.SOZCUK_ANLAMI,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Zeytin “bilge” bir kediydi. “Bilge” ne demektir?',
           options: ['Çok hızlı', 'Çok bilgili ve akıllı', 'Çok yaramaz'],
           correctIndex: 1,
@@ -411,6 +463,8 @@ export const efes: SeedCity = {
           explanation: 'Aferin! Bilge, çok şey bilen ve akıllıca konuşan demektir.',
         },
         {
+          type: QuestionType.ANA_FIKIR,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Pırıl tek kalan sütuna bakınca ne düşündü?',
           options: [
             'Eski şeylerin önemsiz olduğunu',

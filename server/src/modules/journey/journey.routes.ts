@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { LessonKind } from '../../generated/prisma/enums.js';
 import { API_CITY_IDS, CITY_NAMES, cityNo, fromApiCity, toApiCity } from '../../lib/city.js';
 import { Errors } from '../../lib/errors.js';
+import { gradeBandOf } from '../../lib/grade-band.js';
 import {
   achievementsFor,
   bestStreakFrom,
@@ -33,7 +34,7 @@ export async function journeyRoutes(app: FastifyInstance) {
     const query = parse(journeyQuerySchema, request.query);
 
     const [state, dates, lokum] = await Promise.all([
-      loadJourneyState(prisma, user.id),
+      loadJourneyState(prisma, user.id, gradeBandOf(user.grade)),
       loadReadingDates(prisma, user.id),
       lokumBalance(prisma, user.id),
     ]);
@@ -92,7 +93,7 @@ export async function journeyRoutes(app: FastifyInstance) {
     const now = new Date();
 
     const [state, dates, lokum, today, total, lastSession] = await Promise.all([
-      loadJourneyState(prisma, user.id),
+      loadJourneyState(prisma, user.id, gradeBandOf(user.grade)),
       loadReadingDates(prisma, user.id),
       lokumBalance(prisma, user.id),
       prisma.readingSession.aggregate({

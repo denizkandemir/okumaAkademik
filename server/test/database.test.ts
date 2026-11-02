@@ -19,8 +19,22 @@ const TABLES = [
   'question_attempts',
   'lesson_completions',
   'lokum_entries',
+  'lesson_texts',
+  'reading_metrics',
+  'placement_texts',
+  'user_baselines',
 ];
-const VIEWS = ['v_user_summary', 'v_daily_reading', 'v_reading_history', 'v_user_journey'];
+const VIEWS = [
+  'v_user_summary',
+  'v_daily_reading',
+  'v_reading_history',
+  'v_user_journey',
+  'v_reading_metrics',
+  'v_reading_results_by_type',
+  'v_student_daily',
+  'v_student_weekly',
+  'v_student_monthly',
+];
 const DAY = 24 * 60 * 60 * 1000;
 
 describe('saat dilimi', () => {

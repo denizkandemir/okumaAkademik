@@ -90,6 +90,8 @@ model User {
   lessonCompletions LessonCompletion[]
   /// Kullanıcının lokum hareketleri
   lokumEntries      LokumEntry[]
+  /// Kullanıcının seviye belirleme sonuçları (başlangıç ölçümleri)
+  baselines         UserBaseline[]
 
   @@map("users")
 }
@@ -116,36 +118,61 @@ model AuthSession {
   @@map("auth_sessions")
 }
 
+/// Sınıf grubu. Bir yolculuk dersinin metni gruba göre farklı olabilir (lesson_texts).
+/// Eşleme src/lib/grade-band.ts'te: G1 = 1-2, G2 = 3-4, G3 = 5-6, G4 = 7-8. sınıf.
+enum GradeBand {
+  /// 1-2. sınıf
+  G1
+  /// 3-4. sınıf (mevcut 48 hikâye bu grubun metnidir; diğer gruplarda metin yoksa bu okutulur)
+  G2
+  /// 5-6. sınıf
+  G3
+  /// 7-8. sınıf
+  G4
+
+  @@map("grade_band")
+}
+
 /// Okuma metni (hikâye). Kullanıcılara sınıflarına uygun olanlar listelenir.
 model Text {
   /// Okunabilir kimlik (slug), ör. "minik-serce"
-  id               String           @id
+  id                String           @id
   /// Metnin başlığı, ör. "Minik Serçe"
-  title            String
+  title             String
   /// Zorluk seviyesi, ör. BASLANGIC
-  level            ReadingLevel
+  level             ReadingLevel
   /// Tahmini okuma süresi (dakika), ör. 3
-  estimatedMinutes Int              @map("estimated_minutes")
+  estimatedMinutes  Int              @map("estimated_minutes")
   /// Hikâyenin teması, ör. ARKADASLIK
-  theme            TextTheme
+  theme             TextTheme
   /// Metnin paragrafları, sırasıyla
-  paragraphs       String[]
+  paragraphs        String[]
+  /// Kelime sayısı (src/lib/readability.ts ile hesaplanır), ör. 112
+  wordCount         Int?             @map("word_count")
+  /// Cümle sayısı, ör. 14
+  sentenceCount     Int?             @map("sentence_count")
+  /// Ortalama cümle uzunluğu (kelime / cümle, 2 ondalık), ör. 8.0
+  avgSentenceLength Float?           @map("avg_sentence_length")
+  /// Ateşman okunabilirlik puanı (1 ondalık; yüksek = kolay), ör. 78.4
+  atesmanScore      Float?           @map("atesman_score")
   /// Metnin uygun olduğu en küçük sınıf (1-8), ör. 1
-  minGrade         Int              @map("min_grade")
+  minGrade          Int              @map("min_grade")
   /// Metnin uygun olduğu en büyük sınıf (1-8), ör. 4
-  maxGrade         Int              @map("max_grade")
+  maxGrade          Int              @map("max_grade")
   /// Kaydın oluşturulma zamanı
-  createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdAt         DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
   /// Kaydın son güncellenme zamanı (uygulama tarafından otomatik)
-  updatedAt        DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
+  updatedAt         DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
   /// Bu metne ait okuma kayıtları
-  readingSessions  ReadingSession[]
-  /// Bu metni okutan yolculuk dersi (varsa)
-  lesson           Lesson?
+  readingSessions   ReadingSession[]
+  /// Bu metni okutan yolculuk dersi ve sınıf grubu (varsa)
+  lessonText        LessonText?
+  /// Bu metin bir seviye belirleme metniyse grubu ve sırası
+  placementText     PlacementText?
   /// Metnin anlama soruları
-  questions        Question[]
+  questions         Question[]
   /// Metindeki kelimelerin anlamları
-  glossaryEntries  GlossaryEntry[]
+  glossaryEntries   GlossaryEntry[]
 
   @@map("texts")
 }
@@ -179,9 +206,82 @@ model ReadingSession {
   questionAttempts  QuestionAttempt[]
   /// Bu okumayla bitirilen dersler
   lessonCompletions LessonCompletion[]
+  /// Okuma bitince yazılan ölçüm (hız ve anlama)
+  metric            ReadingMetric?
 
   @@index([userId, startedAt])
   @@map("reading_sessions")
+}
+
+/// Biten bir okumanın ölçümü (okuma kaydıyla 1:1). Okuma bitince (kitaplık) ve ders bitince
+/// (sorularla birlikte) yazılır. Hız hiçbir zaman tek başına gösterilmez; anlamayla birlikte okunur.
+model ReadingMetric {
+  /// Ölçülen okuma (reading_sessions.id); birincil anahtar
+  readingSessionId String         @id @map("reading_session_id")
+  /// Ölçülen okuma
+  readingSession   ReadingSession @relation(fields: [readingSessionId], references: [id], onDelete: Cascade)
+  /// Okuma anında kullanıcının sınıf grubu, ör. G2
+  gradeBand        GradeBand      @map("grade_band")
+  /// Metnin kelime sayısı, ör. 112
+  wordCount        Int            @map("word_count")
+  /// Okuma süresi (saniye), ör. 95
+  durationSeconds  Int            @map("duration_seconds")
+  /// Dakikadaki kelime (1 ondalık); süre 0 ise boş, ör. 70.7
+  wordsPerMinute   Float?         @map("words_per_minute")
+  /// Soru sayısı; kitaplık okumasında boş, ör. 3
+  questionsTotal   Int?           @map("questions_total")
+  /// İlk denemede doğru cevaplanan soru sayısı (yıldızla aynı kural); kitaplıkta boş, ör. 2
+  firstTryCorrect  Int?           @map("first_try_correct")
+  /// Anlama oranı, ilk denemeye göre (0-1, 2 ondalık); kitaplıkta boş, ör. 0.67
+  comprehension    Float?
+  /// Acele okuma: hız sınıf grubunun tavanının üstünde ve anlama %60'ın altında
+  rushed           Boolean        @default(false)
+  /// Ölçümün ilk yazıldığı zaman
+  createdAt        DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
+  /// Kaydın son güncellenme zamanı (uygulama tarafından otomatik)
+  updatedAt        DateTime       @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@map("reading_metrics")
+}
+
+/// Seviye belirleme okumasının metni ("Pırıl seni tanımak istiyor!"). Her sınıf grubunda sırayla
+/// okunan 2 kısa metin vardır; bu metinler yolculukta ve kitaplıkta görünmez.
+model PlacementText {
+  /// Sınıf grubu, ör. G2
+  gradeBand GradeBand @map("grade_band")
+  /// Grup içindeki okuma sırası (1-2), ör. 1
+  position  Int
+  /// Okutulan metin (texts.id), ör. "seviye-g2-kutuphanede-bir-gun"
+  textId    String    @unique @map("text_id")
+  /// Okutulan metin
+  text      Text      @relation(fields: [textId], references: [id], onDelete: Cascade)
+
+  @@id([gradeBand, position])
+  @@map("placement_texts")
+}
+
+/// Seviye belirleme sonucu: çocuğun başlangıç hızı ve anlaması; gelişim buna göre ölçülür.
+/// Tekrar yapılabilir: her sonuç yeni bir satırdır, en yenisi geçerlidir (geçmiş silinmez).
+model UserBaseline {
+  /// Birincil anahtar (cuid)
+  id             String    @id @default(cuid())
+  /// Ölçülen kullanıcı (users.id)
+  userId         String    @map("user_id")
+  /// Ölçülen kullanıcı
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// Ölçüm anındaki sınıf (1-8), ör. 3
+  grade          Int
+  /// Ölçüm anındaki sınıf grubu, ör. G2
+  gradeBand      GradeBand @map("grade_band")
+  /// İki metnin toplam kelimesi / toplam okuma süresi (dakikadaki kelime, 1 ondalık), ör. 68.4
+  wordsPerMinute Float     @map("words_per_minute")
+  /// İlk denemede doğru / soru sayısı (0-1, 2 ondalık), ör. 0.83
+  comprehension  Float
+  /// Ölçümün yapıldığı zaman
+  measuredAt     DateTime  @default(now()) @map("measured_at") @db.Timestamptz(3)
+
+  @@index([userId, measuredAt])
+  @@map("user_baselines")
 }
 
 /// Yolculuğun durakları (şehirler), yolculuk sırasıyla. API'de küçük harfli kimlik olarak döner:
@@ -242,10 +342,8 @@ model Lesson {
   title        String
   /// Ders kartındaki tek cümlelik özet
   summary      String
-  /// Hikâyenin metni (texts.id); hikâyelerde zorunlu, sandıklarda boş
-  textId       String?            @unique @map("text_id")
-  /// Hikâyenin metni
-  text         Text?              @relation(fields: [textId], references: [id], onDelete: SetNull)
+  /// Hikâyenin sınıf grubuna göre metinleri; sandıklarda yok
+  texts        LessonText[]
   /// Kaydın oluşturulma zamanı
   createdAt    DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
   /// Kaydın son güncellenme zamanı (uygulama tarafından otomatik)
@@ -259,32 +357,102 @@ model Lesson {
   @@map("lessons")
 }
 
-/// Bir metnin anlama sorusu. Her hikâyenin 3 sorusu vardır; her sorunun 3 şıkkı ve 1 doğru cevabı.
+/// Bir hikâye dersinin bir sınıf grubundaki metni. Grubun metni yoksa G2 metni okutulur.
+model LessonText {
+  /// Ders (lessons.id), ör. "istanbul-03-minik-serce"
+  lessonId  String    @map("lesson_id")
+  /// Ders
+  lesson    Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  /// Sınıf grubu, ör. G2
+  gradeBand GradeBand @map("grade_band")
+  /// Bu grupta okutulan metin (texts.id), ör. "minik-serce"; bir metin tek bir derse aittir
+  textId    String    @unique @map("text_id")
+  /// Bu grupta okutulan metin
+  text      Text      @relation(fields: [textId], references: [id], onDelete: Cascade)
+
+  @@id([lessonId, gradeBand])
+  @@map("lesson_texts")
+}
+
+/// Soru türü (docs/yapay-zeka/02-egzersiz-katalogu.md §3, Q1-Q13). Raporlar "hangi türde
+/// zorlanıyor" bilgisini bu etiketten çıkarır.
+enum QuestionType {
+  /// Q1 Bilgi (kim, ne, nerede, ne zaman)
+  BILGI
+  /// Q2 Sıralama (önce ne oldu)
+  SIRALAMA
+  /// Q3 Bağlamdan sözcük anlamı
+  SOZCUK_ANLAMI
+  /// Q4 Neden-sonuç çıkarımı
+  NEDEN_SONUC
+  /// Q5 Duygu ve karakter
+  DUYGU_KARAKTER
+  /// Q6 Ana fikir / ana duygu
+  ANA_FIKIR
+  /// Q7 Yardımcı fikir
+  YARDIMCI_FIKIR
+  /// Q8 Başlık bulma
+  BASLIK
+  /// Q9 Cümlede anlam (mecaz, deyim, benzetme, amaç-sonuç, koşul)
+  CUMLEDE_ANLAM
+  /// Q10 Paragraf yapısı (akışı bozan cümle, ikiye bölme, boşluk tamamlama)
+  PARAGRAF_YAPISI
+  /// Q11 Sözel mantık (öncüllerden çıkarım)
+  SOZEL_MANTIK
+  /// Q12 Görsel okuma (grafik, tablo, infografik)
+  GORSEL_OKUMA
+  /// Q13 Öncüllü (I, II, III) yorum
+  ONCULLU_YORUM
+
+  @@map("question_type")
+}
+
+/// Sorunun bilişsel düzeyi.
+enum CognitiveLevel {
+  /// Metinde açıkça yazanı hatırlama
+  HATIRLAMA
+  /// Metinde yazanı kendi sözleriyle anlama
+  ANLAMA
+  /// Metinde açıkça yazmayanı çıkarma
+  CIKARIM
+  /// Metni yorumlama, kendi hayatına uygulama
+  DEGERLENDIRME
+
+  @@map("cognitive_level")
+}
+
+/// Bir metnin anlama sorusu. Her hikâyenin 3 sorusu vardır; her sorunun 3-4 şıkkı ve 1 doğru cevabı.
 model Question {
   /// Birincil anahtar (cuid)
-  id           String            @id @default(cuid())
+  id             String            @id @default(cuid())
   /// Sorunun ait olduğu metin (texts.id), ör. "minik-serce"
-  textId       String            @map("text_id")
+  textId         String            @map("text_id")
   /// Sorunun ait olduğu metin
-  text         Text              @relation(fields: [textId], references: [id], onDelete: Cascade)
+  text           Text              @relation(fields: [textId], references: [id], onDelete: Cascade)
   /// Metin içindeki sıra (1-3)
-  position     Int
+  position       Int
   /// Soru, ör. "Rüzgâr esince Pıtır'ın yuvasına ne oldu?"
-  prompt       String
-  /// Tam olarak 3 şık, ekrandaki sırasıyla (A, B, C)
-  options      String[]
-  /// Doğru şıkkın sırası (0-2); istemciye gönderilmez
-  correctIndex Int               @map("correct_index")
+  prompt         String
+  /// 3 ya da 4 şık, ekrandaki sırasıyla (A, B, C, D)
+  options        String[]
+  /// Doğru şıkkın sırası (0'dan başlar, şık sayısından küçük); istemciye gönderilmez
+  correctIndex   Int               @map("correct_index")
+  /// Soru türü, ör. BILGI
+  type           QuestionType
+  /// Bilişsel düzey, ör. HATIRLAMA
+  cognitiveLevel CognitiveLevel    @map("cognitive_level")
+  /// MEB Türkçe dersi öğretim programı kazanım kodu (varsa)
+  mebOutcomeCode String?           @map("meb_outcome_code")
   /// Yanlış cevaptan sonra gösterilen ipucu
-  hint         String
+  hint           String
   /// Doğru cevaptan sonra gösterilen açıklama
-  explanation  String
+  explanation    String
   /// Kaydın oluşturulma zamanı
-  createdAt    DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdAt      DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
   /// Kaydın son güncellenme zamanı (uygulama tarafından otomatik)
-  updatedAt    DateTime          @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
+  updatedAt      DateTime          @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
   /// Bu soruya verilen cevaplar
-  attempts     QuestionAttempt[]
+  attempts       QuestionAttempt[]
 
   @@unique([textId, position])
   @@map("questions")
@@ -325,7 +493,7 @@ model QuestionAttempt {
   readingSessionId String         @map("reading_session_id")
   /// Cevabın verildiği okuma
   readingSession   ReadingSession @relation(fields: [readingSessionId], references: [id], onDelete: Cascade)
-  /// Seçilen şık (0-2)
+  /// Seçilen şık (0-3)
   choiceIndex      Int            @map("choice_index")
   /// Seçilen şık doğru muydu
   correct          Boolean

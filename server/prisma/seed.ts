@@ -1,11 +1,17 @@
 import 'dotenv/config';
 
 import { createPrismaClient } from '../src/db.js';
+import { gradeBandOf } from '../src/lib/grade-band.js';
 import { startOfDayInTimeZone } from '../src/lib/time.js';
 import { hashPassword } from '../src/modules/auth/password.js';
+import { writeReadingMetric } from '../src/modules/progress/reading-metrics.js';
 import {
   seedGlossaryRows,
   seedLessonRows,
+  seedLessonTextRows,
+  seedPlacementQuestionRows,
+  seedPlacementRows,
+  seedPlacementTexts,
   seedQuestionRows,
   seedTexts,
 } from './seed-data/index.js';
@@ -41,6 +47,12 @@ type SeedReading = {
   neverSaved?: boolean;
 };
 
+/** Seviye belirleme sonucu, Türkiye saatiyle `daysAgo` gün önce 17:00'de. */
+type SeedBaseline = { daysAgo: number; wordsPerMinute: number; comprehension: number };
+
+/** Örnek okumaların süresi metnin kelime sayısından hesaplanır (bkz. `r`). */
+const wordsOfText = new Map(seedTexts.map((text) => [text.id, text.wordCount]));
+
 /** Mobil uygulamada elle denemek için; okuma geçmişine dokunulmaz. */
 const TEST_USER: SeedUser = {
   username: 'deneme',
@@ -50,54 +62,65 @@ const TEST_USER: SeedUser = {
   dailyGoalMinutes: 10,
 };
 
-/** Rapor görünümlerinde (v_*) örnek veri olsun diye farklı sınıflardan kullanıcılar. */
-const SAMPLE_USERS: { user: SeedUser; readings: SeedReading[] }[] = [
+/**
+ * Rapor görünümlerinde (v_*) örnek veri olsun diye farklı sınıflardan kullanıcılar. Okuma süreleri
+ * sınıfa uygun dakikadaki kelimeden hesaplanır (01-arastirma.md §4: 2. sınıf ≈ 45-100, ortaokul
+ * ortalaması ≈ 100); yarım kalan okumada okunan kısım kadar. `baseline`: seviye belirleme sonucu;
+ * elif'te yok, böylece girişte seviye belirleme (G1) denenebilir.
+ */
+const SAMPLE_USERS: { user: SeedUser; baseline?: SeedBaseline; readings: SeedReading[] }[] = [
   {
     user: { username: 'elif', password: '1234', name: 'Elif', grade: 2, dailyGoalMinutes: 10 },
     readings: [
-      r(6, '18:30', 'minik-serce', 260, 1, true),
-      r(5, '19:10', 'bahcedeki-domatesler', 150, 0.55, false),
-      r(5, '19:25', 'bahcedeki-domatesler', 210, 1, true),
-      r(3, '17:45', 'kayip-anahtar', 240, 0.4, false),
-      r(1, '18:05', 'kayip-anahtar', 380, 1, true),
-      r(1, '18:20', 'minik-serce', 230, 1, true),
-      r(0, '08:15', 'bahcedeki-domatesler', 95, 0.35, false),
+      r(6, '18:30', 'minik-serce', 54, 1, true),
+      r(5, '19:10', 'bahcedeki-domatesler', 50, 0.55, false),
+      r(5, '19:25', 'bahcedeki-domatesler', 57, 1, true),
+      r(3, '17:45', 'kayip-anahtar', 48, 0.4, false),
+      r(1, '18:05', 'kayip-anahtar', 55, 1, true),
+      r(1, '18:20', 'minik-serce', 63, 1, true),
+      r(0, '08:15', 'bahcedeki-domatesler', 60, 0.35, false),
     ],
   },
   {
     user: { username: 'kerem', password: '1234', name: 'Kerem', grade: 5, dailyGoalMinutes: 15 },
+    baseline: { daysAgo: 8, wordsPerMinute: 92.5, comprehension: 0.67 },
     readings: [
-      r(6, '20:00', 'kayip-anahtar', 420, 1, true),
-      r(5, '20:15', 'deniz-feneri', 300, 0.5, false),
-      r(4, '19:40', 'deniz-feneri', 360, 1, true),
-      { ...r(3, '18:00', 'gokyuzundeki-haritalar', 0, 0, false), neverSaved: true },
-      r(2, '21:00', 'gokyuzundeki-haritalar', 480, 0.45, false),
-      r(1, '20:30', 'gokyuzundeki-haritalar', 540, 1, true),
-      r(1, '20:45', 'kayip-anahtar', 400, 1, true),
-      r(0, '10:30', 'deniz-feneri', 180, 0.3, false),
+      r(6, '20:00', 'kayip-anahtar', 96, 1, true),
+      r(5, '20:15', 'deniz-feneri', 90, 0.5, false),
+      r(4, '19:40', 'deniz-feneri', 101, 1, true),
+      { ...r(3, '18:00', 'gokyuzundeki-haritalar', 100, 0, false), neverSaved: true },
+      r(2, '21:00', 'gokyuzundeki-haritalar', 94, 0.45, false),
+      r(1, '20:30', 'gokyuzundeki-haritalar', 104, 1, true),
+      r(1, '20:45', 'kayip-anahtar', 110, 1, true),
+      r(0, '10:30', 'deniz-feneri', 106, 0.3, false),
     ],
   },
   {
     user: { username: 'zeynep', password: '1234', name: 'Zeynep', grade: 7, dailyGoalMinutes: 20 },
+    baseline: { daysAgo: 8, wordsPerMinute: 116.8, comprehension: 0.83 },
     readings: [
-      r(6, '16:00', 'gokyuzundeki-haritalar', 720, 1, true),
-      r(4, '16:30', 'deniz-feneri', 600, 1, true),
-      r(4, '16:45', 'gokyuzundeki-haritalar', 660, 1, true),
-      r(3, '17:10', 'deniz-feneri', 300, 0.6, false),
-      r(2, '15:20', 'deniz-feneri', 400, 1, true),
-      r(0, '09:40', 'gokyuzundeki-haritalar', 240, 0.25, false),
+      r(6, '16:00', 'gokyuzundeki-haritalar', 118, 1, true),
+      r(4, '16:30', 'deniz-feneri', 124, 1, true),
+      r(4, '16:45', 'gokyuzundeki-haritalar', 121, 1, true),
+      r(3, '17:10', 'deniz-feneri', 115, 0.6, false),
+      r(2, '15:20', 'deniz-feneri', 131, 1, true),
+      r(0, '09:40', 'gokyuzundeki-haritalar', 127, 0.25, false),
     ],
   },
 ];
 
+/** `wordsPerMinute` hızla metnin `progress` kadarını okumanın süresi (saniye). */
 function r(
   daysAgo: number,
   time: string,
   textId: string,
-  durationSeconds: number,
+  wordsPerMinute: number,
   progress: number,
   completed: boolean,
 ): SeedReading {
+  const words = wordsOfText.get(textId);
+  if (words === undefined) throw new Error(`Örnek okuma: "${textId}" metni yok`);
+  const durationSeconds = Math.round((words * progress * 60) / wordsPerMinute);
   return { daysAgo, time, textId, durationSeconds, progress, completed };
 }
 
@@ -145,12 +168,17 @@ async function upsertUser(user: SeedUser) {
   });
 }
 
-/** İçeriği seed-data/ ile eşitler: eksikler eklenir, değişenler güncellenir, fazlalar silinir. */
+/**
+ * İçeriği seed-data/ ile eşitler: eksikler eklenir, değişenler güncellenir, fazlalar silinir.
+ * Metin ölçüleri (kelime, cümle, Ateşman) seed-data'da src/lib/readability.ts ile hesaplanır.
+ */
 async function syncContent() {
-  const textIds = seedTexts.map(({ id }) => id);
+  const texts = [...seedTexts, ...seedPlacementTexts];
+  const questions = [...seedQuestionRows, ...seedPlacementQuestionRows];
+  const textIds = texts.map(({ id }) => id);
   const lessonIds = seedLessonRows.map(({ id }) => id);
 
-  for (const text of seedTexts) {
+  for (const text of texts) {
     const { id, ...data } = text;
     await prisma.text.upsert({ where: { id }, create: text, update: data });
   }
@@ -162,9 +190,38 @@ async function syncContent() {
     const { id, ...data } = lesson;
     await prisma.lesson.upsert({ where: { id }, create: lesson, update: data });
   }
+  // Dersin sınıf grubu metinleri: artık olmayan (ders, grup) çiftleri silinir, diğerleri eşitlenir.
+  const variantKeys = new Set(seedLessonTextRows.map((row) => `${row.lessonId}|${row.gradeBand}`));
+  const existingVariants = await prisma.lessonText.findMany({
+    select: { lessonId: true, gradeBand: true },
+  });
+  for (const variant of existingVariants) {
+    if (variantKeys.has(`${variant.lessonId}|${variant.gradeBand}`)) continue;
+    await prisma.lessonText.delete({ where: { lessonId_gradeBand: variant } });
+  }
+  for (const row of seedLessonTextRows) {
+    const { lessonId, gradeBand, textId } = row;
+    await prisma.lessonText.upsert({
+      where: { lessonId_gradeBand: { lessonId, gradeBand } },
+      create: row,
+      update: { textId },
+    });
+  }
+  // Seviye belirleme metinleri: değişen ya da artık olmayan satırlar silinip yeniden yazılır (bir
+  // metnin sırası değişince text_id tekil kısıtına takılmasın).
+  const placementKeys = new Set(
+    seedPlacementRows.map((row) => `${row.gradeBand}|${row.position}|${row.textId}`),
+  );
+  for (const row of await prisma.placementText.findMany()) {
+    if (placementKeys.has(`${row.gradeBand}|${row.position}|${row.textId}`)) continue;
+    await prisma.placementText.delete({
+      where: { gradeBand_position: { gradeBand: row.gradeBand, position: row.position } },
+    });
+  }
+  await prisma.placementText.createMany({ data: seedPlacementRows, skipDuplicates: true });
   await prisma.text.deleteMany({ where: { id: { notIn: textIds } } });
 
-  for (const question of seedQuestionRows) {
+  for (const question of questions) {
     const { textId, position, ...data } = question;
     await prisma.question.upsert({
       where: { textId_position: { textId, position } },
@@ -173,7 +230,7 @@ async function syncContent() {
     });
   }
   for (const textId of textIds) {
-    const positions = seedQuestionRows.filter((q) => q.textId === textId).map((q) => q.position);
+    const positions = questions.filter((q) => q.textId === textId).map((q) => q.position);
     const words = seedGlossaryRows.filter((g) => g.textId === textId).map((g) => g.word);
     await prisma.question.deleteMany({ where: { textId, position: { notIn: positions } } });
     await prisma.glossaryEntry.deleteMany({ where: { textId, word: { notIn: words } } });
@@ -194,7 +251,7 @@ async function seedUsers(contentSummary: string) {
 
   const now = new Date();
   let readingCount = 0;
-  for (const { user, readings } of SAMPLE_USERS) {
+  for (const { user, baseline, readings } of SAMPLE_USERS) {
     const { id: userId } = await upsertUser(user);
     const planned = readings.map((reading, index) => ({
       id: `seed-${user.username}-${String(index + 1).padStart(2, '0')}`,
@@ -218,7 +275,36 @@ async function seedUsers(contentSummary: string) {
         completed: reading.completed,
       };
       await prisma.readingSession.upsert({ where: { id }, create: { id, ...data }, update: data });
+      // Biten okumanın hız ölçümü (soru yok: kitaplık okuması gibi, anlama boş).
+      if (reading.completed) {
+        await writeReadingMetric(prisma, {
+          readingSessionId: id,
+          gradeBand: gradeBandOf(user.grade),
+          onlyIfMissing: false,
+        });
+      } else {
+        await prisma.readingMetric.deleteMany({ where: { readingSessionId: id } });
+      }
       readingCount++;
+    }
+
+    // Seviye belirleme sonucu yeniden yazılır; uygulamadan yapılanlar da silinir (elif yeniden
+    // seviye belirlemeyi görsün).
+    await prisma.userBaseline.deleteMany({ where: { userId } });
+    if (baseline) {
+      const day = startOfDayInTimeZone(
+        new Date(startOfDayInTimeZone(now).getTime() - baseline.daysAgo * DAY_MS + 12 * HOUR_MS),
+      );
+      await prisma.userBaseline.create({
+        data: {
+          userId,
+          grade: user.grade,
+          gradeBand: gradeBandOf(user.grade),
+          wordsPerMinute: baseline.wordsPerMinute,
+          comprehension: baseline.comprehension,
+          measuredAt: new Date(day.getTime() + 17 * HOUR_MS),
+        },
+      });
     }
   }
 
@@ -240,6 +326,7 @@ async function seedUsers(contentSummary: string) {
       şehir: demo.city,
       lokum: demo.lokum,
       seri: demo.streak,
+      okuma: demo.readings,
       'bugün okudu': demo.readToday ? 'evet' : demo.streak > 0 ? 'hayır (seri tehlikede)' : 'hayır',
     })),
   );
@@ -247,7 +334,9 @@ async function seedUsers(contentSummary: string) {
 
 try {
   await syncContent();
-  const contentSummary = `${seedLessonRows.length} ders, ${seedTexts.length} metin, ${seedQuestionRows.length} soru`;
+  const contentSummary =
+    `${seedLessonRows.length} ders, ${seedTexts.length} metin, ${seedQuestionRows.length} soru, ` +
+    `${seedPlacementTexts.length} seviye belirleme metni`;
 
   if (sampleUsersAllowed(databaseUrl, process.env)) {
     await seedUsers(contentSummary);

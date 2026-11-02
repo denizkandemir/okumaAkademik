@@ -11,6 +11,7 @@ import {
   usernameSchema,
 } from '../../lib/validation.js';
 import { requireAuth } from '../../plugins/auth.js';
+import { needsPlacement } from '../placement/placement.routes.js';
 import { AUTH_RATE_LIMIT, authIpRateLimit, ipAndUsernameKey } from '../../plugins/rate-limit.js';
 import { hashPassword, verifyAgainstDummy, verifyPassword } from './password.js';
 import { createAuthSession, deleteAuthSession } from './auth-session.js';
@@ -102,8 +103,13 @@ export async function authRoutes(app: FastifyInstance) {
     return reply.status(204).send();
   });
 
+  /** `needsPlacement`: seviye belirleme okuması henüz yapılmadı (uygulama bir kez önerir). */
   app.get('/me', { preHandler: app.authenticate }, async (request) => {
-    return { user: toPublicUser(requireAuth(request).user) };
+    const { user } = requireAuth(request);
+    return {
+      user: toPublicUser(user),
+      needsPlacement: await needsPlacement(prisma, user.id, user.grade),
+    };
   });
 
   /** Ayarlar ekranından adı değiştirir; GET /me ile aynı şekli döner. */

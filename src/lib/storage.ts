@@ -16,6 +16,11 @@ export const StorageKeys = {
   reminder: 'okumatik.reminder',
   /** "Yeniden merhaba" ekranının en son gösterildiği Türkiye günü (YYYY-MM-DD). */
   welcomeBackShownOn: 'okumatik.welcome-back-shown-on',
+  /**
+   * Seviye belirlemenin önerildiği kullanıcıların kimlikleri (JSON dizi); her kullanıcıya bu
+   * cihazda bir kez önerilir. Çıkışta silinmez.
+   */
+  placementOfferedTo: 'okumatik.placement-offered-to',
 } as const;
 
 export type StorageKey = (typeof StorageKeys)[keyof typeof StorageKeys];

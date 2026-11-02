@@ -79,6 +79,12 @@ function RootNavigator({ fontsReady }: { fontsReady: boolean }) {
           <Stack.Screen name="settings" />
           {/* Yeniden merhaba: tam ekran; kapat ve Android geri tuşu Yolculuk'a döner. */}
           <Stack.Screen name="welcome-back" options={{ presentation: 'fullScreenModal' }} />
+          {/* Seviye belirleme: tam ekran; okuma ve sorular sürerken kaydırarak kapanmaz (kendi
+              geri ve kapat düğmeleri var). */}
+          <Stack.Screen
+            name="placement"
+            options={{ presentation: 'fullScreenModal', gestureEnabled: false }}
+          />
         </Stack.Protected>
 
         <Stack.Protected guard={!user}>

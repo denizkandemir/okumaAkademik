@@ -6,11 +6,26 @@ import { readingMinutes, wordCount } from '../prisma/seed-data/build.js';
 import {
   seedCities,
   seedLessonRows,
+  seedLessonTextRows,
+  seedPlacementQuestionRows,
+  seedPlacementRows,
+  seedPlacementTexts,
+  seedQuestionRows,
   seedTexts,
   type SeedStoryLesson,
 } from '../prisma/seed-data/index.js';
-import { City, LessonKind, ReadingLevel, TextTheme } from '../src/generated/prisma/enums.js';
+import {
+  City,
+  CognitiveLevel,
+  GradeBand,
+  LessonKind,
+  QuestionType,
+  ReadingLevel,
+  TextTheme,
+} from '../src/generated/prisma/enums.js';
 import { toApiCity } from '../src/lib/city.js';
+import { ATESMAN_TARGET, gradeBandOf } from '../src/lib/grade-band.js';
+import { textMetrics } from '../src/lib/readability.js';
 import { CHEST_POSITIONS, LESSONS_PER_CITY, TOTAL_LESSONS } from '../src/lib/journey.js';
 
 /**
@@ -100,7 +115,10 @@ describe('seed içeriği: yolculuk', () => {
       const lesson = seedLessonRows.find((row) => row.city === city && row.position === position);
       expect(lesson?.title, `${city} ${position}`).toBe(title);
     }
-    const lessonOf = (textId: string) => seedLessonRows.find((lesson) => lesson.textId === textId);
+    const lessonOf = (textId: string) => {
+      const variant = seedLessonTextRows.find((row) => row.textId === textId);
+      return seedLessonRows.find((lesson) => lesson.id === variant?.lessonId);
+    };
     expect(lessonOf('minik-serce')).toMatchObject({ city: City.ISTANBUL, position: 3 });
     expect(lessonOf('bahcedeki-domatesler')).toMatchObject({ city: City.ISTANBUL });
     expect(lessonOf('kayip-anahtar')).toMatchObject({ city: City.EFES, position: 3 });
@@ -127,12 +145,23 @@ describe('seed içeriği: hikâyeler', () => {
       // Tema: hikâye okunarak seçilir; her hikâyenin geçerli bir teması olmalı.
       expect(Object.values(TextTheme)).toContain(text.theme);
 
-      // Sorular: tam 3; her birinde 3 farklı şık ve 0-2 arası doğru cevap.
+      // Metin ölçüleri okunabilirlik aracıyla aynı (seed-data hesaplar).
+      expect({
+        wordCount: text.wordCount,
+        sentenceCount: text.sentenceCount,
+        avgSentenceLength: text.avgSentenceLength,
+        atesmanScore: text.atesmanScore,
+      }).toEqual(textMetrics(text.paragraphs));
+
+      // Sorular: tam 3; G2 metninde (G1-G2 biçimi) 3 farklı şık, doğru cevap şıklardan biri.
+      // Her soru okunarak tür ve bilişsel düzeyle etiketlenmiş.
       expect(lesson.questions).toHaveLength(3);
       for (const question of lesson.questions) {
         expect(question.options).toHaveLength(3);
         expect(new Set(question.options).size).toBe(3);
-        expect([0, 1, 2]).toContain(question.correctIndex);
+        expect(question.correctIndex).toBeLessThan(question.options.length);
+        expect(Object.values(QuestionType)).toContain(question.type);
+        expect(Object.values(CognitiveLevel)).toContain(question.cognitiveLevel);
         expect(question.hint).toMatch(/^İpucu: /);
         expect(question.prompt.trim().length).toBeGreaterThan(0);
         expect(question.explanation.trim().length).toBeGreaterThan(0);
@@ -173,5 +202,90 @@ describe('seed içeriği: hikâye temaları', () => {
     expect(Object.fromEntries(fromMigration)).toEqual(
       Object.fromEntries(seedTexts.map((text) => [text.id, text.theme])),
     );
+  });
+});
+
+describe('seed içeriği: sınıf grubu metinleri', () => {
+  it('her hikâyenin G2 metni var, sandıkların metni yok, bir metin tek bir derse ait', () => {
+    const storyIds = seedLessonRows.filter((l) => l.kind === LessonKind.STORY).map((l) => l.id);
+    const g2 = seedLessonTextRows.filter((row) => row.gradeBand === GradeBand.G2);
+    expect(g2.map((row) => row.lessonId).sort()).toEqual([...storyIds].sort());
+    const textIds = seedLessonTextRows.map((row) => row.textId);
+    expect(new Set(textIds).size).toBe(textIds.length);
+  });
+});
+
+describe('seed içeriği: soru etiketleri', () => {
+  it("migration'daki etiketler seed verisiyle aynıdır", () => {
+    const migrationsDir = new URL('../prisma/migrations/', import.meta.url);
+    const dir = readdirSync(migrationsDir).find((name) => name.endsWith('_question_labels'));
+    expect(dir).toBeDefined();
+    const sql = readFileSync(new URL(`${dir}/migration.sql`, migrationsDir), 'utf8');
+
+    const fromMigration = new Map<string, string>();
+    for (const [, textId, position, type, level] of sql.matchAll(
+      /\('([a-z0-9-]+)', (\d), '(\w+)', '(\w+)'\)/g,
+    )) {
+      fromMigration.set(`${textId}#${position}`, `${type}/${level}`);
+    }
+
+    expect(Object.fromEntries(fromMigration)).toEqual(
+      Object.fromEntries(
+        seedQuestionRows.map((q) => [`${q.textId}#${q.position}`, `${q.type}/${q.cognitiveLevel}`]),
+      ),
+    );
+  });
+
+  it('144 soru etiketli; ana fikir soruları zayıf tür olarak raporlanabilecek kadar çok', () => {
+    expect(seedQuestionRows).toHaveLength(144);
+    const count = (type: QuestionType) => seedQuestionRows.filter((q) => q.type === type).length;
+    expect(count(QuestionType.ANA_FIKIR)).toBeGreaterThanOrEqual(10);
+    expect(count(QuestionType.BILGI)).toBeGreaterThan(0);
+  });
+});
+
+describe('seed içeriği: seviye belirleme', () => {
+  it('her sınıf grubunda sırayla 2 metin; metinler yolculukta yok', () => {
+    for (const band of Object.values(GradeBand)) {
+      const rows = seedPlacementRows.filter((row) => row.gradeBand === band);
+      expect(rows.map((row) => row.position).sort()).toEqual([1, 2]);
+    }
+    const ids = seedPlacementTexts.map((text) => text.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    expect(ids.some((id) => seedTexts.some((text) => text.id === id))).toBe(false);
+  });
+
+  it.each(seedPlacementRows.map((row) => [row.textId, row] as const))('%s', (textId, row) => {
+    const text = seedPlacementTexts.find((entry) => entry.id === textId)!;
+    const questions = seedPlacementQuestionRows.filter((q) => q.textId === textId);
+
+    // Metin: 60-120 kelime, grubun sınıflarına açık, ölçüler araçla aynı, Ateşman hedef aralıkta.
+    expect(text.wordCount).toBeGreaterThanOrEqual(60);
+    expect(text.wordCount).toBeLessThanOrEqual(120);
+    expect(gradeBandOf(text.minGrade)).toBe(row.gradeBand);
+    expect(gradeBandOf(text.maxGrade)).toBe(row.gradeBand);
+    expect({
+      wordCount: text.wordCount,
+      sentenceCount: text.sentenceCount,
+      avgSentenceLength: text.avgSentenceLength,
+      atesmanScore: text.atesmanScore,
+    }).toEqual(textMetrics(text.paragraphs));
+    const target = ATESMAN_TARGET[row.gradeBand];
+    expect(text.atesmanScore).toBeGreaterThanOrEqual(target.min);
+    expect(text.atesmanScore).toBeLessThanOrEqual(target.max);
+
+    // Sorular: 3 etiketli soru; G1-G2'de 3, G3-G4'te 4 farklı şık; doğru cevap hep aynı yerde değil.
+    const optionCount = row.gradeBand === GradeBand.G1 || row.gradeBand === GradeBand.G2 ? 3 : 4;
+    expect(questions.map((q) => q.position)).toEqual([1, 2, 3]);
+    for (const question of questions) {
+      expect(question.options).toHaveLength(optionCount);
+      expect(new Set(question.options).size).toBe(optionCount);
+      expect(question.correctIndex).toBeLessThan(optionCount);
+      expect(Object.values(QuestionType)).toContain(question.type);
+      expect(Object.values(CognitiveLevel)).toContain(question.cognitiveLevel);
+      expect(question.hint).toMatch(/^İpucu: /);
+      expect(question.explanation.trim().length).toBeGreaterThan(0);
+    }
+    expect(new Set(questions.map((q) => q.correctIndex)).size).toBeGreaterThan(1);
   });
 });

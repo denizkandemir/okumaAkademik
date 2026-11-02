@@ -12,6 +12,7 @@ import { TextLink } from '@/design/components/text-link';
 import { SlidersIcon } from '@/design/icons';
 import { useAuth } from '@/features/auth/auth-context';
 import type { StatsResponse } from '@/features/game/types';
+import type { MeResponse } from '@/features/placement/types';
 import { AchievementRow, sortAchievements } from '@/features/profile/achievement-row';
 import { CitySeals } from '@/features/profile/city-seals';
 import { ProfileSummary } from '@/features/profile/profile-summary';
@@ -28,6 +29,8 @@ export default function ProfileScreen() {
     user ? '/me/stats' : null,
     { refetchOnFocus: true },
   );
+  // Seviye belirleme bitince bağlantı metni değişsin diye o da odaklanmada tazelenir.
+  const me = useApiQuery<MeResponse>(user ? '/me' : null, { refetchOnFocus: true });
 
   if (!user) return null;
 
@@ -79,6 +82,15 @@ export default function ProfileScreen() {
             onPress={() => router.push('/certificate')}
           />
         </>
+      ) : null}
+
+      {/* Seviye belirleme kendiliğinden bir kez önerilir; sonra yalnızca buradan açılır. */}
+      {me.data ? (
+        <TextLink
+          title={me.data.needsPlacement ? 'Seviyemi belirle' : 'Seviyemi yeniden ölç'}
+          accessibilityRole="button"
+          onPress={() => router.push('/placement')}
+        />
       ) : null}
 
       {__DEV__ ? (
