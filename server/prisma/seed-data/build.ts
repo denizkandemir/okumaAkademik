@@ -5,6 +5,7 @@ import {
   type TextTheme,
 } from '../../src/generated/prisma/enums.js';
 import { toApiCity } from '../../src/lib/city.js';
+import { textMetrics } from '../../src/lib/readability.js';
 import type { SeedChestLesson, SeedGlossary, SeedQuestion, SeedStoryLesson } from './types.js';
 
 /** Çocukların ortalama okuma hızı varsayımı: yaklaşık 45 kelime ≈ 1 dakika. */
@@ -57,6 +58,7 @@ export function story(
       minGrade: 1,
       maxGrade: 8,
       paragraphs: input.paragraphs,
+      ...textMetrics(input.paragraphs),
     },
     questions: input.questions,
     glossary: input.glossary,

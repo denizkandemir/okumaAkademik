@@ -3,7 +3,9 @@ import { router, usePathname } from 'expo-router';
 import { useEffect, useRef } from 'react';
 import { AppState } from 'react-native';
 
+import { useAuth } from '@/features/auth/auth-context';
 import type { StatsResponse } from '@/features/game/types';
+import { markPlacementOffered, shouldOfferPlacement } from '@/features/placement/placement-offer';
 import { REMINDER_SUPPORTED } from '@/features/reminder/reminder';
 import { api } from '@/lib/api';
 import * as storage from '@/lib/storage';
@@ -22,7 +24,8 @@ function isFlowScreen(pathname: string) {
     pathname.startsWith('/lesson/') ||
     pathname === '/level-up' ||
     pathname === '/city-unlocked' ||
-    pathname === '/finale'
+    pathname === '/finale' ||
+    pathname === '/placement'
   );
 }
 
@@ -41,11 +44,15 @@ async function shouldShowWelcomeBack(): Promise<boolean> {
 }
 
 /**
- * Oturum açıkken çizilir; ekranı yoktur. Açılışta ve uygulama öne geldiğinde geri dönüş kontrolünü
- * yapar; hatırlatma bildirimine dokunulunca Yolculuk sekmesini açar. Hiçbir şeyi bekletmez; hata
+ * Oturum açıkken çizilir; ekranı yoktur. Açılışta ve uygulama öne geldiğinde önce seviye
+ * belirlemeyi (kullanıcı başına bir kez), o önerilmezse geri dönüş kontrolünü yapar; hatırlatma
+ * bildirimine dokunulunca Yolculuk sekmesini açar. Hiçbir şeyi bekletmez; hata
  * olursa sessizce geçer.
  */
 export function WelcomeBackGate() {
+  const { user } = useAuth();
+  // Kapı yalnızca oturum açıkken çizilir (çıkışta kaldırılır).
+  const userId = user?.id ?? '';
   const pathname = usePathname();
   const pathnameRef = useRef(pathname);
   useEffect(() => {
@@ -54,10 +61,22 @@ export function WelcomeBackGate() {
   const checking = useRef(false);
 
   useEffect(() => {
+    /** Seviye belirleme (bir kez) önerildiyse `true`; o açılışta geri dönüş ekranı gösterilmez. */
+    const offerPlacement = async () => {
+      const current = pathnameRef.current;
+      if (isFlowScreen(current) || current === '/welcome-back') return false;
+      if (!(await shouldOfferPlacement(userId))) return false;
+      await markPlacementOffered(userId);
+      router.push('/placement');
+      return true;
+    };
+
     const check = () => {
       if (checking.current) return;
       checking.current = true;
-      shouldShowWelcomeBack()
+      offerPlacement()
+        .catch(() => false)
+        .then((offered) => (offered ? false : shouldShowWelcomeBack()))
         .then(async (show) => {
           const current = pathnameRef.current;
           // Akış ekranındaysa gösterilmez; gün kaydedilmediği için sonraki öne gelişte yeniden denenir.
@@ -76,7 +95,7 @@ export function WelcomeBackGate() {
       if (state === 'active') check();
     });
     return () => subscription.remove();
-  }, []);
+  }, [userId]);
 
   return REMINDER_SUPPORTED ? <ReminderTapHandler pathnameRef={pathnameRef} /> : null;
 }

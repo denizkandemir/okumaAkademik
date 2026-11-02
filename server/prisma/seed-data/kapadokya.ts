@@ -1,4 +1,10 @@
-import { City, ReadingLevel, TextTheme } from '../../src/generated/prisma/enums.js';
+import {
+  City,
+  CognitiveLevel,
+  QuestionType,
+  ReadingLevel,
+  TextTheme,
+} from '../../src/generated/prisma/enums.js';
 import { chest, story } from './build.js';
 import type { SeedCity } from './types.js';
 
@@ -25,6 +31,8 @@ export const kapadokya: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Annesine göre peri bacalarının taşı neyden oluşmuş?',
           options: ['Deniz kumundan', 'Yanardağ külünden', 'Eriyen kardan'],
           correctIndex: 1,
@@ -32,6 +40,8 @@ export const kapadokya: SeedCity = {
           explanation: 'Doğru! Yanardağlardan çıkan kül sertleşip yumuşak bir taşa dönüşmüş.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Peri bacalarının tepesindeki sert taşlar ne işe yaramış?',
           options: [
             'Altlarındaki kayayı korumuş',
@@ -43,6 +53,8 @@ export const kapadokya: SeedCity = {
           explanation: 'Aferin! Sert taşlar şemsiye gibi altlarındaki kayayı aşınmaktan korumuş.',
         },
         {
+          type: QuestionType.CUMLEDE_ANLAM,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Nehir rüzgârı ve yağmuru neye benzetti?',
           options: ['Yaramaz çocuklara', 'Usta heykeltıraşlara', 'Yorgun yolculara'],
           correctIndex: 1,
@@ -74,6 +86,8 @@ export const kapadokya: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Selim Bey’e göre balonu yükselten nedir?',
           options: ['Rüzgâr', 'Sıcak hava', 'Kuşlar'],
           correctIndex: 1,
@@ -81,6 +95,8 @@ export const kapadokya: SeedCity = {
           explanation: 'Doğru! Sıcak hava soğuk havadan hafif olduğu için balonu yükseltir.',
         },
         {
+          type: QuestionType.DUYGU_KARAKTER,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Ali neden annesinin elini sıkıca tuttu?',
           options: [
             'Sepet yerden kesilince biraz korktuğu için',
@@ -92,6 +108,8 @@ export const kapadokya: SeedCity = {
           explanation: 'Aferin! Sepet yerden kesilince Ali bir an korktu.',
         },
         {
+          type: QuestionType.DUYGU_KARAKTER,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Yolculuğun sonunda Ali ne düşünüyordu?',
           options: [
             'Bir daha asla binmeyeceğini',
@@ -126,6 +144,8 @@ export const kapadokya: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Yeraltı şehrinin kapıları neyle kapatılırdı?',
           options: ['Tahta kapılarla', 'Kocaman, yuvarlak taşlarla', 'Demir parmaklıklarla'],
           correctIndex: 1,
@@ -133,6 +153,8 @@ export const kapadokya: SeedCity = {
           explanation: 'Doğru! Kapılar kocaman, yuvarlak taşlar yuvarlanarak kapatılırdı.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Yerin altında yaşayanlar nasıl nefes alabiliyordu?',
           options: [
             'Havalandırma bacaları temiz hava getirdiği için',
@@ -144,6 +166,8 @@ export const kapadokya: SeedCity = {
           explanation: 'Aferin! Havalandırma bacaları yukarıdan temiz hava taşıyordu.',
         },
         {
+          type: QuestionType.DUYGU_KARAKTER,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Defne şehri kazan insanlar için ne düşündü?',
           options: [
             'Çok tembel olduklarını',
@@ -179,6 +203,8 @@ export const kapadokya: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Avanos’taki çömlekçiler kırmızı toprağı nereden alıyordu?',
           options: ['Kızılırmak’tan', 'Denizden', 'Dağın tepesinden'],
           correctIndex: 0,
@@ -186,6 +212,8 @@ export const kapadokya: SeedCity = {
           explanation: 'Doğru! Kırmızı toprak Kızılırmak’tan alınıyordu.',
         },
         {
+          type: QuestionType.SOZCUK_ANLAMI,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Mert’in çamuru “yamuldu.” Bu ne demek?',
           options: ['Çok güzel bir şekil aldı', 'Şekli bozulup eğri oldu', 'Sertleşip taşa döndü'],
           correctIndex: 1,
@@ -193,6 +221,8 @@ export const kapadokya: SeedCity = {
           explanation: 'Aferin! Yamulmak, şeklin bozulup eğri olması demektir.',
         },
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Usta Mert’e ne öğütledi?',
           options: [
             'Hemen pes etmesini',
@@ -232,6 +262,8 @@ export const kapadokya: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Kayalardaki küçük delikler ne için açılmıştı?',
           options: [
             'Güvercinlere ev olsun diye',
@@ -243,6 +275,8 @@ export const kapadokya: SeedCity = {
           explanation: 'Doğru! İnsanlar kayaları oyup güvercinlere ev yapmış.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'İnsanlar güvercinlik yaparak nasıl bir fayda sağlamış?',
           options: [
             'Güvercinleri satıp zengin olmuşlar',
@@ -254,6 +288,8 @@ export const kapadokya: SeedCity = {
           explanation: 'Aferin! Güvercin gübresi üzüm bağlarını besliyor, üzümler bol oluyordu.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Zeynep pekmezi tadınca neden gülümsedi?',
           options: [
             'Pekmez çok acı olduğu için',
@@ -292,6 +328,8 @@ export const kapadokya: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Eski denizciler kuzeyi hangi yıldızla bulurdu?',
           options: ['Çoban Yıldızı', 'Kuzey Yıldızı', 'Akşam Yıldızı'],
           correctIndex: 1,
@@ -300,6 +338,8 @@ export const kapadokya: SeedCity = {
             'Doğru! Kuzey Yıldızı yer değiştirmediği için denizcilere kuzeyi gösterirdi.',
         },
         {
+          type: QuestionType.SOZCUK_ANLAMI,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: '“Takımyıldız” ne demektir?',
           options: [
             'Yıldızların bir araya gelerek oluşturduğu şekil',
@@ -311,6 +351,8 @@ export const kapadokya: SeedCity = {
           explanation: 'Aferin! Takımyıldız, yıldızların birlikte oluşturduğu şekildir.',
         },
         {
+          type: QuestionType.ANA_FIKIR,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Hikâyenin sonunda bize ne hatırlatılıyor?',
           options: [
             'Telefonsuz hiç yola çıkmamamız gerektiği',
@@ -346,6 +388,8 @@ export const kapadokya: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Bora’nın ailesi nerede kaldı?',
           options: ['Kayaya oyulmuş bir otelde', 'Bir çadırda', 'Bir apartman dairesinde'],
           correctIndex: 0,
@@ -353,6 +397,8 @@ export const kapadokya: SeedCity = {
           explanation: 'Doğru! Kayaya oyulmuş bir otelde kaldılar.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Mağara evler neden yazın serin, kışın sıcak olur?',
           options: [
             'Her odada klima olduğu için',
@@ -364,6 +410,8 @@ export const kapadokya: SeedCity = {
           explanation: 'Aferin! Kalın kaya duvarlar dışarıdaki sıcağı ve soğuğu içeri geçirmez.',
         },
         {
+          type: QuestionType.DUYGU_KARAKTER,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Bora gece gözlerini kapattığında nasıl hissediyordu?',
           options: ['Çok korkuyordu', 'Kızgındı', 'Huzurluydu, hiç korkmuyordu'],
           correctIndex: 2,
@@ -394,6 +442,8 @@ export const kapadokya: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Pırıl ile Ayla damda neyi izlediler?',
           options: ['Yıldızları', 'Balonları', 'Kuşları'],
           correctIndex: 1,
@@ -401,6 +451,8 @@ export const kapadokya: SeedCity = {
           explanation: 'Doğru! Gün doğarken gökyüzünü dolduran balonları izlediler.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Pırıl doğuya, dağların ardına neden baktı?',
           options: [
             'Memleketi Van o yönde olduğu için',
@@ -412,6 +464,8 @@ export const kapadokya: SeedCity = {
           explanation: 'Aferin! Memleketi Van, doğuda, büyük bir gölün kıyısındaydı.',
         },
         {
+          type: QuestionType.DUYGU_KARAKTER,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Ayla, Pırıl gideceği için nasıl hissetti?',
           options: ['Çok sevindi', 'Ona kızdı', 'Biraz üzüldü ama ona iyi yolculuklar diledi'],
           correctIndex: 2,

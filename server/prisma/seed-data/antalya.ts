@@ -1,4 +1,10 @@
-import { City, ReadingLevel, TextTheme } from '../../src/generated/prisma/enums.js';
+import {
+  City,
+  CognitiveLevel,
+  QuestionType,
+  ReadingLevel,
+  TextTheme,
+} from '../../src/generated/prisma/enums.js';
 import { chest, story } from './build.js';
 import type { SeedCity } from './types.js';
 
@@ -26,6 +32,8 @@ export const antalya: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Kaan ipucu avının sonunda ne buldu?',
           options: ['En sevdiği kitabı', 'Oyuncak bir tekneyi', 'Eski bir haritayı'],
           correctIndex: 0,
@@ -33,6 +41,8 @@ export const antalya: SeedCity = {
           explanation: 'Doğru! Kutunun içinden Kaan’ın en sevdiği kitap çıktı.',
         },
         {
+          type: QuestionType.SOZCUK_ANLAMI,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Babaannesine göre “cumba” nedir?',
           options: [
             'Üç kemerli eski bir kapı',
@@ -44,6 +54,8 @@ export const antalya: SeedCity = {
           explanation: 'Aferin! Cumba, eski evlerde sokağa doğru taşan pencereli bölümdür.',
         },
         {
+          type: QuestionType.DUYGU_KARAKTER,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Kaan oyun bitince ne hissetti?',
           options: ['Çok sıkıldı', 'Babaannesine kızdı', 'Çok mutlu oldu ve babaannesine sarıldı'],
           correctIndex: 2,
@@ -74,6 +86,8 @@ export const antalya: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Kaptan Rıza Ela’ya ne öğretti?',
           options: ['Yüzmeyi', 'Denizci düğümü atmayı', 'Balık tutmayı'],
           correctIndex: 1,
@@ -81,6 +95,8 @@ export const antalya: SeedCity = {
           explanation: 'Doğru! Kaptan Ela’ya denizci düğümü atmayı öğretti.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Ela dipteki taşları neden görebiliyordu?',
           options: [
             'Su çok berrak olduğu için',
@@ -92,6 +108,8 @@ export const antalya: SeedCity = {
           explanation: 'Aferin! Su o kadar berraktı ki dibi bile görünüyordu.',
         },
         {
+          type: QuestionType.DUYGU_KARAKTER,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Kaptan “Yeni bir denizci var!” deyince Ela nasıl hissetti?',
           options: ['Utanıp ağladı', 'Korktu', 'Gururlandı ve sevindi'],
           correctIndex: 2,
@@ -122,6 +140,8 @@ export const antalya: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Aşağı Düden Şelalesi nereye dökülüyordu?',
           options: ['Bir göle', 'Denize', 'Bir nehre'],
           correctIndex: 1,
@@ -129,6 +149,8 @@ export const antalya: SeedCity = {
           explanation: 'Doğru! Aşağı Düden Şelalesi yüksek kayalıklardan denize dökülür.',
         },
         {
+          type: QuestionType.CUMLEDE_ANLAM,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: '“Su, bir perde gibi önlerinden akıyordu.” Bu cümle ne anlatıyor?',
           options: [
             'Su, önlerinde perde gibi bir duvar oluşturuyordu',
@@ -140,6 +162,8 @@ export const antalya: SeedCity = {
           explanation: 'Aferin! Dökülen su, önlerinde bir perde gibi duruyordu.',
         },
         {
+          type: QuestionType.ANA_FIKIR,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Efe şelaleyi izlerken ne düşündü?',
           options: [
             'Hemen eve dönmek istediğini',
@@ -174,6 +198,8 @@ export const antalya: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'İlkbaharda portakal ağaçları ne açar?',
           options: ['Pembe yapraklar', 'Beyaz çiçekler', 'Sarı tohumlar'],
           correctIndex: 1,
@@ -181,6 +207,8 @@ export const antalya: SeedCity = {
           explanation: 'Doğru! İlkbaharda portakal ağaçları beyaz çiçek açar.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Dedesi Melis’e neden dalı kırmadan koparmasını söyledi?',
           options: [
             'Ağaç zarar görmesin ve yeniden meyve versin diye',
@@ -192,6 +220,8 @@ export const antalya: SeedCity = {
           explanation: 'Aferin! Dallar sağlam kalırsa ağaç her yıl yeniden meyve verir.',
         },
         {
+          type: QuestionType.ANA_FIKIR,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Melis hikâyenin sonunda ne fark etti?',
           options: [
             'Portakalların çok ağır olduğunu',
@@ -227,6 +257,8 @@ export const antalya: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Kaplumbağa yavruları denizi neyle bulur?',
           options: ['Ay ışığının parıltısıyla', 'Annelerinin sesiyle', 'Fenerlerin ışığıyla'],
           correctIndex: 0,
@@ -234,6 +266,8 @@ export const antalya: SeedCity = {
           explanation: 'Doğru! Yavrular denizi ay ışığının parıltısından bulur.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Işıklar kapatılmasaydı ne olabilirdi?',
           options: [
             'Yavrular daha hızlı yürürdü',
@@ -246,6 +280,8 @@ export const antalya: SeedCity = {
             'Aferin! Işıklar yavruların yolunu şaşırtıp onları denizden uzaklaştırabilir.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.DEGERLENDIRME,
           prompt: 'Can kaplumbağalara nasıl yardım edebilir?',
           options: [
             'Yavruları eve götürerek',
@@ -281,6 +317,8 @@ export const antalya: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Hasan Kaptan her akşam ne yapardı?',
           options: ['Balığa çıkardı', 'Fenerin lambasını yakardı', 'Gemileri boyardı'],
           correctIndex: 1,
@@ -288,6 +326,8 @@ export const antalya: SeedCity = {
           explanation: 'Doğru! Her akşam basamakları çıkıp fenerin lambasını yakardı.',
         },
         {
+          type: QuestionType.CUMLEDE_ANLAM,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Hasan Kaptan “hiç vakit kaybetmeden” lambayı hazırladı. Bu ne demek?',
           options: ['Hemen, beklemeden', 'Çok yavaş yavaş', 'Ertesi sabah'],
           correctIndex: 0,
@@ -295,6 +335,8 @@ export const antalya: SeedCity = {
           explanation: 'Aferin! Vakit kaybetmeden, hiç beklemeden hemen demektir.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Balıkçılar ertesi sabah neden geldiler?',
           options: [
             'Feneri gezmek için',
@@ -329,6 +371,8 @@ export const antalya: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Arda sabah nereye gitti?',
           options: ['Saklıkent’e', 'Konyaaltı sahiline', 'Kaleiçi’ne'],
           correctIndex: 0,
@@ -336,6 +380,8 @@ export const antalya: SeedCity = {
           explanation: 'Doğru! Arda sabah karlı Saklıkent’e gitti.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Dağdan inerken kar neden azaldı?',
           options: [
             'Güneş battığı için',
@@ -347,6 +393,8 @@ export const antalya: SeedCity = {
           explanation: 'Aferin! Aşağılarda hava daha sıcak olduğu için kar erir.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Arda hikâyenin sonunda neden güldü?',
           options: [
             'Ayakları üşüdüğü için',
@@ -384,6 +432,8 @@ export const antalya: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Ressamın resminde neler vardı?',
           options: ['Deniz ve tekneler', 'Balonlar ve sivri kayalar', 'Portakal ağaçları'],
           correctIndex: 1,
@@ -391,6 +441,8 @@ export const antalya: SeedCity = {
           explanation: 'Doğru! Resimde rengârenk balonlar ve sivri kayalar vardı.',
         },
         {
+          type: QuestionType.SOZCUK_ANLAMI,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Ressama göre “peri bacası” nedir?',
           options: ['Kapadokya’daki sivri kayalar', 'Bir çeşit balon', 'Eski bir evin bacası'],
           correctIndex: 0,
@@ -398,6 +450,8 @@ export const antalya: SeedCity = {
           explanation: 'Aferin! Peri bacaları, Kapadokya’daki külah biçimli sivri kayalardır.',
         },
         {
+          type: QuestionType.DUYGU_KARAKTER,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Resme bakarken Pırıl’ın kuyruğu neden sallanıyordu?',
           options: ['Çok kızdığı için', 'Üşüdüğü için', 'Heyecanlandığı için'],
           correctIndex: 2,

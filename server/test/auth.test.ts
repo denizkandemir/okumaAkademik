@@ -175,6 +175,8 @@ describe('GET /me ve oturum', () => {
     expect(response.statusCode).toBe(200);
     expect(response.json()).toEqual({
       user: { id: expect.any(String), username: 'ayse', name: 'Ayşe', grade: 3 },
+      // Yeni kullanıcı seviye belirlemeyi henüz yapmadı.
+      needsPlacement: true,
     });
   });
 

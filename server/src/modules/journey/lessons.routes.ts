@@ -6,6 +6,7 @@ import { Prisma } from '../../generated/prisma/client.js';
 import { LessonKind, LokumReason } from '../../generated/prisma/enums.js';
 import { toApiCity } from '../../lib/city.js';
 import { Errors } from '../../lib/errors.js';
+import { gradeBandOf } from '../../lib/grade-band.js';
 import {
   firstTryCorrectCount,
   LOKUM,
@@ -20,6 +21,7 @@ import { withApiLevel } from '../../lib/reading-level.js';
 import { toApiTheme } from '../../lib/text-theme.js';
 import { parse } from '../../lib/validation.js';
 import { requireAuth } from '../../plugins/auth.js';
+import { writeReadingMetric } from '../progress/reading-metrics.js';
 import {
   loadJourneyState,
   loadReadingDates,
@@ -30,19 +32,19 @@ import {
 
 const lessonParamsSchema = z.object({ id: z.string().min(1).max(100) });
 
-const readingSessionIdSchema = z
+export const readingSessionIdSchema = z
   .string({ error: 'Okuma kaydı eksik.' })
   .min(1, { error: 'Okuma kaydı eksik.' })
   .max(100);
 
-const answerSchema = z.object({
+export const answerSchema = z.object({
   readingSessionId: readingSessionIdSchema,
   questionId: z.string({ error: 'Soru seçilmedi.' }).min(1, { error: 'Soru seçilmedi.' }).max(100),
   choiceIndex: z
     .number({ error: 'Bir şık seç.' })
     .int({ error: 'Bir şık seç.' })
     .min(0, { error: 'Bir şık seç.' })
-    .max(2, { error: 'Bir şık seç.' }),
+    .max(3, { error: 'Bir şık seç.' }),
 });
 
 const completeSchema = z.object({ readingSessionId: readingSessionIdSchema.optional() });
@@ -78,7 +80,7 @@ function findOpenLesson(state: JourneyState, id: string): JourneyLesson {
   return lesson;
 }
 
-/** Okuma kaydı kullanıcıya ve dersin metnine ait olmalı. */
+/** Okuma kaydı kullanıcıya ve dersin (herhangi bir sınıf grubundaki) metnine ait olmalı. */
 async function findLessonReading(
   prisma: PrismaClient,
   userId: string,
@@ -90,7 +92,7 @@ async function findLessonReading(
     select: { id: true, textId: true, completed: true, durationSeconds: true },
   });
   if (!session) throw Errors.notFound('Bu okuma kaydını bulamadık.');
-  if (session.textId !== lesson.textId) {
+  if (!lesson.textIds.includes(session.textId)) {
     throw Errors.validation({ readingSessionId: 'Bu okuma bu derse ait değil.' });
   }
   return session;
@@ -167,31 +169,31 @@ export async function lessonsRoutes(app: FastifyInstance) {
   app.get('/lessons/:id', async (request) => {
     const { user } = requireAuth(request);
     const { id } = parse(lessonParamsSchema, request.params);
-    const state = await loadJourneyState(prisma, user.id);
+    const state = await loadJourneyState(prisma, user.id, gradeBandOf(user.grade));
     const lesson = findOpenLesson(state, id);
 
-    const details = await prisma.lesson.findUniqueOrThrow({
-      where: { id },
-      select: {
-        summary: true,
-        text: {
-          select: {
-            id: true,
-            title: true,
-            level: true,
-            estimatedMinutes: true,
-            theme: true,
-            paragraphs: true,
-            glossaryEntries: { select: { word: true, meaning: true }, orderBy: { word: 'asc' } },
-            questions: {
-              select: { id: true, position: true, prompt: true, options: true },
-              orderBy: { position: 'asc' },
+    // Kullanıcının sınıf grubunun metni (yoksa G2); sandıkta metin yok.
+    const [details, text] = await Promise.all([
+      prisma.lesson.findUniqueOrThrow({ where: { id }, select: { summary: true } }),
+      lesson.textId
+        ? prisma.text.findUnique({
+            where: { id: lesson.textId },
+            select: {
+              id: true,
+              title: true,
+              level: true,
+              estimatedMinutes: true,
+              theme: true,
+              paragraphs: true,
+              glossaryEntries: { select: { word: true, meaning: true }, orderBy: { word: 'asc' } },
+              questions: {
+                select: { id: true, position: true, prompt: true, options: true },
+                orderBy: { position: 'asc' },
+              },
             },
-          },
-        },
-      },
-    });
-    const text = details.text;
+          })
+        : null,
+    ]);
 
     return {
       lesson: {
@@ -214,6 +216,7 @@ export async function lessonsRoutes(app: FastifyInstance) {
             estimatedMinutes: text.estimatedMinutes,
             theme: toApiTheme(text.theme),
             paragraphs: text.paragraphs,
+            gradeBand: lesson.gradeBand,
           })
         : null,
       glossary: text?.glossaryEntries ?? [],
@@ -226,16 +229,20 @@ export async function lessonsRoutes(app: FastifyInstance) {
     const { user } = requireAuth(request);
     const { id } = parse(lessonParamsSchema, request.params);
     const input = parse(answerSchema, request.body);
-    const state = await loadJourneyState(prisma, user.id);
+    const state = await loadJourneyState(prisma, user.id, gradeBandOf(user.grade));
     const lesson = findOpenLesson(state, id);
     if (lesson.kind !== LessonKind.STORY || !lesson.textId) throw Errors.noQuestions();
 
-    await findLessonReading(prisma, user.id, lesson, input.readingSessionId);
+    const session = await findLessonReading(prisma, user.id, lesson, input.readingSessionId);
+    // Sorular okunan metnindir (okuma sırasında sınıf değiştiyse eski grubun metni).
     const question = await prisma.question.findFirst({
-      where: { id: input.questionId, textId: lesson.textId },
-      select: { id: true, correctIndex: true, hint: true, explanation: true },
+      where: { id: input.questionId, textId: session.textId },
+      select: { id: true, correctIndex: true, hint: true, explanation: true, options: true },
     });
     if (!question) throw Errors.validation({ questionId: 'Bu soru bu derse ait değil.' });
+    if (input.choiceIndex >= question.options.length) {
+      throw Errors.validation({ choiceIndex: 'Bir şık seç.' });
+    }
 
     // Ders bitmeden "ilk deneme", kullanıcının bu soruya hangi okumada olursa olsun verdiği ilk
     // cevaptır (complete ile aynı kural). Bitmiş derste lokum gösterilmez.
@@ -268,7 +275,7 @@ export async function lessonsRoutes(app: FastifyInstance) {
     const { user } = requireAuth(request);
     const { id } = parse(lessonParamsSchema, request.params);
     const input = parse(completeSchema, request.body);
-    const state = await loadJourneyState(prisma, user.id);
+    const state = await loadJourneyState(prisma, user.id, gradeBandOf(user.grade));
     const lesson = findOpenLesson(state, id);
 
     let story: {
@@ -395,9 +402,20 @@ export async function lessonsRoutes(app: FastifyInstance) {
       first = await persist();
     }
     const rewards = first?.rewards ?? null;
+    const firstTryCorrect = first ? first.firstTryCorrect : (story?.firstTryCorrect ?? null);
+
+    // Okuma ölçümü sorularla birlikte; yanıtı kaybolan istek aynı satırı yeniden yazar.
+    if (story && firstTryCorrect !== null) {
+      await writeReadingMetric(prisma, {
+        readingSessionId: story.readingSessionId,
+        gradeBand: gradeBandOf(user.grade),
+        questions: { total: story.questionIds.length, firstTryCorrect },
+        onlyIfMissing: false,
+      });
+    }
 
     const [after, dates, balance] = await Promise.all([
-      loadJourneyState(prisma, user.id),
+      loadJourneyState(prisma, user.id, gradeBandOf(user.grade)),
       loadReadingDates(prisma, user.id),
       lokumBalance(prisma, user.id),
     ]);
@@ -405,7 +423,7 @@ export async function lessonsRoutes(app: FastifyInstance) {
     return {
       firstTime: first !== null,
       stars: first ? first.stars : (story?.stars ?? null),
-      firstTryCorrect: first ? first.firstTryCorrect : (story?.firstTryCorrect ?? null),
+      firstTryCorrect,
       durationSeconds: story?.durationSeconds ?? null,
       lokum: {
         lesson: rewards?.lesson ?? 0,

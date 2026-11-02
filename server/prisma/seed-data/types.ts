@@ -1,6 +1,8 @@
 import type {
   City,
+  CognitiveLevel,
   LessonKind,
+  QuestionType,
   ReadingLevel,
   TextTheme,
 } from '../../src/generated/prisma/enums.js';
@@ -16,13 +18,23 @@ export type SeedText = {
   minGrade: number;
   maxGrade: number;
   paragraphs: string[];
+  /** Metin ölçüleri; paragraflardan src/lib/readability.ts ile hesaplanır. */
+  wordCount: number;
+  sentenceCount: number;
+  avgSentenceLength: number;
+  atesmanScore: number | null;
 };
 
-/** Anlama sorusu: tam 3 şık, `correctIndex` doğru şıkkın sırası (0-2). */
+/** Anlama sorusu: 3-4 şık, `correctIndex` doğru şıkkın sırası (0'dan başlar). */
 export type SeedQuestion = {
+  /** Soru türü (Q1-Q13); soru okunarak seçilir, migration'daki eşlemeyle aynı olmalı. */
+  type: QuestionType;
+  cognitiveLevel: CognitiveLevel;
+  /** MEB kazanım kodu (varsa) */
+  mebOutcomeCode?: string;
   prompt: string;
-  options: [string, string, string];
-  correctIndex: 0 | 1 | 2;
+  options: [string, string, string] | [string, string, string, string];
+  correctIndex: 0 | 1 | 2 | 3;
   /** Yanlış cevaptan sonra; cevabı söylemeden metnin ilgili yerine yönlendirir. */
   hint: string;
   /** Doğru cevaptan sonra; över ve tek cümleyle açıklar. */

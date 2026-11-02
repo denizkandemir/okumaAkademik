@@ -1,4 +1,10 @@
-import { City, ReadingLevel, TextTheme } from '../../src/generated/prisma/enums.js';
+import {
+  City,
+  CognitiveLevel,
+  QuestionType,
+  ReadingLevel,
+  TextTheme,
+} from '../../src/generated/prisma/enums.js';
 import { chest, story } from './build.js';
 import type { SeedCity } from './types.js';
 
@@ -26,6 +32,8 @@ export const izmir: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Saat Kulesi’nin çevresinde neler dolaşıyordu?',
           options: ['Martılar', 'Güvercinler', 'Kediler'],
           correctIndex: 1,
@@ -33,6 +41,8 @@ export const izmir: SeedCity = {
           explanation: 'Doğru! Kulenin çevresinde yüzlerce güvercin vardı.',
         },
         {
+          type: QuestionType.SOZEL_MANTIK,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Uzun kol on ikide, kısa kol üçteyse saat kaçtır?',
           options: ['Saat üç', 'Saat on iki', 'Saat dokuz'],
           correctIndex: 0,
@@ -40,6 +50,8 @@ export const izmir: SeedCity = {
           explanation: 'Aferin! Uzun kol on ikideyken kısa kol üçü gösteriyorsa saat üçtür.',
         },
         {
+          type: QuestionType.DUYGU_KARAKTER,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Can saati doğru okuyunca nasıl hissetti?',
           options: ['Üzüldü', 'Korktu', 'Sevindi'],
           correctIndex: 2,
@@ -69,6 +81,8 @@ export const izmir: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'İzmir’de boyoz neyle yenir?',
           options: ['Bal ve tereyağıyla', 'Haşlanmış yumurta ve çayla', 'Peynir ve zeytinle'],
           correctIndex: 1,
@@ -76,6 +90,8 @@ export const izmir: SeedCity = {
           explanation: 'Doğru! İzmir’de boyoz haşlanmış yumurta ve çayla yenir.',
         },
         {
+          type: QuestionType.SOZCUK_ANLAMI,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: '“Meşhur” kelimesi ne demektir?',
           options: ['Ünlü, herkesin bildiği', 'Çok pahalı', 'Yeni yapılmış'],
           correctIndex: 0,
@@ -83,6 +99,8 @@ export const izmir: SeedCity = {
           explanation: 'Aferin! Meşhur, çok kişinin bildiği, ünlü demektir.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Defne arkadaşı Ayşe için neden boyoz aldı?',
           options: [
             'Boyozları sevmediği için',
@@ -116,6 +134,8 @@ export const izmir: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Elif bisiklet sürmeyi nerede denedi?',
           options: ['Okulun bahçesinde', 'Kordon’da', 'Parkta'],
           correctIndex: 1,
@@ -123,6 +143,8 @@ export const izmir: SeedCity = {
           explanation: 'Doğru! Elif bisiklet sürmeyi Kordon’da denedi.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Elif ilk denemede neden yere düştü?',
           options: [
             'Dengesini kaybettiği için',
@@ -134,6 +156,8 @@ export const izmir: SeedCity = {
           explanation: 'Aferin! Elif dengesini kaybedince yere düştü.',
         },
         {
+          type: QuestionType.ANA_FIKIR,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Babası Elif’e ne öğretti?',
           options: [
             'Bisikletin tehlikeli olduğunu',
@@ -168,6 +192,8 @@ export const izmir: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Ali hangi kokuyu bilemedi?',
           options: ['Kekik', 'Nane', 'Tarçın'],
           correctIndex: 0,
@@ -175,6 +201,8 @@ export const izmir: SeedCity = {
           explanation: 'Doğru! Ali üçüncü kavanozdaki kekiği bilemedi.',
         },
         {
+          type: QuestionType.SOZCUK_ANLAMI,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Baharatçı amca “Kokladığın şeyi tahmin et” dedi. “Tahmin et” ne demektir?',
           options: [
             'Hemen oradan uzaklaş',
@@ -186,6 +214,8 @@ export const izmir: SeedCity = {
           explanation: 'Aferin! Tahmin etmek, emin olmadan düşünüp bir cevap söylemektir.',
         },
         {
+          type: QuestionType.DUYGU_KARAKTER,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Ali koku oyunu için ne hissetti?',
           options: ['Çok sıkıldı', 'Oyunu çok sevdi', 'Korktu'],
           correctIndex: 1,
@@ -220,6 +250,8 @@ export const izmir: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Teyzeye göre imbat ne zaman eser?',
           options: ['Sabah erkenden', 'Gece yarısı', 'Öğleden sonra'],
           correctIndex: 2,
@@ -227,6 +259,8 @@ export const izmir: SeedCity = {
           explanation: 'Doğru! İmbat öğleden sonra denizden eser.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Uçurtma ilk seferde neden uçmadı?',
           options: ['Hiç rüzgâr olmadığı için', 'İpi koptuğu için', 'Uçurtma yırtık olduğu için'],
           correctIndex: 0,
@@ -234,6 +268,8 @@ export const izmir: SeedCity = {
           explanation: 'Aferin! Rüzgâr olmayınca uçurtma havada kalamaz.',
         },
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Çocuklar uçurtmayı uçurabilmek için ne yaptılar?',
           options: ['Eve gidip uyudular', 'Sabırla beklediler', 'Uçurtmayı çöpe attılar'],
           correctIndex: 1,
@@ -267,6 +303,8 @@ export const izmir: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Bir sonraki durakta tramvaya kim bindi?',
           options: [
             'Elinde bastonu olan yaşlı bir amca',
@@ -278,6 +316,8 @@ export const izmir: SeedCity = {
           explanation: 'Doğru! Bastonlu, yaşlı bir amca bindi.',
         },
         {
+          type: QuestionType.SOZCUK_ANLAMI,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Amca “Ne kibar bir kızsın” dedi. “Kibar” ne demektir?',
           options: ['Çok hızlı', 'Nazik ve saygılı', 'Çok uzun boylu'],
           correctIndex: 1,
@@ -285,6 +325,8 @@ export const izmir: SeedCity = {
           explanation: 'Aferin! Kibar, nazik ve saygılı demektir.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Ece ayakta dururken neden hiç yorulmadı?',
           options: [
             'Tramvay çok yavaş gittiği için',
@@ -319,6 +361,8 @@ export const izmir: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Martı neden uçamıyordu?',
           options: ['Kanadı kırılmıştı', 'Ayağına misina dolanmıştı', 'Çok yorgundu'],
           correctIndex: 1,
@@ -326,6 +370,8 @@ export const izmir: SeedCity = {
           explanation: 'Doğru! Martının ayağına misina dolanmıştı.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Babası neden martıya kendilerinin dokunmasını istemedi?',
           options: [
             'Martı korkmuştu; ona nasıl yardım edileceğini bilen biri gerekiyordu',
@@ -338,6 +384,8 @@ export const izmir: SeedCity = {
             'Aferin! Korkmuş bir hayvana, onu nasıl tutacağını bilen biri yardım etmelidir.',
         },
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Zeynep o günden sonra ne yaptı?',
           options: [
             'Martıları kovaladı',
@@ -373,6 +421,8 @@ export const izmir: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Kızın okuduğu kitap neyi anlatıyordu?',
           options: ['Van’ı', 'İstanbul’u', 'Efes’i'],
           correctIndex: 2,
@@ -380,6 +430,8 @@ export const izmir: SeedCity = {
           explanation: 'Doğru! Kitap çok eski bir kent olan Efes’i anlatıyordu.',
         },
         {
+          type: QuestionType.CUMLEDE_ANLAM,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: '“Pırıl’ın gözleri parladı.” Bu cümle ne anlatıyor?',
           options: [
             'Pırıl çok heyecanlandı ve merak etti',
@@ -392,6 +444,8 @@ export const izmir: SeedCity = {
             'Aferin! Gözleri parlamak, bir şeye çok heyecanlanmak ve merak etmek demektir.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Pırıl kıza neden teşekkür eder gibi miyavladı?',
           options: [
             'Kız ona balık verdiği için',

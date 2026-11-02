@@ -1,4 +1,10 @@
-import { City, ReadingLevel, TextTheme } from '../../src/generated/prisma/enums.js';
+import {
+  City,
+  CognitiveLevel,
+  QuestionType,
+  ReadingLevel,
+  TextTheme,
+} from '../../src/generated/prisma/enums.js';
 import { chest, story } from './build.js';
 import type { SeedCity } from './types.js';
 
@@ -26,6 +32,8 @@ export const istanbul: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Vapur nereden nereye gidiyordu?',
           options: ['Eminönü’nden Üsküdar’a', 'Kadıköy’den Eminönü’ne', 'Beşiktaş’tan Kadıköy’e'],
           correctIndex: 1,
@@ -33,6 +41,8 @@ export const istanbul: SeedCity = {
           explanation: 'Doğru! Vapur Kadıköy’den Eminönü’ne gidiyordu.',
         },
         {
+          type: QuestionType.SOZCUK_ANLAMI,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Martılar rüzgârda “süzülüyorlardı.” Bu ne demek?',
           options: [
             'Kanat çırpmadan yavaşça uçuyorlardı',
@@ -44,6 +54,8 @@ export const istanbul: SeedCity = {
           explanation: 'Aferin! Süzülmek, kanat çırpmadan havada kayar gibi uçmaktır.',
         },
         {
+          type: QuestionType.DUYGU_KARAKTER,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Martı simit parçasını kapınca Ece nasıl hissetti?',
           options: ['Çok kızdı', 'Korkup ağladı', 'Önce şaşırdı, sonra güldü'],
           correctIndex: 2,
@@ -74,6 +86,8 @@ export const istanbul: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Elif ile dedesi bahçeye ne diktiler?',
           options: ['Domates fidesi', 'Elma ağacı', 'Çiçek tohumu'],
           correctIndex: 0,
@@ -81,6 +95,8 @@ export const istanbul: SeedCity = {
           explanation: 'Doğru! Baharda bahçeye domates fidesi diktiler.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Elif fidelere neden her gün su verdi?',
           options: [
             'Toprak kirlenmesin diye',
@@ -92,6 +108,8 @@ export const istanbul: SeedCity = {
           explanation: 'Aferin! Bitkiler büyümek için suya ve güneşe ihtiyaç duyar.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Elif neden “Emeğimizin tadı başka!” dedi?',
           options: [
             'Salata çok tuzlu olduğu için',
@@ -127,6 +145,8 @@ export const istanbul: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Komşu kuşlar Pıtır’ın nesini çok severdi?',
           options: ['Yuvasını', 'Tüylerini', 'Sesini'],
           correctIndex: 2,
@@ -134,6 +154,8 @@ export const istanbul: SeedCity = {
           explanation: 'Doğru! Pıtır her sabah şarkı söyler, komşu kuşlar da sesini çok severdi.',
         },
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Rüzgâr esince Pıtır’ın yuvasına ne oldu?',
           options: ['Yere düştü', 'Daha da büyüdü', 'Ağaçta saklandı'],
           correctIndex: 0,
@@ -141,6 +163,8 @@ export const istanbul: SeedCity = {
           explanation: 'Evet! Güçlü rüzgâr Pıtır’ın yuvasını yere düşürdü.',
         },
         {
+          type: QuestionType.ANA_FIKIR,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Bu hikâye bize ne anlatıyor?',
           options: [
             'Rüzgârlı havada dışarı çıkmamayı',
@@ -174,6 +198,8 @@ export const istanbul: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Kız Kulesi nerede duruyor?',
           options: ['Bir tepenin üstünde', 'Denizdeki küçük bir adada', 'Büyük bir parkın içinde'],
           correctIndex: 1,
@@ -181,6 +207,8 @@ export const istanbul: SeedCity = {
           explanation: 'Doğru! Kız Kulesi denizdeki küçük bir adanın üstünde durur.',
         },
         {
+          type: QuestionType.CUMLEDE_ANLAM,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: '“Mert gözlerini kuleden ayıramadı.” Bu ne demek?',
           options: [
             'Kuleye uzun uzun, hayranlıkla baktı',
@@ -192,6 +220,8 @@ export const istanbul: SeedCity = {
           explanation: 'Aferin! Mert kuleyi o kadar beğendi ki ona bakmaya doyamadı.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Mert resmi neden anneannesine hediye etti?',
           options: [
             'Resmi hiç beğenmediği için',
@@ -230,6 +260,8 @@ export const istanbul: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Deniz ile babası nereye çıktılar?',
           options: ['Galata Kulesi’nin tepesine', 'Bir vapurun en üst katına', 'Köprünün kenarına'],
           correctIndex: 0,
@@ -237,6 +269,8 @@ export const istanbul: SeedCity = {
           explanation: 'Doğru! Galata Kulesi’nin tepesine çıktılar.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Evler neden minicik kutulara benziyordu?',
           options: [
             'Evler çok küçük yapıldığı için',
@@ -248,6 +282,8 @@ export const istanbul: SeedCity = {
           explanation: 'Aferin! Yüksekten bakınca her şey küçük görünür.',
         },
         {
+          type: QuestionType.DUYGU_KARAKTER,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Deniz kulenin tepesinde kendini nasıl hissetti?',
           options: ['Uykulu', 'Sıkılmış', 'Kuş gibi'],
           correctIndex: 2,
@@ -277,6 +313,8 @@ export const istanbul: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Zeynep ile annesi Kapalıçarşı’ya neden gitti?',
           options: [
             'Lamba tamir ettirmek için',
@@ -288,6 +326,8 @@ export const istanbul: SeedCity = {
           explanation: 'Doğru! Babaanneye hediye almaya gitmişlerdi.',
         },
         {
+          type: QuestionType.CUMLEDE_ANLAM,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: '“Zeynep’in kalbi hızlı hızlı çarptı.” Bu cümle ne anlatıyor?',
           options: ['Zeynep bir an endişelendi', 'Zeynep koşu yapıyordu', 'Zeynep çok uykuluydu'],
           correctIndex: 0,
@@ -295,6 +335,8 @@ export const istanbul: SeedCity = {
           explanation: 'Aferin! Annesini göremeyince Zeynep bir an endişelendi.',
         },
         {
+          type: QuestionType.ANA_FIKIR,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Bu hikâyeden ne öğreniyoruz?',
           options: [
             'Çarşıda hiç durmamayı',
@@ -329,6 +371,8 @@ export const istanbul: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Ali ve ailesi kime gidiyordu?',
           options: ['Dedesine', 'Amcasına', 'Teyzesine'],
           correctIndex: 2,
@@ -336,6 +380,8 @@ export const istanbul: SeedCity = {
           explanation: 'Doğru! Teyzelerini ziyarete gidiyorlardı.',
         },
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Boğaz Köprüsü neleri birbirine bağlıyor?',
           options: ['İki kıtayı', 'İki adayı', 'İki dağı'],
           correctIndex: 0,
@@ -343,6 +389,8 @@ export const istanbul: SeedCity = {
           explanation: 'Aferin! Köprü, Asya ile Avrupa kıtalarını birbirine bağlar.',
         },
         {
+          type: QuestionType.ANA_FIKIR,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Ali köprüler hakkında ne düşündü?',
           options: [
             'Çok gürültülü olduklarını',
@@ -376,6 +424,8 @@ export const istanbul: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Pırıl İstanbul’dan sonra hangi şehre uğrayacak?',
           options: ['Ankara’ya', 'İzmir’e', 'Antalya’ya'],
           correctIndex: 1,
@@ -383,6 +433,8 @@ export const istanbul: SeedCity = {
           explanation: 'Doğru! Pırıl önce İzmir’e uğrayacak.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Pamuk, Pırıl’a neden nereli olduğunu sordu?',
           options: [
             'Pırıl’ın gözleri farklı renkte olduğu için',
@@ -395,6 +447,8 @@ export const istanbul: SeedCity = {
             'Aferin! Van kedilerinin gözleri farklı renkte olabilir; Pamuk bunu fark etti.',
         },
         {
+          type: QuestionType.DUYGU_KARAKTER,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Pırıl ayrılırken arkadaşları için ne hissediyordu?',
           options: [
             'Onlara kızgındı',

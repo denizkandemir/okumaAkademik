@@ -1,9 +1,10 @@
-import { LessonKind } from '../../src/generated/prisma/enums.js';
+import { GradeBand, LessonKind } from '../../src/generated/prisma/enums.js';
 import { antalya } from './antalya.js';
 import { efes } from './efes.js';
 import { istanbul } from './istanbul.js';
 import { izmir } from './izmir.js';
 import { kapadokya } from './kapadokya.js';
+import { placementReadings } from './placement.js';
 import type { SeedCity, SeedStoryLesson, SeedText } from './types.js';
 import { van } from './van.js';
 
@@ -30,8 +31,16 @@ export const seedLessonRows = seedCities.flatMap(({ city, lessons }) =>
     kind: lesson.kind,
     title: lesson.title,
     summary: lesson.summary,
-    textId: lesson.kind === LessonKind.STORY ? lesson.text.id : null,
   })),
+);
+
+/** Hikâye derslerinin metinleri; mevcut hikâyeler G2 (3-4. sınıf) varyantıdır. */
+export const seedLessonTextRows = seedCities.flatMap(({ lessons }) =>
+  lessons.flatMap((lesson) =>
+    lesson.kind === LessonKind.STORY
+      ? [{ lessonId: lesson.id, gradeBand: GradeBand.G2, textId: lesson.text.id }]
+      : [],
+  ),
 );
 
 export const seedQuestionRows = stories.flatMap((story) =>
@@ -44,4 +53,17 @@ export const seedQuestionRows = stories.flatMap((story) =>
 
 export const seedGlossaryRows = stories.flatMap((story) =>
   story.glossary.map((entry) => ({ textId: story.text.id, ...entry })),
+);
+
+/** Seviye belirleme metinleri (yolculukta ve kitaplıkta yok); ayrıntı placement.ts. */
+export const seedPlacementTexts: SeedText[] = placementReadings.map(({ text }) => text);
+
+export const seedPlacementRows = placementReadings.map(({ gradeBand, position, text }) => ({
+  gradeBand,
+  position,
+  textId: text.id,
+}));
+
+export const seedPlacementQuestionRows = placementReadings.flatMap(({ text, questions }) =>
+  questions.map((question, index) => ({ textId: text.id, position: index + 1, ...question })),
 );

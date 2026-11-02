@@ -2,11 +2,13 @@ import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 
 import { Errors } from '../../lib/errors.js';
+import { gradeBandOf } from '../../lib/grade-band.js';
 import { toApiLevel } from '../../lib/reading-level.js';
 import { startOfDayInTimeZone } from '../../lib/time.js';
 import { parse } from '../../lib/validation.js';
 import { requireAuth } from '../../plugins/auth.js';
 import { loadJourneyState, lockedTextIds } from '../journey/journey-state.js';
+import { writeReadingMetric } from './reading-metrics.js';
 
 /** İstemcinin bildirdiği süre, oturum başlangıcından bu yana geçen süreyi en fazla bu kadar aşabilir. */
 const DURATION_SLACK_SECONDS = 60;
@@ -39,7 +41,9 @@ export async function progressRoutes(app: FastifyInstance) {
 
     const text = await prisma.text.findUnique({ where: { id: textId }, select: { id: true } });
     if (!text) throw Errors.notFound('Bu metni bulamadık.');
-    if (lockedTextIds(await loadJourneyState(prisma, user.id)).has(textId)) {
+    if (
+      lockedTextIds(await loadJourneyState(prisma, user.id, gradeBandOf(user.grade))).has(textId)
+    ) {
       throw Errors.lessonLocked();
     }
 
@@ -82,11 +86,20 @@ export async function progressRoutes(app: FastifyInstance) {
       const progress = completed ? 1 : Math.max(existing.progress, input.progress);
       const endedAt = existing.completed ? existing.endedAt : now;
 
-      return tx.readingSession.update({
+      const updated = await tx.readingSession.update({
         where: { id: existing.id },
         data: { durationSeconds, progress, completed, endedAt },
         select: { id: true, progress: true, durationSeconds: true, completed: true },
       });
+      // Okuma bitti: hız ölçümü (anlama yok). Ders okumasında soruları ders tamamlama ekler.
+      if (completed && !existing.completed) {
+        await writeReadingMetric(tx, {
+          readingSessionId: existing.id,
+          gradeBand: gradeBandOf(user.grade),
+          onlyIfMissing: true,
+        });
+      }
+      return updated;
     });
   });
 
@@ -99,8 +112,9 @@ export async function progressRoutes(app: FastifyInstance) {
         where: { userId: user.id, startedAt: { gte: dayStart } },
         _sum: { durationSeconds: true },
       }),
+      // Yarım kalan seviye belirleme okuması kitaplıktan "devam et" ile açılmaz.
       prisma.readingSession.findMany({
-        where: { userId: user.id },
+        where: { userId: user.id, text: { placementText: { is: null } } },
         orderBy: { startedAt: 'desc' },
         take: RECENT_SESSIONS_LIMIT,
         select: {

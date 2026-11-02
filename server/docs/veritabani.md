@@ -35,12 +35,16 @@ erDiagram
     users ||--o{ auth_sessions : "giriş yapar"
     users ||--o{ reading_sessions : "okur"
     texts ||--o{ reading_sessions : "okunur"
-    texts |o--o| lessons : "hikâyesi"
+    lessons ||--o{ lesson_texts : "grup metinleri"
+    texts ||--o| lesson_texts : "okutulur"
     texts ||--o{ questions : "soruları"
     texts ||--o{ glossary_entries : "kelimeleri"
     users ||--o{ question_attempts : "cevaplar"
     questions ||--o{ question_attempts : "cevaplanır"
     reading_sessions ||--o{ question_attempts : "sırasında"
+    reading_sessions ||--o| reading_metrics : "ölçümü"
+    texts ||--o| placement_texts : "seviye belirlemede"
+    users ||--o{ user_baselines : "başlangıç ölçümü"
     users ||--o{ lesson_completions : "bitirir"
     lessons ||--o{ lesson_completions : "bitirilir"
     reading_sessions |o--o{ lesson_completions : "ilk okuma"
@@ -74,6 +78,10 @@ erDiagram
         text_array paragraphs
         int min_grade "1-8"
         int max_grade "1-8"
+        int word_count "seed hesaplar"
+        int sentence_count
+        float avg_sentence_length "kelime/cümle"
+        float atesman_score "yüksek = kolay"
         timestamptz created_at
         timestamptz updated_at
     }
@@ -95,17 +103,24 @@ erDiagram
         lesson_kind kind "STORY | CHEST"
         text title
         text summary
-        text text_id FK,UK "hikâyede zorunlu"
         timestamptz created_at
         timestamptz updated_at
+    }
+    lesson_texts {
+        text lesson_id PK,FK
+        grade_band grade_band PK "G1-G4"
+        text text_id FK,UK
     }
     questions {
         text id PK
         text text_id FK
         int position "1-3"
         text prompt
-        text_array options "tam 3"
-        int correct_index "0-2"
+        text_array options "3-4"
+        int correct_index "şıklardan biri"
+        question_type type "Q1-Q13"
+        cognitive_level cognitive_level
+        text meb_outcome_code "boş olabilir"
         text hint
         text explanation
         timestamptz created_at
@@ -122,9 +137,36 @@ erDiagram
         text user_id FK
         text question_id FK
         text reading_session_id FK
-        int choice_index "0-2"
+        int choice_index "0-3"
         boolean correct
         timestamptz created_at
+    }
+    reading_metrics {
+        text reading_session_id PK,FK
+        grade_band grade_band
+        int word_count
+        int duration_seconds
+        float words_per_minute "süre 0 ise boş"
+        int questions_total "kitaplıkta boş"
+        int first_try_correct "kitaplıkta boş"
+        float comprehension "0-1, kitaplıkta boş"
+        boolean rushed
+        timestamptz created_at
+        timestamptz updated_at
+    }
+    placement_texts {
+        grade_band grade_band PK
+        int position PK "1-2"
+        text text_id FK,UK
+    }
+    user_baselines {
+        text id PK
+        text user_id FK
+        int grade "1-8"
+        grade_band grade_band
+        float words_per_minute "> 0"
+        float comprehension "0-1"
+        timestamptz measured_at
     }
     lesson_completions {
         text id PK
@@ -150,11 +192,16 @@ erDiagram
 - Bir kullanıcının birden çok **giriş oturumu** (farklı cihazlar) ve birden çok **okuma kaydı**
   olabilir.
 - Bir metin birçok kez okunabilir; her açılış yeni bir `reading_sessions` satırıdır.
-- Her hikâye dersinin bir metni vardır; bir metin en fazla bir derse aittir. Yolculukta olmayan
-  metinler yalnızca kitaplıkta okunur.
+- Her hikâye dersinin sınıf grubuna göre metinleri vardır (`lesson_texts`); her hikâyenin en az G2
+  metni vardır, bir metin en fazla bir derse aittir. Çocuğa kendi grubunun metni, yoksa G2 metni
+  okutulur. Yolculukta olmayan metinler yalnızca kitaplıkta okunur; seviye belirleme metinleri
+  (`placement_texts`) ne yolculukta ne kitaplıkta görünür.
+- Biten her okumanın bir `reading_metrics` satırı olur (okuma silinince o da silinir).
+- Bir kullanıcının birden çok seviye belirleme sonucu (`user_baselines`) olabilir; en yenisi
+  geçerlidir.
 - Yabancı anahtarların çoğu `ON DELETE CASCADE`'dir: kullanıcı silinince oturumları, okumaları,
   cevapları, ders tamamlamaları ve lokumları; metin silinince okumaları, soruları ve kelimeleri de
-  silinir. İstisnalar `ON DELETE SET NULL`'dur: `lessons.text_id`,
+  silinir. İstisnalar `ON DELETE SET NULL`'dur:
   `lesson_completions.reading_session_id` ve `lokum_entries.lesson_id` (lokum defteri ders
   silinse de kaybolmaz).
 
@@ -199,6 +246,10 @@ yani veritabanını gören biri token'ı kullanamaz.
 | `theme`                   | `text_theme` enum'u: hikâyenin teması (ör. `ARKADASLIK`)                            |
 | `paragraphs`              | Paragraflar, sırasıyla (`text[]`)                                                   |
 | `min_grade` / `max_grade` | Metnin uygun olduğu sınıf aralığı; kullanıcının `grade`'i bu aralıktaysa listelenir |
+| `word_count`              | Kelime sayısı                                                                       |
+| `sentence_count`          | Cümle sayısı                                                                        |
+| `avg_sentence_length`     | Ortalama cümle uzunluğu (kelime / cümle, 2 ondalık)                                 |
+| `atesman_score`           | Ateşman okunabilirlik puanı (1 ondalık); yüksek puan kolay metin demektir           |
 
 API seviyeyi sayı olarak döner (`BASLANGIC`=1, `ORTA`=2, `ILERI`=3). Dönüşüm yalnızca
 [`src/lib/reading-level.ts`](../src/lib/reading-level.ts)'te yapılır. Enum değerlerinin sırası
@@ -212,8 +263,20 @@ okunarak seçilir ve seed verisinde (`prisma/seed-data/*.ts`) yazılıdır. Kolo
 `*_text_theme` migration'ı mevcut metinleri aynı eşlemeyle doldurur; `test/seed-data.test.ts`
 ikisinin aynı kaldığını denetler.
 
+**Metin ölçüleri** seed'de [`src/lib/readability.ts`](../src/lib/readability.ts) ile paragraflardan
+hesaplanır (`test/seed-data.test.ts` aynı olduklarını denetler); seed'den önce boştur.
+
+- Kelime: harf ya da rakam içeren her boşlukla ayrılmış parça.
+- Cümle: `.`, `!`, `?` ya da `…` ile biter, ardından paragraf sonu ya da büyük harf gelir
+  (`“Geleceğiz!” dedi.` tek cümledir). Her paragraf en az bir cümledir.
+- Hece: ünlü sayısı (Türkçede hece = ünlü; `İ`/`I` Türkçe kurala göre küçültülür).
+- **Ateşman (1997):** `198,825 − 40,175 × (hece / kelime) − 2,610 × (kelime / cümle)`.
+  Aralıklar: 90-100 çok kolay, 70-89 kolay, 50-69 orta güçlükte, 30-49 zor, 1-29 çok zor. Kaynak
+  ve doğrulama notu kodun başındaki yorumda. Mevcut 48 hikâye 53,5-89 arasında (ortalama 78,5).
+
 Kısıtlar: `texts_estimated_minutes_positive_check` (> 0), `texts_grade_range_check`
-(1 ≤ `min_grade` ≤ `max_grade` ≤ 8).
+(1 ≤ `min_grade` ≤ `max_grade` ≤ 8), `texts_word_count_check`, `texts_sentence_count_check`,
+`texts_avg_sentence_length_check` (boş ya da pozitif).
 
 ### `reading_sessions` — okuma kayıtları
 
@@ -248,27 +311,59 @@ paragraf, 90-180 kelime, 3 soru × 3 şık, metinde geçen 2-3 kelime anlamı, t
 | `position` | Şehir içindeki sıra, 1-10 (`order` SQL anahtar kelimesi olduğu için kullanılmadı) |
 | `kind`     | `lesson_kind` enum'u: `STORY` veya `CHEST`                                        |
 | `summary`  | Ders kartında görünen tek cümle                                                   |
-| `text_id`  | Hikâyenin metni; hikâyede zorunlu, sandıkta boş. Tekil                            |
 
 API şehri küçük harfli kimlik olarak döner (`ISTANBUL` → `istanbul`); dönüşüm yalnızca
 [`src/lib/city.ts`](../src/lib/city.ts)'te yapılır.
 
-Kısıtlar: `lessons_city_position_key` (şehirde her sıra bir kez), `lessons_text_id_key`,
-`lessons_position_range_check` (1-10), `lessons_story_text_check` (hikâyenin metni var, sandığın yok).
+Kısıtlar: `lessons_city_position_key` (şehirde her sıra bir kez), `lessons_position_range_check`
+(1-10). Hikâyenin metni `lesson_texts`'tedir.
+
+### `lesson_texts` — dersin sınıf grubu metinleri
+
+Yolculuk dersi (şehir, sıra, başlık) herkes için aynıdır; metni ve soruları sınıf grubuna göre
+farklı olabilir. Birincil anahtar `(lesson_id, grade_band)`; `text_id` tekildir (bir metin tek bir
+derse aittir). Sandıkların satırı yoktur.
+
+| Kolon        | Açıklama                                                                   |
+| ------------ | -------------------------------------------------------------------------- |
+| `lesson_id`  | Ders                                                                       |
+| `grade_band` | `grade_band` enum'u: `G1` (1-2. sınıf), `G2` (3-4), `G3` (5-6), `G4` (7-8) |
+| `text_id`    | Bu grupta okutulan metin; soruları ve kelime anlamları metne bağlıdır      |
+
+- Mevcut 48 hikâye **G2** metnidir. Diğer grupların metinleri A3'te üretilecek.
+- Çocuğa kendi grubunun metni, o grupta metin yoksa G2 metni okutulur (`GET /lessons/:id` metinde
+  `gradeBand` döner; haritadaki tema ve süre de bu metinden).
+- Sınıf → grup eşlemesi yalnızca [`src/lib/grade-band.ts`](../src/lib/grade-band.ts)'tedir.
+- Okuma, dersin herhangi bir grubundaki metne ait olabilir (okurken sınıf değişirse akış bozulmaz);
+  kilitli dersin bütün grup metinleri kitaplıkta görünmez ve açılamaz.
+- Seed, artık olmayan `(ders, grup)` satırlarını siler; ders kimlikleri değişmemelidir.
 
 ### `questions` — anlama soruları
 
-| Kolon           | Açıklama                                            |
-| --------------- | --------------------------------------------------- |
-| `text_id`       | Sorunun metni                                       |
-| `position`      | Metindeki sıra, 1-3                                 |
-| `options`       | Tam 3 şık (`text[]`), ekrandaki sırasıyla (A, B, C) |
-| `correct_index` | Doğru şık (0-2). **İstemciye gönderilmez**          |
-| `hint`          | Yanlış cevaptan sonra gösterilen ipucu              |
-| `explanation`   | Doğru cevaptan sonra gösterilen açıklama            |
+| Kolon              | Açıklama                                                                    |
+| ------------------ | --------------------------------------------------------------------------- |
+| `text_id`          | Sorunun metni                                                               |
+| `position`         | Metindeki sıra, 1-3                                                         |
+| `options`          | 3 ya da 4 şık (`text[]`), ekrandaki sırasıyla (A, B, C, D)                  |
+| `correct_index`    | Doğru şık (0'dan başlar). **İstemciye gönderilmez**                         |
+| `type`             | `question_type` enum'u: soru türü Q1-Q13 (aşağıda)                          |
+| `cognitive_level`  | `cognitive_level` enum'u: `HATIRLAMA`, `ANLAMA`, `CIKARIM`, `DEGERLENDIRME` |
+| `meb_outcome_code` | MEB Türkçe programı kazanım kodu; şimdilik hepsi boş                        |
+| `hint`             | Yanlış cevaptan sonra gösterilen ipucu                                      |
+| `explanation`      | Doğru cevaptan sonra gösterilen açıklama                                    |
+
+Soru türleri ([`docs/yapay-zeka/02-egzersiz-katalogu.md`](../../docs/yapay-zeka/02-egzersiz-katalogu.md)
+§3): `BILGI` (Q1), `SIRALAMA`, `SOZCUK_ANLAMI`, `NEDEN_SONUC`, `DUYGU_KARAKTER`, `ANA_FIKIR`,
+`YARDIMCI_FIKIR`, `BASLIK`, `CUMLEDE_ANLAM`, `PARAGRAF_YAPISI`, `SOZEL_MANTIK`, `GORSEL_OKUMA`,
+`ONCULLU_YORUM` (Q13). Mevcut 144 soru tek tek okunarak etiketlendi (seed-data): 57 bilgi, 37
+neden-sonuç, 18 duygu-karakter, 13 ana fikir, 11 sözcük anlamı, 7 cümlede anlam (mecaz, deyim,
+benzetme), 1 sözel mantık. Kolonları ekleyen `*_question_labels` migration'ı mevcut soruları aynı
+eşlemeyle doldurur; `test/seed-data.test.ts` ikisinin aynı kaldığını denetler. Şık sayısı G1-G2'de
+3, G3-G4'te 4 olacak (LGS biçimi).
 
 Kısıtlar: `questions_text_id_position_key`, `questions_position_range_check` (1-3),
-`questions_options_count_check` (tam 3 şık), `questions_correct_index_range_check` (0-2).
+`questions_options_count_check` (3-4 şık), `questions_correct_index_range_check` (şıklardan
+biri), `questions_meb_outcome_code_check` (boş metin olamaz).
 
 ### `glossary_entries` — kelime anlamları
 
@@ -281,8 +376,90 @@ Okurken mor renkli kelimeye dokununca Pırıl'ın söylediği anlam. `word` meti
 lokumu, kullanıcının her soruya **hangi okumada olursa olsun** verdiği ilk cevap belirler: yanlış
 cevaptan sonra sorulardan çıkıp hikâyeyi yeniden okumak o soruyu "ilk denemede doğru" yapmaz.
 Tekrar oynamada (ders bitmişken) yıldız yalnızca o okumanın (`reading_session_id`) ilk cevaplarına
-bakar. Index'ler: `question_attempts_reading_session_id_question_id_idx`,
+bakar. `choice_index` 0-3 (`question_attempts_choice_index_range_check`); sunucu ayrıca sorunun
+şık sayısını aşan seçimi reddeder. Index'ler: `question_attempts_reading_session_id_question_id_idx`,
 `question_attempts_user_id_idx`.
+
+### `reading_metrics` — okuma ölçümleri
+
+Biten her okuma için bir satır (`reading_session_id` birincil anahtar). Hız **hiçbir zaman tek
+başına** değerlendirilmez; her zaman anlamayla birlikte okunur
+([`01-arastirma.md`](../../docs/yapay-zeka/01-arastirma.md) §4).
+
+| Kolon               | Açıklama                                                                |
+| ------------------- | ----------------------------------------------------------------------- |
+| `grade_band`        | Okuma anında çocuğun sınıf grubu (acele tavanı buna göre)               |
+| `word_count`        | Metnin kelime sayısı                                                    |
+| `duration_seconds`  | Okuma süresi (okuma kaydındaki)                                         |
+| `words_per_minute`  | `word_count × 60 / duration_seconds` (1 ondalık); süre 0 ise boş        |
+| `questions_total`   | Soru sayısı; kitaplık okumasında boş                                    |
+| `first_try_correct` | İlk denemede doğru (yıldızla aynı kural, bkz. Oyun kuralları)           |
+| `comprehension`     | `first_try_correct / questions_total` (2 ondalık); kitaplıkta boş       |
+| `rushed`            | Acele okuma: hız grubun tavanının **üstünde ve** anlama 0,6'nın altında |
+
+- **Ne zaman yazılır:** okuma bitince (`PATCH /reading-sessions/:id`, `completed` ilk kez
+  `true`) anlamasız bir satır; ders bitince (`POST /lessons/:id/complete`) aynı satır sorularla
+  yeniden yazılır. Yanıtı kaybolan tamamlama aynı satırı yazar; geç gelen bir PATCH soruları
+  silmez. Bitmemiş okuma ölçülmez.
+- **Acele tavanı** (kelime/dk): G1 120, G2 160, G3 200, G4 240
+  ([`src/lib/grade-band.ts`](../src/lib/grade-band.ts)). Araştırmadaki sınıf aralıklarının üst
+  ucunun yaklaşık 1,5-2 katı; kendi verimizle ayarlanacak.
+- Hesap [`src/lib/reading-metrics.ts`](../src/lib/reading-metrics.ts)'te (saf, birim testli).
+
+Kısıtlar: `reading_metrics_word_count_check`, `reading_metrics_duration_check`,
+`reading_metrics_wpm_check` (yalnızca süre 0 iken boş), `reading_metrics_questions_check` (soru
+alanları birlikte boş ya da tutarlı), `reading_metrics_rushed_check` (acele yalnızca anlama
+ölçüldüyse).
+
+### `placement_texts` — seviye belirleme metinleri
+
+"Pırıl seni tanımak istiyor!" okumasının metinleri: her sınıf grubunda sırayla okunan 2 kısa
+metin (60-120 kelime, 3 etiketli soru). Birincil anahtar `(grade_band, position)`; `text_id`
+tekildir. Metinler, soruları ve cevapları normal `texts`, `questions` ve `question_attempts`
+satırlarıdır; böylece okuma ölçümü ve soru türü raporları aynı yoldan çalışır.
+
+| Kolon        | Açıklama                            |
+| ------------ | ----------------------------------- |
+| `grade_band` | Sınıf grubu (`G1`-`G4`)             |
+| `position`   | Okuma sırası (1-2)                  |
+| `text_id`    | Okutulan metin (`seviye-g2-…` gibi) |
+
+- İçerik [`prisma/seed-data/placement.ts`](../prisma/seed-data/placement.ts)'te; öğretmen onayı
+  için okunabilir hâli [`docs/icerik/onay/seviye-belirleme.md`](../../docs/icerik/onay/seviye-belirleme.md).
+- Ateşman puanı grubun hedef aralığında olmalı (`ATESMAN_TARGET`,
+  [`src/lib/grade-band.ts`](../src/lib/grade-band.ts)): G1 85-100, G2 70-89, G3 60-79, G4 50-69.
+  Test bunu denetler. G1-G2'de 3, G3-G4'te 4 şık.
+- `GET /texts` ve `GET /me/progress` ("devam et") bu metinleri göstermez.
+
+Kısıt: `placement_texts_position_check` (sıra 1 ya da 2).
+
+### `user_baselines` — seviye belirleme sonuçları
+
+Çocuğun başlangıç hızı ve anlaması; gelişim buna göre ölçülür. Her seviye belirleme yeni bir
+satırdır (geçmiş silinmez), en yenisi geçerlidir.
+
+| Kolon              | Açıklama                                                          |
+| ------------------ | ----------------------------------------------------------------- |
+| `user_id`          | Ölçülen kullanıcı                                                 |
+| `grade`            | Ölçüm anındaki sınıf                                              |
+| `grade_band`       | Ölçüm anındaki sınıf grubu                                        |
+| `words_per_minute` | İki metnin toplam kelimesi × 60 / toplam okuma süresi (1 ondalık) |
+| `comprehension`    | Altı sorunun ilk denemede doğru oranı (2 ondalık)                 |
+| `measured_at`      | Ölçüm zamanı                                                      |
+
+- **Akış:** `GET /placement` grubun 2 metnini ve sorularını (cevapsız) döner. Okuma her zamanki
+  gibi `POST /reading-sessions` ve `PATCH /reading-sessions/:id` ile, cevaplar
+  `POST /placement/answers` ile (ders cevabıyla aynı gövde ve yanıt, lokum 0) kaydedilir.
+  `POST /placement/complete { readingSessionIds }` iki metnin de bitmiş okumasını ve her soruya
+  bir cevap ister; her okumanın `reading_metrics` satırını sorularla yeniden yazar ve bir
+  `user_baselines` satırı ekler. Yanıtı kaybolan istek yeniden gelirse (okumalardan sonra yazılmış
+  bir sonuç varsa) aynı sonuç döner.
+- `GET /me` `needsPlacement` döner: kullanıcının sonucu yoksa ve grubunun metinleri varsa `true`.
+  Uygulama bunu kullanıcı başına (cihazda) bir kez önerir; "Sonra yapalım" ile atlanır, yolculuk
+  hiçbir zaman beklemez.
+
+Kısıtlar: `user_baselines_grade_check`, `user_baselines_wpm_check` (> 0),
+`user_baselines_comprehension_check` (0-1).
 
 ### `lesson_completions` — bitirilen dersler
 
@@ -334,9 +511,9 @@ Kaynak: [`docs/tasarim/README.md`](../../docs/tasarim/README.md) "Oyun kurallar�
 
 ## Rapor görünümleri (view)
 
-Salt-okunur, SQL araçlarından hızlı bakış içindir; uygulama kullanmaz. Şifre ve token hash'leri
-hiçbir görünümde yoktur. Zaman kolonları **Türkiye saatiyle**, saniyeye yuvarlanmış olarak
-gösterilir.
+Salt-okunur, SQL araçlarından hızlı bakış içindir. Uygulama yalnızca öğrenci özetlerini
+`GET /me/metrics` üzerinden okur. Şifre ve token hash'leri hiçbir görünümde yoktur. Zaman
+kolonları **Türkiye saatiyle**, saniyeye yuvarlanmış olarak gösterilir.
 
 ### `v_user_summary` — kullanıcı özeti
 
@@ -388,6 +565,76 @@ Her kullanıcı için bir satır. Değerler koddakiyle aynı kurallarla SQL'de t
 | `current_streak`            | Şu anki seri (gün); bugün okunmadıysa dünden sayılır |
 | `last_read_at`              | Son okuma zamanı (Türkiye saati)                     |
 
+### `v_reading_metrics` — ölçülen okumalar
+
+`reading_metrics`'in okunabilir hâli (kullanıcı adı, gün, metin başlığı), en yeniden eskiye.
+Aşağıdaki özetlerin kaynağıdır.
+
+### `v_reading_results_by_type` — soru türüne göre sonuç
+
+Okuma × soru türü başına bir satır: `questions_answered`, `first_try_correct` (bu okumadaki ilk
+cevabı doğru olan), `wrong_attempts` (yanlış cevap sayısı). Not: burada ilk deneme **o okumanın**
+ilk cevabıdır; yıldızdaki "dersin ilk tamamlanışından önceki ilk cevap" kuralı değil.
+
+### `v_student_daily`, `v_student_weekly`, `v_student_monthly` — öğrenci özetleri
+
+Yalnızca biten, ölçülen okumalar. Gün Türkiye saatiyle okumanın **başladığı** gündür; hafta
+pazartesi başlar (`week_start`), ay takvim ayıdır (`month_start`).
+
+| Kolon           | Açıklama                                                             |
+| --------------- | -------------------------------------------------------------------- |
+| `read_minutes`  | Biten okumaların süresi (dakika, 1 ondalık)                          |
+| `text_count`    | Farklı metin sayısı                                                  |
+| `reading_count` | Biten okuma sayısı                                                   |
+| `median_wpm`    | Dakikadaki kelimenin ortancası                                       |
+| `comprehension` | Toplam ilk denemede doğru / toplam soru (sorulu okumalar); yoksa boş |
+| `rushed_count`  | Acele okuma sayısı                                                   |
+
+Haftalık ve aylık görünümlerde ayrıca önceki dönemin değerleri (`prev_read_minutes`,
+`prev_median_wpm`, `prev_comprehension`) ve değişim (`read_minutes_change`, `median_wpm_change`,
+`comprehension_change`) vardır. Önceki dönemde okuma yoksa önceki değerler ve hız/anlama değişimi
+boştur (süre değişimi bu durumda süreyle aynıdır).
+
+Başlangıca göre değişim: `baseline_wpm`, `baseline_comprehension` (dönemin sonuna kadar yapılmış en
+son seviye belirleme; sonradan yapılan ölçüm eski dönemleri değiştirmez), `median_wpm_vs_baseline`
+ve `comprehension_vs_baseline`. Seviye belirleme yoksa bu dört kolon boştur.
+
+**`GET /me/metrics?period=day|week|month`** (varsayılan `week`) bu görünümleri kullanıcı adıyla
+okur ve şu anki ile önceki dönemi döner:
+
+```json
+{
+  "period": "week",
+  "current": {
+    "start": "2026-10-26",
+    "readMinutes": 14.5,
+    "textCount": 4,
+    "readingCount": 7,
+    "medianWpm": 93.2,
+    "comprehension": 0.9,
+    "rushedCount": 0
+  },
+  "previous": {
+    "start": "2026-10-19",
+    "readMinutes": 6,
+    "textCount": 3,
+    "readingCount": 3,
+    "medianWpm": 82.1,
+    "comprehension": 0.78,
+    "rushedCount": 0
+  },
+  "baseline": {
+    "gradeBand": "G2",
+    "wordsPerMinute": 67.4,
+    "comprehension": 0.67,
+    "measuredAt": "2026-09-20T14:00:00.000Z"
+  }
+}
+```
+
+Dönemde okuma yoksa sayılar 0, `medianWpm` ve `comprehension` null. `baseline` en son seviye
+belirleme sonucudur (`user_baselines`); hiç yapılmadıysa null.
+
 Örnek sorgular:
 
 ```sql
@@ -425,6 +672,45 @@ FROM (
 JOIN questions q ON q.id = first.question_id
 GROUP BY q.id
 ORDER BY ilk_deneme_yanlis_yuzde DESC;
+
+-- Bir öğrencinin haftalık hız ve anlama gelişimi
+SELECT week_start, reading_count, median_wpm, comprehension, rushed_count, median_wpm_change
+FROM v_student_weekly
+WHERE username = 'demo.izmir'
+ORDER BY week_start;
+
+-- Bir öğrencinin zayıf olduğu soru türleri (ilk denemede doğru oranı en düşük olanlar)
+SELECT question_type, sum(questions_answered) AS soru,
+       round(sum(first_try_correct)::numeric / sum(questions_answered), 2) AS ilk_deneme_dogru
+FROM v_reading_results_by_type
+WHERE username = 'demo.izmir'
+GROUP BY question_type
+ORDER BY ilk_deneme_dogru;
+
+-- Başlangıca (seviye belirleme) göre haftalık gelişim
+SELECT week_start, median_wpm, baseline_wpm, median_wpm_vs_baseline,
+       comprehension, baseline_comprehension, comprehension_vs_baseline
+FROM v_student_weekly
+WHERE username = 'demo.izmir'
+ORDER BY week_start;
+
+-- Seviye belirleme sonuçları (tekrarlar dahil), en yeniden eskiye
+SELECT u.username, b.grade, b.grade_band, b.words_per_minute, b.comprehension,
+       b.measured_at AT TIME ZONE 'Europe/Istanbul' AS zaman
+FROM user_baselines b
+JOIN users u ON u.id = b.user_id
+ORDER BY b.measured_at DESC;
+
+-- Acele okumalar
+SELECT username, reading_date, text_title, words_per_minute, comprehension
+FROM v_reading_metrics
+WHERE rushed
+ORDER BY reading_date DESC;
+
+-- Okunabilirliği en düşük (en zor) metinler
+SELECT id, word_count, sentence_count, avg_sentence_length, atesman_score
+FROM texts
+ORDER BY atesman_score;
 ```
 
 ## Demo kullanıcılar (yalnızca geliştirme)
@@ -441,17 +727,32 @@ diye diğer durumlarda bu kısım bir mesajla atlanır. İçerik (metinler, ders
 eşitlenir. Not: ders kimliği değişirse seed eski dersi siler ve kullanıcıların o dersteki
 tamamlamaları da silinir.
 
-| Kullanıcı        | Bitirilen ders | Seviye | Şehir     | Seri | Not                             |
-| ---------------- | -------------- | ------ | --------- | ---- | ------------------------------- |
-| `demo.istanbul`  | 4              | 3      | İstanbul  | 6    | Bugün okumadı: seri tehlikede   |
-| `demo.sehir`     | 9              | 5      | İstanbul  | 5    | 10. ders: seviye atlama + İzmir |
-| `demo.donus`     | 6              | 4      | İstanbul  | 0    | 3 gündür okumadı: geri dönüş    |
-| `demo.izmir`     | 14             | 8      | İzmir     | 9    |                                 |
-| `demo.efes`      | 22             | 12     | Efes      | 14   | Bugün okumadı: seri tehlikede   |
-| `demo.antalya`   | 32             | 17     | Antalya   | 21   |                                 |
-| `demo.kapadokya` | 42             | 22     | Kapadokya | 28   |                                 |
-| `demo.van`       | 54             | 28     | Van       | 35   |                                 |
-| `demo.final`     | 60             | 30     | Van       | 42   | Yolculuk bitti (`finished`)     |
+| Kullanıcı        | Bitirilen ders | Seviye | Şehir     | Seri | Zayıf tür      | Not                             |
+| ---------------- | -------------- | ------ | --------- | ---- | -------------- | ------------------------------- |
+| `demo.istanbul`  | 4              | 3      | İstanbul  | 6    | NEDEN_SONUC    | Bugün okumadı: seri tehlikede   |
+| `demo.sehir`     | 9              | 5      | İstanbul  | 5    | SOZCUK_ANLAMI  | 10. ders: seviye atlama + İzmir |
+| `demo.donus`     | 6              | 4      | İstanbul  | 0    | DUYGU_KARAKTER | 3 gündür okumadı: geri dönüş    |
+| `demo.izmir`     | 14             | 8      | İzmir     | 9    | ANA_FIKIR      | 1 acele okuma                   |
+| `demo.efes`      | 22             | 12     | Efes      | 14   | CUMLEDE_ANLAM  | Bugün okumadı; 3 acele okuma    |
+| `demo.antalya`   | 32             | 17     | Antalya   | 21   | NEDEN_SONUC    |                                 |
+| `demo.kapadokya` | 42             | 22     | Kapadokya | 28   | SOZCUK_ANLAMI  |                                 |
+| `demo.van`       | 54             | 28     | Van       | 35   | ANA_FIKIR      | 1 acele okuma                   |
+| `demo.final`     | 60             | 30     | Van       | 42   | DUYGU_KARAKTER | Yolculuk bitti (`finished`)     |
+
+**Okuma geçmişi (A0):** son 6 haftaya yayılır. Seriden önceki haftalarda haftada üç seyrek gün
+okunur (art arda iki gün yok, serinin bir gün öncesi boş; seri ve en iyi seri değişmez), sonra seri
+günleri. Dersler bu günlere sırayla düşer; ders düşmeyen günlerde son hikâye sorularıyla yeniden
+okunur. Süreler kullanıcının dakikadaki kelime eğrisinden (6 haftada ör. 70 → 92, ±%8 gürültü)
+hesaplanır. Yanlış ilk cevaplar çoğunlukla zayıf türe düşer; yıldız ve lokum kuralları değişmez.
+Her biten okumanın `reading_metrics` satırı vardır. Her demo kullanıcının, geçmişin başlangıcından
+bir gün önce yapılmış bir seviye belirleme sonucu vardır (hız 6 hafta önceki eğrinin biraz altında,
+anlama 0,67 ya da 0,83); bu yüzden uygulamada onlara seviye belirleme önerilmez.
+
+Örnek kullanıcıların (`elif` 2. sınıf, `kerem` 5. sınıf, `zeynep` 7. sınıf) biten okumalarında
+yalnızca hız ölçümü vardır (soru yok). Süreleri sınıfa uygun hızdan hesaplanır: `elif` ≈ 50-63,
+`kerem` ≈ 90-110, `zeynep` ≈ 115-131 kelime/dk. `kerem` ve `zeynep`'in seviye belirleme sonucu
+vardır; `elif`'in yoktur, böylece girişte G1 seviye belirlemesi denenebilir (seed her çalışmada
+örnek kullanıcıların sonuçlarını sıfırlar).
 
 ## Saat dilimi
 
@@ -470,7 +771,9 @@ oturumu her zaman UTC olmalıdır; [`src/db.ts`](../src/db.ts) bunu bağlantı s
 1. `prisma/schema.prisma`'yı düzenleyin (yeni alanlara `@map("snake_case")` ve `///` açıklaması
    ekleyin; zamanlar için `@db.Timestamptz(3)`).
 2. `npx prisma migrate dev --create-only --name <ad>` ile migration'ı oluşturun ve SQL'i
-   **uygulamadan önce** okuyun. Prisma yeniden adlandırmayı DROP + ADD olarak üretir (veri
+   **uygulamadan önce** okuyun. Etkileşimsiz bir ortamda `migrate dev` çalışmaz; o zaman SQL'i
+   `npx prisma migrate diff --from-config-datasource --to-schema prisma/schema.prisma --script`
+   ile üretip yeni bir migration klasörüne yazın ve `npx prisma migrate deploy` ile uygulayın. Prisma yeniden adlandırmayı DROP + ADD olarak üretir (veri
    kaybı); `ALTER TABLE ... RENAME` ile elle düzeltin.
 3. Aynı migration'a yeni kolonların `COMMENT ON COLUMN` satırlarını ekleyin. Prisma
    açıklamaları, CHECK kısıtlarını ve görünümleri yönetmez; bunlar yalnızca migration SQL'indedir.

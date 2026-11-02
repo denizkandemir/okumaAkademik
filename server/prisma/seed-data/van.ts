@@ -1,4 +1,10 @@
-import { City, ReadingLevel, TextTheme } from '../../src/generated/prisma/enums.js';
+import {
+  City,
+  CognitiveLevel,
+  QuestionType,
+  ReadingLevel,
+  TextTheme,
+} from '../../src/generated/prisma/enums.js';
 import { chest, story } from './build.js';
 import type { SeedCity } from './types.js';
 
@@ -26,6 +32,8 @@ export const van: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Van Gölü’nde hangi balık yaşayabilir?',
           options: ['Alabalık', 'İnci kefali', 'Hamsi'],
           correctIndex: 1,
@@ -34,6 +42,8 @@ export const van: SeedCity = {
             'Doğru! Van Gölü’nün tuzlu ve sodalı suyunda yalnızca inci kefali yaşayabilir.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Ayşe’nin parmakları neden kaygan oldu?',
           options: [
             'Gölün suyu sodalı olduğu için',
@@ -45,6 +55,8 @@ export const van: SeedCity = {
           explanation: 'Aferin! Gölün sodalı suyu, parmakları sabunlu su gibi kaygan yapar.',
         },
         {
+          type: QuestionType.DUYGU_KARAKTER,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Ayşe günlüğüne yazdıklarına göre ne hissediyordu?',
           options: ['Gölden korktuğunu', 'Tatilden sıkıldığını', 'Doğaya hayran kaldığını'],
           correctIndex: 2,
@@ -76,6 +88,8 @@ export const van: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Akdamar Adası ilkbaharda neyle kaplıydı?',
           options: ['Karla', 'Badem çiçekleriyle', 'Kumla'],
           correctIndex: 1,
@@ -83,6 +97,8 @@ export const van: SeedCity = {
           explanation: 'Doğru! Ada beyaz ve pembe badem çiçekleriyle kaplıydı.',
         },
         {
+          type: QuestionType.CUMLEDE_ANLAM,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: '“Ada, gölün ortasında pembe bir bulut gibi duruyordu.” Bu cümle ne anlatıyor?',
           options: [
             'Çiçekli ada uzaktan pembe bir buluta benziyordu',
@@ -94,6 +110,8 @@ export const van: SeedCity = {
           explanation: 'Aferin! Çiçeklerle kaplı ada, uzaktan pembe bir bulut gibi görünüyordu.',
         },
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Emre adadan ayrılırken ne istedi?',
           options: ['Bir daha hiç gelmemeyi', 'Teknede uyumayı', 'Gelecek bahar yine gelmeyi'],
           correctIndex: 2,
@@ -125,6 +143,8 @@ export const van: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Babasına göre Van Kalesi’ni kimler yaptı?',
           options: ['Romalılar', 'Urartular', 'Osmanlılar'],
           correctIndex: 1,
@@ -132,6 +152,8 @@ export const van: SeedCity = {
           explanation: 'Doğru! Van Kalesi yaklaşık üç bin yıl önce Urartular tarafından yapıldı.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Kerim neden parmağıyla işaretlerin üstünden geçmedi?',
           options: [
             'Eski yazıya zarar vermek istemediği için',
@@ -144,6 +166,8 @@ export const van: SeedCity = {
             'Aferin! Binlerce yıllık yazılar çok değerlidir; onlara dokunmadan bakmalıyız.',
         },
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Babası, kayaların hatırlamaya devam etmesi için ne gerektiğini söyledi?',
           options: ['Onları boyamamız', 'Üstlerine adımızı yazmamız', 'Onları korumamız'],
           correctIndex: 2,
@@ -175,6 +199,8 @@ export const van: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Teyzesine göre murtuğa neyle yapılır?',
           options: ['Un, tereyağı ve yumurtayla', 'Pirinç ve sütle', 'Peynir ve domatesle'],
           correctIndex: 0,
@@ -182,6 +208,8 @@ export const van: SeedCity = {
           explanation: 'Doğru! Murtuğa un, tereyağı ve yumurtayla yapılır.',
         },
         {
+          type: QuestionType.SOZCUK_ANLAMI,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Can “Bu bir şölen mi?” diye sordu. “Şölen” ne demektir?',
           options: [
             'Küçük bir atıştırmalık',
@@ -193,6 +221,8 @@ export const van: SeedCity = {
           explanation: 'Aferin! Şölen, bol yemekli ve neşeli büyük bir sofradır.',
         },
         {
+          type: QuestionType.ANA_FIKIR,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Elif’e göre sofranın en güzel yanı neydi?',
           options: ['Bal ve kaymak', 'Tabakların sayısı', 'Hep birlikte olmaları'],
           correctIndex: 2,
@@ -226,6 +256,8 @@ export const van: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'İnci kefalleri yumurtalarını nereye bırakır?',
           options: ['Gölün en derin yerine', 'Tatlı sulu çaylara', 'Kumsala'],
           correctIndex: 1,
@@ -233,6 +265,8 @@ export const van: SeedCity = {
           explanation: 'Doğru! İnci kefalleri yumurtalarını tatlı sulu çaylara bırakır.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Bu dönemde balık avlamak neden yasaktır?',
           options: [
             'Balıklar yumurtlayıp çoğalabilsin diye',
@@ -245,6 +279,8 @@ export const van: SeedCity = {
             'Aferin! Balıklar rahat bırakılırsa yumurtlar, çoğalır ve her yıl geri gelir.',
         },
         {
+          type: QuestionType.ANA_FIKIR,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Deniz inatçı balıktan ne öğrendi?',
           options: [
             'Suya hiç yaklaşmamayı',
@@ -280,6 +316,8 @@ export const van: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Zehra Hanım’a göre Van kedileri neyi sever?',
           options: ['Hiç uyumamayı', 'Suyla oynamayı', 'Ağaçlara tırmanmayı'],
           correctIndex: 1,
@@ -287,6 +325,8 @@ export const van: SeedCity = {
           explanation: 'Doğru! Van kedileri suyla oynamayı sever, bazıları yüzebilir bile.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Fındık su kabına patisini daldırınca çocuklar neden güldü?',
           options: [
             'Fındık, Zehra Hanım’ın anlattığı gibi suyla oynamaya başladığı için',
@@ -298,6 +338,8 @@ export const van: SeedCity = {
           explanation: 'Aferin! Fındık, anlatılanı hemen göstererek herkesi güldürdü.',
         },
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Zehra Hanım’a göre Van kedileri için görevimiz nedir?',
           options: ['Onları evlere kapatmak', 'Onlardan uzak durmak', 'Onları sevmek ve korumak'],
           correctIndex: 2,
@@ -329,6 +371,8 @@ export const van: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Ninesine göre koçboynuzu deseni ne anlatır?',
           options: ['Güç ve cesaret', 'Yağmur ve su', 'Uyku ve rüya'],
           correctIndex: 0,
@@ -336,6 +380,8 @@ export const van: SeedCity = {
           explanation: 'Doğru! Koçboynuzu deseni güç ve cesaret demektir.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Zehra neden kilimdeki her şeklin bir kelime gibi olduğunu düşündü?',
           options: [
             'Desenler harflerden oluştuğu için',
@@ -347,6 +393,8 @@ export const van: SeedCity = {
           explanation: 'Aferin! Her desen kelimeler gibi bir anlam taşır ve bir hikâye anlatır.',
         },
         {
+          type: QuestionType.DUYGU_KARAKTER,
+          cognitiveLevel: CognitiveLevel.ANLAMA,
           prompt: 'Kilim bitince Zehra nasıl hissetti?',
           options: ['Üzüldü', 'Sıkıldı', 'Gurur duydu'],
           correctIndex: 2,
@@ -382,6 +430,8 @@ export const van: SeedCity = {
       ],
       questions: [
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Pırıl’ı kıyıdaki evin bahçesinde kimler karşıladı?',
           options: ['Annesi ve kardeşleri', 'Bir balıkçı', 'Efes’teki kedi Zeytin'],
           correctIndex: 0,
@@ -389,6 +439,8 @@ export const van: SeedCity = {
           explanation: 'Doğru! Pırıl’ı annesi ve iki küçük kardeşi karşıladı.',
         },
         {
+          type: QuestionType.NEDEN_SONUC,
+          cognitiveLevel: CognitiveLevel.CIKARIM,
           prompt: 'Pırıl neden “Yalnız değildim” dedi?',
           options: [
             'Annesi onunla birlikte yolculuk etmişti',
@@ -400,6 +452,8 @@ export const van: SeedCity = {
           explanation: 'Aferin! Yolculuk boyunca ona hikâye okuyan bir arkadaşı vardı: sen!',
         },
         {
+          type: QuestionType.BILGI,
+          cognitiveLevel: CognitiveLevel.HATIRLAMA,
           prompt: 'Pırıl hikâyenin sonunda sana ne söyledi?',
           options: [
             'Artık hiç okumayacağını',
