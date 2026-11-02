@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import type { CityId } from '../theme';
@@ -30,7 +31,18 @@ export function NextStopCard({
       <AppText variant="heading" align="center">
         {city ? CITIES[city].name : 'Eve dönüş'}
       </AppText>
-      {/* Yolculuk bitince bağlantı "Sertifikamı gör ↗" olacak; sertifika ekranı T03'te gelir. */}
+      {nextStop.kind === 'finished' ? (
+        <Pressable
+          accessibilityRole="link"
+          accessibilityLabel="Sertifikamı gör"
+          onPress={() => router.push('/certificate')}
+          hitSlop={6}
+          style={styles.link}>
+          <AppText variant="bodyStrong" color={colors.accent}>
+            Sertifikamı gör ↗
+          </AppText>
+        </Pressable>
+      ) : null}
       {nextStop.kind === 'next' ? (
         <Pressable
           accessibilityRole="button"

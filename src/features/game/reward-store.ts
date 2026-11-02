@@ -15,8 +15,11 @@ export type Reward = {
   kind: LessonKind;
   city: CityId;
   result: CompleteLessonResponse;
-  /** Pırıl'ın ders sonu notu (ör. son sorunun açıklaması). */
-  note?: string;
+  /**
+   * Hikâyede bu okuma dahil en iyi yıldız (tekrar okumada "En iyi: 3 yıldız"). Tamamlama yanıtı
+   * yalnız bu okumanın yıldızını döndürdüğü için ders bilgisiyle birlikte hesaplanır.
+   */
+  bestStars?: number | null;
 };
 
 let current: Reward | null = null;
