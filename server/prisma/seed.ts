@@ -240,7 +240,7 @@ async function seedUsers(contentSummary: string) {
       şehir: demo.city,
       lokum: demo.lokum,
       seri: demo.streak,
-      'bugün okudu': demo.readToday ? 'evet' : 'hayır (seri tehlikede)',
+      'bugün okudu': demo.readToday ? 'evet' : demo.streak > 0 ? 'hayır (seri tehlikede)' : 'hayır',
     })),
   );
 }

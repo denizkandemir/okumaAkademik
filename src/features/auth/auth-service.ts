@@ -15,6 +15,12 @@ export async function signOut(): Promise<void> {
   await api.post<void>('/auth/logout', undefined, { timeoutMs: 5_000 });
 }
 
+/** Adı değiştirir (Ayarlar); güncel kullanıcıyı döner. */
+export async function updateName(name: string): Promise<User> {
+  const { user } = await api.patch<{ user: User }>('/me', { name });
+  return user;
+}
+
 /** Kayıtlı token'ın hâlâ geçerli olduğunu doğrular ve güncel kullanıcıyı döner. */
 export async function fetchCurrentUser(options?: { timeoutMs?: number }): Promise<User> {
   const { user } = await api.get<{ user: User }>('/me', options);

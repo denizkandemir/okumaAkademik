@@ -12,6 +12,10 @@ import { Platform } from 'react-native';
 export const StorageKeys = {
   authToken: 'okumatik.auth-token',
   authUser: 'okumatik.auth-user',
+  /** Okuma hatırlatması `{ enabled, hour, minute }`; yalnızca bu cihazda. */
+  reminder: 'okumatik.reminder',
+  /** "Yeniden merhaba" ekranının en son gösterildiği Türkiye günü (YYYY-MM-DD). */
+  welcomeBackShownOn: 'okumatik.welcome-back-shown-on',
 } as const;
 
 export type StorageKey = (typeof StorageKeys)[keyof typeof StorageKeys];

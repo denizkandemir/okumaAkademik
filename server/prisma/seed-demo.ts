@@ -30,12 +30,23 @@ type DemoUser = {
   streakDays: number;
   /** false: seri dün biter, bugün henüz okunmadı (seri "tehlikede") */
   readToday: boolean;
+  /** Son okumanın kaç gün önce olduğu (varsayılan: bugün okuduysa 0, değilse 1). */
+  awayDays?: number;
 };
 
 const DEMO_USERS: DemoUser[] = [
   { username: 'demo.istanbul', name: 'Ayşe', completed: 4, streakDays: 6, readToday: false },
   // İstanbul'un 9 dersi bitmiş: 10. ders (sandık) seviye atlatır ve İzmir'i açar (P06 akışı).
   { username: 'demo.sehir', name: 'Selin', completed: 9, streakDays: 5, readToday: false },
+  // Son okuması 3 gün önce: açılışta "Yeniden merhaba" ekranı (T04).
+  {
+    username: 'demo.donus',
+    name: 'Elif',
+    completed: 6,
+    streakDays: 4,
+    readToday: false,
+    awayDays: 3,
+  },
   { username: 'demo.izmir', name: 'Mert', completed: 14, streakDays: 9, readToday: true },
   { username: 'demo.efes', name: 'Zeynep', completed: 22, streakDays: 14, readToday: false },
   { username: 'demo.antalya', name: 'Emir', completed: 32, streakDays: 21, readToday: true },
@@ -115,7 +126,7 @@ export async function seedDemoUsers(prisma: PrismaClient, now: Date): Promise<De
     await prisma.readingSession.deleteMany({ where: { userId } });
 
     const lessons = seedLessonRows.slice(0, demo.completed);
-    const lastDaysAgo = demo.readToday ? 0 : 1;
+    const lastDaysAgo = demo.awayDays ?? (demo.readToday ? 0 : 1);
     // Her ders bir güne düşer (gün 0 = serinin ilk günü); ders yoksa o gün tekrar okuma yapılır.
     const dayOf = (index: number) => Math.floor((index * demo.streakDays) / lessons.length);
     const perDay = new Map<number, number>();

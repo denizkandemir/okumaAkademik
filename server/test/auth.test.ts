@@ -234,6 +234,65 @@ describe('GET /me ve oturum', () => {
   });
 });
 
+describe('PATCH /me', () => {
+  function patchMe(token: string | null, payload: unknown) {
+    return ctx.app.inject({
+      method: 'PATCH',
+      url: '/me',
+      headers: token ? bearer(token) : {},
+      payload: payload as Record<string, unknown>,
+    });
+  }
+
+  it('adı değiştirir ve GET /me ile aynı şekli döner', async () => {
+    const { token } = await registerUser(ctx.app);
+    const response = await patchMe(token, { name: '  Elif ' });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toEqual({
+      user: { id: expect.any(String), username: 'ayse', name: 'Elif', grade: 3 },
+    });
+
+    const me = await ctx.app.inject({ method: 'GET', url: '/me', headers: bearer(token) });
+    expect(me.json().user.name).toBe('Elif');
+  });
+
+  it('kayıttaki kuralla doğrular: boş ve 40 karakterden uzun ad 400 döner', async () => {
+    const { token } = await registerUser(ctx.app);
+
+    const empty = await patchMe(token, { name: '   ' });
+    expect(empty.statusCode).toBe(400);
+    expect(empty.json()).toEqual({
+      code: 'VALIDATION_ERROR',
+      message: 'Bazı bilgiler eksik ya da hatalı.',
+      fieldErrors: { name: 'Adını yaz.' },
+    });
+
+    const long = await patchMe(token, { name: 'a'.repeat(41) });
+    expect(long.statusCode).toBe(400);
+    expect(long.json().fieldErrors).toEqual({ name: 'Adın en fazla 40 karakter olabilir.' });
+
+    const stored = await ctx.prisma.user.findUniqueOrThrow({ where: { username: 'ayse' } });
+    expect(stored.name).toBe('Ayşe');
+  });
+
+  it('token yoksa veya geçersizse 401 döner', async () => {
+    for (const token of [null, 'gecersiz-token']) {
+      const response = await patchMe(token, { name: 'Elif' });
+      expect(response.statusCode).toBe(401);
+      expect(response.json().code).toBe('UNAUTHORIZED');
+    }
+  });
+
+  it('kullanıcı başına 5 dakikada 10 denemeden sonra 429 döner', async () => {
+    const { token } = await registerUser(ctx.app);
+    for (let i = 0; i < 10; i++) {
+      expect((await patchMe(token, { name: `Ad ${i}` })).statusCode).toBe(200);
+    }
+    expect((await patchMe(token, { name: 'Fazla' })).statusCode).toBe(429);
+  });
+});
+
 describe('hata biçimi', () => {
   it('olmayan uç için 404 ve standart biçim', async () => {
     const response = await ctx.app.inject({ method: 'GET', url: '/olmayan' });

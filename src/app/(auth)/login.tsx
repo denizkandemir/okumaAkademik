@@ -1,40 +1,22 @@
+import { router } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet } from 'react-native';
 
-import { TextField } from '@/components/text-field';
+import { Button } from '@/design/components/button';
+import { FeedbackPanel } from '@/design/components/feedback-panel';
+import { TextField } from '@/design/components/text-field';
+import { TextLink } from '@/design/components/text-link';
 import { useAuth } from '@/features/auth/auth-context';
-import {
-  AuthFooterLink,
-  AuthFormLayout,
-  PasswordVisibilityButton,
-} from '@/features/auth/auth-form-layout';
+import { AuthFormLayout } from '@/features/auth/auth-form-layout';
 import { hasErrors, validateSignIn, type FieldErrors } from '@/features/auth/validation';
-import { GameText } from '@/features/game/ui/game-text';
-import { GameButton } from '@/features/game/ui/game-button';
 import { getErrorMessage } from '@/lib/errors';
-
-const GREETING = 'Tekrar hoş geldin! Kullanıcı adını yazar mısın?';
-
-/** Hatayı Pırıl'ın ağzından, çocuğa uygun bir dille söyler; hata yoksa `null`. */
-function errorBubble(errors: FieldErrors<'username' | 'password'>, formError: string | null) {
-  if (formError) return `Hımm, olmadı! ${formError}`;
-  if (errors.username && errors.password) {
-    return 'Hımm, kullanıcı adını ve şifreni yazmayı unuttun galiba.';
-  }
-  if (errors.username) return 'Hımm, önce kullanıcı adını yazar mısın?';
-  if (errors.password) return 'Şifreni de yazar mısın? Sonra hemen başlarız!';
-  return null;
-}
 
 export default function LoginScreen() {
   const { signIn } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<FieldErrors<'username' | 'password'>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [mascotTalking, setMascotTalking] = useState(false);
 
   const handleSubmit = async () => {
     // Düğme ve klavyedeki "git" birlikte basılınca ikinci istek gitmesin.
@@ -54,19 +36,16 @@ export default function LoginScreen() {
     }
   };
 
-  const problem = errorBubble(errors, formError);
-
   return (
     <AuthFormLayout
-      pose={problem ? 'think' : 'talk'}
-      talking={!problem && mascotTalking}
-      bubble={problem ?? GREETING}
-      onBubbleTypingChange={setMascotTalking}
-      title="Giriş yap"
-      footer={<AuthFooterLink prompt="Hesabın yok mu?" label="Kayıt ol" href="/register" />}>
+      eyebrow="TEKRAR HOŞ GELDİN"
+      title="Yolculuğuna devam et"
+      footer={
+        // Bağlantı ekranı değiştirir (geri yığını büyümez).
+        <TextLink title="Yeni bir yolculuk başlat" onPress={() => router.replace('/register')} />
+      }>
       <TextField
-        variant="game"
-        label="Kullanıcı adın"
+        label="Kullanıcı adı"
         placeholder="Kullanıcı adını yaz"
         value={username}
         onChangeText={setUsername}
@@ -78,49 +57,28 @@ export default function LoginScreen() {
         returnKeyType="next"
       />
       <TextField
-        variant="game"
-        label="Şifren"
+        label="Şifre"
         placeholder="Şifreni yaz"
         value={password}
         onChangeText={setPassword}
         error={errors.password}
-        secureTextEntry={!showPassword}
+        secure
         autoCapitalize="none"
         autoCorrect={false}
         autoComplete="current-password"
         textContentType="password"
         returnKeyType="go"
         onSubmitEditing={handleSubmit}
-        trailing={
-          <PasswordVisibilityButton
-            visible={showPassword}
-            onToggle={() => setShowPassword((value) => !value)}
-          />
-        }
       />
 
-      {formError ? (
-        <GameText variant="caption" color={ERROR_COLOR} accessibilityRole="alert">
-          {formError}
-        </GameText>
-      ) : null}
+      {formError ? <FeedbackPanel tone="wrong" title="Hımm, olmadı!" text={formError} /> : null}
 
-      <GameButton
-        title="GİRİŞ YAP"
-        accessibilityLabel="Giriş yap"
-        size="md"
+      <Button
+        title="YOLA DEVAM ET"
+        accessibilityLabel="Yola devam et"
         onPress={handleSubmit}
         loading={submitting}
-        style={styles.button}
       />
     </AuthFormLayout>
   );
 }
-
-const ERROR_COLOR = '#B42318';
-
-const styles = StyleSheet.create({
-  button: {
-    marginTop: 2,
-  },
-});

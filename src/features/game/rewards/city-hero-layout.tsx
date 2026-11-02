@@ -28,10 +28,17 @@ type CityHeroLayoutProps = {
   children?: ReactNode;
   /** Ekranın altındaki düğmeler. */
   actions: ReactNode;
+  /** Varsayılan `true`: üstte AppHeader. Karşılamada oturum olmadığı için kapalıdır. */
+  header?: boolean;
+  /** Kahraman görselin ekran yüksekliğine oranı; varsayılan 0,45. */
+  heroRatio?: number;
+  /** Pırıl'ın en büyük boyutu ve kahraman yüksekliğine oranı; varsayılan 170 ve 0,55. */
+  mascotMax?: number;
+  mascotRatio?: number;
 };
 
 /**
- * Şehir arka planlı ödül ekranlarının ortak düzeni (14-sehir-acilisi, 24-eve-donus): şehrin üst
+ * Şehir arka planlı ekranların ortak düzeni (14-sehir-acilisi, 24-eve-donus, 15-karsilama): şehrin üst
  * kısmı ekran zeminine kaybolur, Pırıl üstünde durur; altında üst başlık, başlık, metin ve düğmeler.
  */
 export function CityHeroLayout({
@@ -43,15 +50,19 @@ export function CityHeroLayout({
   lines,
   children,
   actions,
+  header = true,
+  heroRatio = HERO_RATIO,
+  mascotMax = 170,
+  mascotRatio = 0.55,
 }: CityHeroLayoutProps) {
   const insets = useSafeAreaInsets();
   const window = useWindowDimensions();
-  const heroHeight = Math.round(window.height * HERO_RATIO);
-  const mascotSize = Math.min(170, Math.round(heroHeight * 0.55));
+  const heroHeight = Math.round(window.height * heroRatio);
+  const mascotSize = Math.min(mascotMax, Math.round(heroHeight * mascotRatio));
 
   return (
     <View style={[styles.root, { paddingTop: insets.top }]}>
-      <AppHeader profileLink={false} />
+      {header ? <AppHeader profileLink={false} /> : null}
       <ScrollView contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 30 }]}>
         <View style={[styles.hero, { height: heroHeight }]}>
           <Image

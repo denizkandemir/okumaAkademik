@@ -445,6 +445,7 @@ tamamlamaları da silinir.
 | ---------------- | -------------- | ------ | --------- | ---- | ------------------------------- |
 | `demo.istanbul`  | 4              | 3      | İstanbul  | 6    | Bugün okumadı: seri tehlikede   |
 | `demo.sehir`     | 9              | 5      | İstanbul  | 5    | 10. ders: seviye atlama + İzmir |
+| `demo.donus`     | 6              | 4      | İstanbul  | 0    | 3 gündür okumadı: geri dönüş    |
 | `demo.izmir`     | 14             | 8      | İzmir     | 9    |                                 |
 | `demo.efes`      | 22             | 12     | Efes      | 14   | Bugün okumadı: seri tehlikede   |
 | `demo.antalya`   | 32             | 17     | Antalya   | 21   |                                 |

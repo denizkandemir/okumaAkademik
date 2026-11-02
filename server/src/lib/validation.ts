@@ -24,6 +24,13 @@ export const passwordSchema = z
   .min(MIN_PASSWORD_LENGTH, { error: `Şifren en az ${MIN_PASSWORD_LENGTH} karakter olmalı.` })
   .max(MAX_PASSWORD_LENGTH, { error: 'Şifren çok uzun.' });
 
+/** Kayıtta ve ad değiştirmede (PATCH /me) aynı kural. */
+export const nameSchema = z
+  .string({ error: 'Adını yaz.' })
+  .trim()
+  .min(1, { error: 'Adını yaz.' })
+  .max(40, { error: 'Adın en fazla 40 karakter olabilir.' });
+
 export const gradeSchema = z
   .number({ error: 'Sınıfını seç.' })
   .int({ error: 'Sınıfını seç.' })
