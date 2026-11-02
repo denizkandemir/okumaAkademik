@@ -231,19 +231,60 @@ describe('başlangıca göre değişim', () => {
     const { baseline } = (
       await inject(token, 'POST', '/placement/complete', { readingSessionIds: ids })
     ).json<{ baseline: { wordsPerMinute: number } }>();
+    await read(token, storyAt('istanbul', 1).textId, 90);
 
     const [week] = await ctx.prisma.$queryRaw<Record<string, number | null>[]>`
       SELECT median_wpm::float8 AS median_wpm, baseline_wpm::float8 AS baseline_wpm,
         baseline_comprehension::float8 AS baseline_comprehension,
-        median_wpm_vs_baseline::float8 AS wpm_vs_baseline,
-        comprehension_vs_baseline::float8 AS comprehension_vs_baseline
+        median_wpm_vs_baseline::float8 AS wpm_vs_baseline
       FROM v_student_weekly WHERE username = 'ayse'`;
     expect(week).toMatchObject({
       baseline_wpm: baseline.wordsPerMinute,
       baseline_comprehension: 1,
-      comprehension_vs_baseline: 0,
     });
     expect(week!.wpm_vs_baseline).toBeCloseTo((week!.median_wpm ?? 0) - baseline.wordsPerMinute);
+  });
+
+  it('seviye belirleme okumaları özetlerin hız, anlama ve sayılarına girmez; süreye ve seriye girer', async () => {
+    const { token } = await registerUser(ctx.app, { grade: 3 });
+    // Seviye belirleme hızlı (60 sn) ve tam doğru; yolculuk okuması yavaş (240 sn) ve kitaplık gibi.
+    const ids = await takePlacement(token, GradeBand.G2, [0, 0]);
+    await inject(token, 'POST', '/placement/complete', { readingSessionIds: ids });
+    const story = storyAt('istanbul', 1);
+    await read(token, story.textId, 240);
+    const storyWords = (await ctx.prisma.text.findUniqueOrThrow({ where: { id: story.textId } }))
+      .wordCount!;
+    const storyWpm = Math.round(((storyWords * 60) / 240) * 10) / 10;
+
+    const flagged = await ctx.prisma.$queryRaw<{ is_placement: boolean }[]>`
+      SELECT is_placement FROM v_reading_metrics ORDER BY is_placement`;
+    expect(flagged.map((row) => row.is_placement)).toEqual([false, true, true]);
+
+    for (const view of ['v_student_daily', 'v_student_weekly', 'v_student_monthly']) {
+      const [row] = await ctx.prisma.$queryRawUnsafe<Record<string, number | null>[]>(
+        `SELECT read_minutes::float8 AS read_minutes, text_count, reading_count,
+           median_wpm::float8 AS median_wpm, comprehension::float8 AS comprehension, rushed_count
+         FROM ${view} WHERE username = 'ayse'`,
+      );
+      expect(row, view).toEqual({
+        read_minutes: 6, // 60 + 60 + 240 saniye: seviye belirleme süresi dahil
+        text_count: 1,
+        reading_count: 1,
+        median_wpm: storyWpm,
+        comprehension: null,
+        rushed_count: 0,
+      });
+    }
+
+    const metrics = await inject(token, 'GET', '/me/metrics?period=day');
+    expect(metrics.json()).toMatchObject({
+      current: { readingCount: 1, medianWpm: storyWpm, comprehension: null },
+    });
+    // Günlük hedef ve seri okuma kayıtlarından: seviye belirleme dahil.
+    const progress = await inject(token, 'GET', '/me/progress');
+    expect(progress.json()).toMatchObject({ dailyGoal: { readMinutes: 6 } });
+    const stats = await inject(token, 'GET', '/me/stats');
+    expect(stats.json()).toMatchObject({ readToday: true, streak: 1 });
   });
 
   it('seviye belirlemesi olmayan kullanıcıda başlangıç kolonları boştur', async () => {

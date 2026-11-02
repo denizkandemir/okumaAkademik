@@ -456,7 +456,10 @@ satırdır (geçmiş silinmez), en yenisi geçerlidir.
   bir sonuç varsa) aynı sonuç döner.
 - `GET /me` `needsPlacement` döner: kullanıcının sonucu yoksa ve grubunun metinleri varsa `true`.
   Uygulama bunu kullanıcı başına (cihazda) bir kez önerir; "Sonra yapalım" ile atlanır, yolculuk
-  hiçbir zaman beklemez.
+  hiçbir zaman beklemez. Sonra Profil'deki "Seviyemi belirle" (sonucu varsa "Seviyemi yeniden
+  ölç") bağlantısıyla açılır; kendiliğinden yeniden önerilmez.
+- Seviye belirleme okumaları günlük hedefe ve seriye sayılır, ama öğrenci özetlerinin hız, anlama
+  ve sayı ölçülerine girmez (bkz. `v_student_daily`).
 
 Kısıtlar: `user_baselines_grade_check`, `user_baselines_wpm_check` (> 0),
 `user_baselines_comprehension_check` (0-1).
@@ -579,7 +582,9 @@ ilk cevabıdır; yıldızdaki "dersin ilk tamamlanışından önceki ilk cevap" 
 ### `v_student_daily`, `v_student_weekly`, `v_student_monthly` — öğrenci özetleri
 
 Yalnızca biten, ölçülen okumalar. Gün Türkiye saatiyle okumanın **başladığı** gündür; hafta
-pazartesi başlar (`week_start`), ay takvim ayıdır (`month_start`).
+pazartesi başlar (`week_start`), ay takvim ayıdır (`month_start`). Seviye belirleme okumaları
+(`v_reading_metrics.is_placement`) yalnızca `read_minutes`'a girer; metin ve okuma sayısı, hız,
+anlama ve acele ölçüleri onlarsız hesaplanır (sonuçları `user_baselines`'ta ayrı tutulur).
 
 | Kolon           | Açıklama                                                             |
 | --------------- | -------------------------------------------------------------------- |

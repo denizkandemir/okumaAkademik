@@ -5,7 +5,8 @@ import * as storage from '@/lib/storage';
 
 /**
  * Seviye belirleme önerilmeli mi? Sunucu `needsPlacement` diyorsa ve bu kullanıcıya bu cihazda
- * daha önce önerilmediyse. Öneri bir kezdir: "Sonra yapalım" denirse bir daha açılmaz.
+ * daha önce önerilmediyse. Öneri bir kezdir: "Sonra yapalım" denirse kendiliğinden bir daha
+ * açılmaz; çocuk Profil'deki "Seviyemi belirle" bağlantısıyla açabilir.
  */
 export async function shouldOfferPlacement(userId: string): Promise<boolean> {
   const offered = (await storage.getJSON<string[]>(storage.StorageKeys.placementOfferedTo)) ?? [];
