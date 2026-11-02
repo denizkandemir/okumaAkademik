@@ -93,9 +93,9 @@ const styles = StyleSheet.create({
     gap: 12,
     marginTop: 10,
   },
+  // Düğmeler içeriğin hemen ardından gelir (12-ders-sonucu: kutucuklardan sonra 23 px).
   actions: {
     gap: 12,
-    marginTop: 'auto',
-    paddingTop: 16,
+    marginTop: 11,
   },
 });

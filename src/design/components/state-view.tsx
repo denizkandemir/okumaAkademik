@@ -32,7 +32,7 @@ export function StateView({
   if (error) {
     return (
       <View style={styles.container} accessibilityLiveRegion="polite">
-        {mascot ? <Mascot pose="think" size={MASCOT_SIZE} /> : null}
+        {mascot ? <Mascot pose="think" size={MASCOT_SIZE} decorative /> : null}
         <AppText variant="heading" align="center">
           Bir şeyler ters gitti. Tekrar deneyelim mi?
         </AppText>
@@ -46,12 +46,14 @@ export function StateView({
 
   if (isLoading) {
     return (
+      // Tek odak noktası: içerideki metin ve Pırıl ayrıca okunmaz.
       <View
         style={styles.container}
+        accessible
         accessibilityRole="progressbar"
         accessibilityLabel={loadingLabel}>
         {mascot ? (
-          <Mascot pose="read" size={MASCOT_SIZE} accessibilityLabel={loadingLabel} />
+          <Mascot pose="read" size={MASCOT_SIZE} decorative />
         ) : (
           <ActivityIndicator size="large" color={colors.accent} />
         )}

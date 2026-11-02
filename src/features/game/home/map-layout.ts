@@ -1,4 +1,4 @@
-import type { CityId } from '../theme';
+import type { CityId } from '@/design/cities';
 
 /**
  * Yolculuk haritasının düzeni (docs/tasarim, 01-06-yolculuk). Saf veri ve hesap; çizim yok.

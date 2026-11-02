@@ -1,8 +1,3 @@
-import { Baloo2_700Bold } from '@expo-google-fonts/baloo-2/700Bold';
-import { Baloo2_800ExtraBold } from '@expo-google-fonts/baloo-2/800ExtraBold';
-import { Nunito_600SemiBold } from '@expo-google-fonts/nunito/600SemiBold';
-import { Nunito_700Bold } from '@expo-google-fonts/nunito/700Bold';
-import { Nunito_800ExtraBold } from '@expo-google-fonts/nunito/800ExtraBold';
 import { Literata_400Regular } from '@expo-google-fonts/literata/400Regular';
 import { Literata_400Regular_Italic } from '@expo-google-fonts/literata/400Regular_Italic';
 import { Literata_600SemiBold } from '@expo-google-fonts/literata/600SemiBold';
@@ -14,18 +9,10 @@ import { NunitoSans_900Black } from '@expo-google-fonts/nunito-sans/900Black';
 import { useFonts } from 'expo-font';
 import { useEffect, useState } from 'react';
 
-import { GameFonts } from './theme';
-
 import { fonts } from '@/design/tokens';
 
 /** Yalnızca tasarımda kullanılan kalınlıklar yüklenir (her biri ayrı bir dosya). */
 const FONT_MAP = {
-  // Eski oyun tasarımı (T06'da kaldırılır).
-  [GameFonts.heading]: Baloo2_700Bold,
-  [GameFonts.headingHeavy]: Baloo2_800ExtraBold,
-  [GameFonts.body]: Nunito_600SemiBold,
-  [GameFonts.bodyBold]: Nunito_700Bold,
-  [GameFonts.bodyHeavy]: Nunito_800ExtraBold,
   // "Pırıl'ın Atlası": arayüz Nunito Sans, okuma metni Literata.
   [fonts.sans]: NunitoSans_400Regular,
   [fonts.sansSemiBold]: NunitoSans_600SemiBold,
@@ -41,7 +28,7 @@ const FONT_MAP = {
 const FONT_TIMEOUT_MS = 4_000;
 
 /**
- * Oyun yazı tiplerini yükler. Yüklendiğinde, hata verdiğinde ya da zaman aşımında `true` döner;
+ * Uygulamanın yazı tiplerini yükler. Yüklendiğinde, hata verdiğinde ya da zaman aşımında `true` döner;
  * açılış ekranı bu süre boyunca açık kalır. Hata olursa uygulama sistem yazı tipiyle çalışır.
  */
 export function useGameFonts(): boolean {

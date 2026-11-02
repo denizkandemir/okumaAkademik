@@ -6,7 +6,7 @@
  * - durumlar `server/src/lib/journey.ts`, seviye `server/src/lib/reading-level.ts`
  * Sunucu değişirse burayı da güncelleyin.
  */
-import type { CityId } from './theme';
+import type { CityId } from '@/design/cities';
 
 /** Sunucudaki `LessonStatus`. */
 export type LessonStatus = 'done' | 'current' | 'locked';

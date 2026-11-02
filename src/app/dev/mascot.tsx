@@ -1,14 +1,15 @@
 import { Stack } from 'expo-router';
 import { use, useEffect, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Button } from '@/components/button';
-import { Card } from '@/components/card';
-import { ThemedText } from '@/components/themed-text';
-import { MaxContentWidth, MinTouchSize, Radius, Spacing } from '@/constants/theme';
+import { AppText } from '@/design/components/app-text';
+import { Button } from '@/design/components/button';
+import { Card } from '@/design/components/card';
+import { FilterChip } from '@/design/components/filter-chip';
+import { ToggleRow } from '@/design/components/toggle-row';
+import { colors, radius, screenPadding, size, space } from '@/design/tokens';
 import { Mascot, MascotSizes, mascotRenderStats } from '@/features/mascot/mascot';
-import { MascotBubble } from '@/features/mascot/mascot-bubble';
 import {
   DEFAULT_MASCOT_DEBUG,
   MascotDebugContext,
@@ -18,14 +19,8 @@ import {
 } from '@/features/mascot/mascot-debug';
 import { POSE_ART } from '@/features/mascot/mascot-assets';
 import { MASCOT_POSES, type MascotPose } from '@/features/mascot/types';
-import { useTheme } from '@/hooks/use-theme';
 
 const SIZES = [MascotSizes.small, MascotSizes.medium, MascotSizes.large] as const;
-const BUBBLE_TEXTS = [
-  'Merhaba! Ben Pırıl.',
-  'Bugün hangi hikâyeyi okuyalım?',
-  'Harika gidiyorsun, devam et!',
-];
 
 const HEADER_OPTIONS = {
   headerShown: true,
@@ -42,7 +37,7 @@ export default function MascotShowcaseScreen() {
     return (
       <View style={styles.unavailable}>
         <Stack.Screen options={{ ...HEADER_OPTIONS, title: '' }} />
-        <ThemedText>Bu sayfa kullanılamıyor.</ThemedText>
+        <AppText>Bu sayfa kullanılamıyor.</AppText>
       </View>
     );
   }
@@ -50,9 +45,8 @@ export default function MascotShowcaseScreen() {
 }
 
 function Showcase() {
-  const theme = useTheme();
   const insets = useSafeAreaInsets();
-  const [size, setSize] = useState<number>(MascotSizes.medium);
+  const [mascotSize, setMascotSize] = useState<number>(MascotSizes.medium);
   const [talking, setTalking] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
   const [useAppleWebpCodec, setUseAppleWebpCodec] = useState(
@@ -62,8 +56,6 @@ function Showcase() {
     DEFAULT_MASCOT_DEBUG.legacyTransformOrigin,
   );
   const [cycleIndex, setCycleIndex] = useState(0);
-  const [bubbleIndex, setBubbleIndex] = useState(0);
-  const [bubbleTalking, setBubbleTalking] = useState(false);
 
   const cyclePose = MASCOT_POSES[cycleIndex % MASCOT_POSES.length];
   // Kullanıcı açıkça seçmediyse sistem ayarı kullanılır.
@@ -76,64 +68,65 @@ function Showcase() {
     <MascotDebugContext value={debug}>
       <Stack.Screen options={HEADER_OPTIONS} />
       <ScrollView
-        style={{ backgroundColor: theme.background }}
+        style={styles.screen}
         // iOS'ta içerik başlık çubuğunun altında başlar (saydam başlıkta da üst üste binmez).
         contentInsetAdjustmentBehavior="automatic"
         contentContainerStyle={[
           styles.content,
           {
-            paddingBottom: insets.bottom + Spacing.five,
-            paddingLeft: insets.left + Spacing.three,
-            paddingRight: insets.right + Spacing.three,
+            paddingBottom: insets.bottom + space.xxl,
+            paddingLeft: insets.left + screenPadding,
+            paddingRight: insets.right + screenPadding,
           },
         ]}>
         <View style={styles.inner}>
-          <Card>
-            <ThemedText type="subtitle">Ayarlar</ThemedText>
+          <Card style={styles.card}>
+            <AppText variant="heading">Ayarlar</AppText>
             <RenderCounter />
 
-            <ThemedText type="smallBold" themeColor="textSecondary">
+            <AppText variant="bodyStrong" color={colors.textMuted}>
               Boyut
-            </ThemedText>
+            </AppText>
             <View style={styles.row}>
               {SIZES.map((preset) => (
-                <Chip
+                <FilterChip
                   key={preset}
                   label={`${preset} dp`}
-                  selected={size === preset}
-                  onPress={() => setSize(preset)}
+                  selected={mascotSize === preset}
+                  onPress={() => setMascotSize(preset)}
                 />
               ))}
             </View>
 
-            <Toggle label="Konuşuyor (talk)" value={talking} onChange={setTalking} />
-            <Toggle
+            <ToggleRow label="Konuşuyor (talk)" value={talking} onValueChange={setTalking} />
+            <ToggleRow
               label="Hareketi azalt (simülasyon)"
               value={reduceMotion}
-              onChange={setReduceMotion}
+              onValueChange={setReduceMotion}
             />
             <Button
-              title={`Pozu değiştir (şimdi: ${cyclePose})`}
+              title={`POZU DEĞİŞTİR (ŞİMDİ: ${cyclePose})`}
+              accessibilityLabel={`Pozu değiştir, şimdi ${cyclePose}`}
               onPress={() => setCycleIndex((value) => value + 1)}
             />
 
-            <ThemedText type="smallBold" themeColor="textSecondary">
+            <AppText variant="bodyStrong" color={colors.textMuted}>
               Tanı (eski davranışla karşılaştırma)
-            </ThemedText>
-            <Toggle
+            </AppText>
+            <ToggleRow
               label="iOS: Apple WebP çözücüsü"
               value={useAppleWebpCodec}
-              onChange={setUseAppleWebpCodec}
+              onValueChange={setUseAppleWebpCodec}
             />
-            <Toggle
+            <ToggleRow
               label="Eski pivot (transformOrigin)"
               value={legacyTransformOrigin}
-              onChange={setLegacyTransformOrigin}
+              onValueChange={setLegacyTransformOrigin}
             />
           </Card>
 
-          <Card>
-            <ThemedText type="subtitle">Poz geçişi</ThemedText>
+          <Card style={styles.card}>
+            <AppText variant="heading">Poz geçişi</AppText>
             <View style={styles.center}>
               <Mascot
                 key={debugKey}
@@ -145,35 +138,12 @@ function Showcase() {
             </View>
           </Card>
 
-          <Card>
-            <ThemedText type="subtitle">Balon</ThemedText>
-            <View style={styles.bubbleRow}>
-              <Mascot
-                key={debugKey}
-                pose="talk"
-                size={MascotSizes.medium}
-                talking={bubbleTalking}
-                reduceMotion={motion}
-              />
-              <MascotBubble
-                text={BUBBLE_TEXTS[bubbleIndex % BUBBLE_TEXTS.length]}
-                onTypingChange={setBubbleTalking}
-                reduceMotion={motion}
-              />
-            </View>
-            <Button
-              title="Yeni cümle"
-              variant="secondary"
-              onPress={() => setBubbleIndex((value) => value + 1)}
-            />
-          </Card>
-
           <View style={styles.grid}>
             {MASCOT_POSES.map((pose) => (
               <PoseCard
                 key={`${pose}-${debugKey}`}
                 pose={pose}
-                size={size}
+                size={mascotSize}
                 talking={talking}
                 reduceMotion={motion}
               />
@@ -197,7 +167,6 @@ type PoseCardProps = {
 
 /** Tek poz: kendi "animasyon kapalı" anahtarı ve karelerin yüklenme durumu. */
 function PoseCard({ pose, size, talking, reduceMotion }: PoseCardProps) {
-  const theme = useTheme();
   const parentDebug = use(MascotDebugContext);
   const [still, setStill] = useState(false);
   const hasOverlay = !!POSE_ART[pose].overlay;
@@ -215,7 +184,7 @@ function PoseCard({ pose, size, talking, reduceMotion }: PoseCardProps) {
   };
 
   return (
-    <View style={[styles.tile, { backgroundColor: theme.backgroundElement }]}>
+    <View style={styles.tile}>
       <MascotDebugContext value={{ ...parentDebug, onFrameEvent }}>
         <Mascot
           pose={pose}
@@ -225,17 +194,10 @@ function PoseCard({ pose, size, talking, reduceMotion }: PoseCardProps) {
           reduceMotion={reduceMotion}
         />
       </MascotDebugContext>
-      <ThemedText type="smallBold">{pose}</ThemedText>
+      <AppText variant="bodyStrong">{pose}</AppText>
       <FrameLine label="temel" status={frames.base} />
       {hasOverlay ? <FrameLine label="2. kare" status={frames.overlay} /> : null}
-      <View style={styles.tileToggle}>
-        <ThemedText type="small">Animasyon kapalı</ThemedText>
-        <Switch
-          value={still}
-          onValueChange={setStill}
-          accessibilityLabel={`${pose} animasyon kapalı`}
-        />
-      </View>
+      <ToggleRow label={`${pose}: animasyon kapalı`} value={still} onValueChange={setStill} />
     </View>
   );
 }
@@ -248,12 +210,11 @@ function FrameLine({ label, status }: { label: string; status: FrameStatus }) {
         ? `yüklendi ${status.text}`
         : `HATA: ${status.text}`;
   return (
-    <ThemedText
-      type="small"
-      themeColor={status.state === 'error' ? 'danger' : 'textSecondary'}
-      style={styles.frameLine}>
+    <AppText
+      variant="secondary"
+      color={status.state === 'error' ? colors.danger : colors.textMuted}>
       {label}: {text}
-    </ThemedText>
+    </AppText>
   );
 }
 
@@ -274,55 +235,9 @@ function RenderCounter() {
   }, []);
 
   return (
-    <ThemedText type="small" testID="render-counter">
+    <AppText variant="secondary" testID="render-counter">
       Maskot render sayısı: {stats.total} (son 1 sn: +{stats.perSecond})
-    </ThemedText>
-  );
-}
-
-function Toggle({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: boolean;
-  onChange: (value: boolean) => void;
-}) {
-  return (
-    <View style={styles.toggle}>
-      <ThemedText style={styles.toggleLabel}>{label}</ThemedText>
-      <Switch value={value} onValueChange={onChange} accessibilityLabel={label} />
-    </View>
-  );
-}
-
-function Chip({
-  label,
-  selected,
-  onPress,
-}: {
-  label: string;
-  selected: boolean;
-  onPress: () => void;
-}) {
-  const theme = useTheme();
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityState={{ selected }}
-      onPress={onPress}
-      style={[
-        styles.chip,
-        {
-          backgroundColor: selected ? theme.primary : theme.background,
-          borderColor: selected ? theme.primary : theme.border,
-        },
-      ]}>
-      <ThemedText type="smallBold" style={{ color: selected ? theme.onPrimary : theme.text }}>
-        {label}
-      </ThemedText>
-    </Pressable>
+    </AppText>
   );
 }
 
@@ -331,70 +246,48 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: colors.background,
+  },
+  screen: {
+    backgroundColor: colors.background,
   },
   content: {
     flexGrow: 1,
     alignItems: 'center',
-    paddingTop: Spacing.three,
+    paddingTop: space.md,
   },
   inner: {
     width: '100%',
-    maxWidth: MaxContentWidth,
-    gap: Spacing.three,
+    maxWidth: size.maxContentWidth,
+    gap: space.md,
+  },
+  card: {
+    gap: space.xs,
   },
   row: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: Spacing.two,
-  },
-  toggle: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: Spacing.three,
-    minHeight: MinTouchSize,
-  },
-  toggleLabel: {
-    flexShrink: 1,
-  },
-  chip: {
-    minHeight: MinTouchSize,
-    justifyContent: 'center',
-    paddingHorizontal: Spacing.three,
-    borderRadius: Radius.full,
-    borderWidth: 2,
+    gap: space.xs,
   },
   center: {
     alignItems: 'center',
-    paddingTop: Spacing.five,
-  },
-  bubbleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.two,
+    paddingTop: space.xxl,
   },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: Spacing.three,
+    gap: space.md,
     justifyContent: 'center',
   },
   tile: {
     alignItems: 'center',
-    gap: Spacing.one,
-    padding: Spacing.three,
-    paddingTop: Spacing.five,
-    borderRadius: Radius.large,
-    minWidth: 160,
-  },
-  tileToggle: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.two,
-    marginTop: Spacing.one,
-  },
-  frameLine: {
-    fontSize: 13,
-    lineHeight: 18,
+    gap: space.xxs,
+    padding: space.md,
+    paddingTop: space.xxl,
+    borderRadius: radius.cardLarge,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+    backgroundColor: colors.surface,
+    width: 180,
   },
 });

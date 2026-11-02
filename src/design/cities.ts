@@ -1,7 +1,10 @@
 import type { ImageSource } from 'expo-image';
 
-import type { CityId } from '@/features/game/theme';
 import type { MascotPose } from '@/features/mascot/types';
+
+/** Yolculuğun 6 durağı, sırayla (sunucudaki şehir kimlikleri). */
+export const CITY_IDS = ['istanbul', 'izmir', 'efes', 'antalya', 'kapadokya', 'van'] as const;
+export type CityId = (typeof CITY_IDS)[number];
 
 /** Bir şehrin tasarım verisi (docs/tasarim/README.md, "Şehir verileri"). */
 export type CityDesign = {

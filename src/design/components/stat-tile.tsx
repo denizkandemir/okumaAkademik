@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: size.cardLip,
     borderBottomColor: colors.statTile.lip,
     borderRadius: radius.input,
-    paddingVertical: 14,
+    paddingVertical: 15,
     paddingHorizontal: 10,
   },
   center: {

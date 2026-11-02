@@ -1,10 +1,8 @@
 import { Image } from 'expo-image';
 import { Platform, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
-import { CITIES } from '../cities';
+import { CITIES, type CityId } from '../cities';
 import { colors } from '../tokens';
-
-import type { CityId } from '@/features/game/theme';
 
 export type CityImageProps = {
   city: CityId;

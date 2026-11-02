@@ -1,4 +1,5 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { useEffect } from 'react';
+import { AccessibilityInfo, Pressable, StyleSheet, View } from 'react-native';
 
 import type { GlossaryEntry } from './glossary-text';
 
@@ -17,19 +18,21 @@ type GlossaryCardProps = {
 /**
  * Sözlük kartı (08-okuma): altı noktalı bir kelimeye dokununca ekranın altında açılır. Pırıl
  * kelimeyi ve anlamını söyler. Karta ya da kapat düğmesine dokunmak kapatır.
+ *
+ * Ekran okuyucuda kart düğme değildir (içinde kapat düğmesi var, iç içe düğmeye VoiceOver
+ * ulaşamaz): kelime ve anlamı tek öğe olarak okunur, kapat düğmesi ayrı odak alır.
  */
 export function GlossaryCard({ entry, onClose, bottomInset }: GlossaryCardProps) {
+  const label = `${entry.word}: ${entry.meaning}`;
+  useEffect(() => {
+    AccessibilityInfo.announceForAccessibility(label);
+  }, [label]);
+
   return (
     <View style={[styles.wrap, { paddingBottom: bottomInset + 12 }]} pointerEvents="box-none">
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={`${entry.word}: ${entry.meaning}`}
-        accessibilityHint="Kartı kapatır"
-        accessibilityLiveRegion="polite"
-        onPress={onClose}
-        style={styles.card}>
-        <Mascot pose="talk" size={64} animated={false} />
-        <View style={styles.texts}>
+      <Pressable accessible={false} onPress={onClose} style={styles.card}>
+        <Mascot pose="talk" size={64} animated={false} decorative />
+        <View style={styles.texts} accessible accessibilityLabel={label}>
           <AppText variant="bodyStrong">{entry.word}</AppText>
           <AppText variant="secondary" color={colors.textMuted}>
             {entry.meaning}

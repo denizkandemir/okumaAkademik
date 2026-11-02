@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { CITIES } from '@/design/cities';
+import { CITIES, type CityId } from '@/design/cities';
 import { AppHeader } from '@/design/components/app-header';
 import { AppText } from '@/design/components/app-text';
 import { Button } from '@/design/components/button';
@@ -24,7 +24,6 @@ import { ThemeTag } from '@/design/components/theme-tag';
 import { BackIcon } from '@/design/icons';
 import { colors, readingSize, screenPadding, size, type } from '@/design/tokens';
 import { LessonResultView, formatDuration } from '@/features/game/rewards/lesson-result-view';
-import type { CityId } from '@/features/game/theme';
 import type { LessonDetailResponse } from '@/features/game/types';
 import { GlossaryCard } from '@/features/reading/glossary-card';
 import { GlossaryText, type GlossaryEntry } from '@/features/reading/glossary-text';
@@ -367,14 +366,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
     paddingHorizontal: screenPadding,
-    paddingVertical: 12,
+    // .screen üst boşluğu 24, .screenhead alt boşluğu 25 (12 + içeriğin 13'ü).
+    paddingTop: 24,
+    paddingBottom: 12,
   },
   disabled: {
     opacity: 0.4,
   },
   content: {
     paddingHorizontal: screenPadding,
-    paddingTop: 8,
+    paddingTop: 13,
   },
   article: {
     width: '100%',
@@ -386,7 +387,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   reader: {
-    marginVertical: 20,
+    marginVertical: 27,
     gap: 22,
   },
   paragraph: {

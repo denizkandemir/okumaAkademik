@@ -39,8 +39,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    paddingTop: 16,
-    paddingBottom: 14,
+    paddingTop: 19,
+    paddingBottom: 16,
     paddingHorizontal: screenPadding,
     backgroundColor: colors.chapterBar,
     borderBottomWidth: 1,
@@ -48,6 +48,6 @@ const styles = StyleSheet.create({
   },
   texts: {
     flex: 1,
-    gap: 2,
+    gap: 5,
   },
 });

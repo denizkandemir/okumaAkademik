@@ -1,9 +1,8 @@
 import { router } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import type { CityId } from '../theme';
+import { CITIES, type CityId } from '@/design/cities';
 
-import { CITIES } from '@/design/cities';
 import { AppText } from '@/design/components/app-text';
 import { Eyebrow } from '@/design/components/eyebrow';
 import { colors, radius, size } from '@/design/tokens';
@@ -63,7 +62,7 @@ const styles = StyleSheet.create({
   card: {
     alignItems: 'center',
     gap: 6,
-    padding: 18,
+    padding: 20,
     backgroundColor: colors.map.nextStop,
     borderWidth: 1,
     borderColor: colors.map.nextStopBorder,

@@ -26,7 +26,7 @@ export function ProfileSummary({ name, grade, stats }: ProfileSummaryProps) {
     <>
       <View style={styles.passport} accessible accessibilityLabel={`${name}. ${title}`}>
         <View style={styles.innerBorder} pointerEvents="none" />
-        <Mascot pose="idle" size={88} />
+        <Mascot pose="idle" size={88} decorative />
         <AppText variant="question" align="center">
           {name}
         </AppText>

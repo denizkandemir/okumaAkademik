@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { CITIES } from '@/design/cities';
+import { CITIES, CITY_IDS, type CityId } from '@/design/cities';
 import { AppHeader } from '@/design/components/app-header';
 import { AppText } from '@/design/components/app-text';
 import { Card } from '@/design/components/card';
@@ -13,7 +13,6 @@ import { StateView } from '@/design/components/state-view';
 import { CheckIcon, LockIcon } from '@/design/icons';
 import { colors, radius } from '@/design/tokens';
 import { CityPreviewSheet } from '@/features/game/home/city-preview-sheet';
-import { CITY_IDS, type CityId } from '@/features/game/theme';
 import type { CityStatus } from '@/features/game/types';
 import { useJourney } from '@/features/game/use-journey';
 

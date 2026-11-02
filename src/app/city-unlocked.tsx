@@ -3,10 +3,10 @@ import { StyleSheet, View } from 'react-native';
 
 import { CITIES, CITY_UNLOCK_LINE } from '@/design/cities';
 import { Button } from '@/design/components/button';
+import { CityHeroLayout } from '@/design/components/city-hero-layout';
 import { Chip } from '@/design/components/chip';
 import { continueRewardFlow } from '@/features/game/reward-flow';
 import { useReward } from '@/features/game/reward-store';
-import { CityHeroLayout } from '@/features/game/rewards/city-hero-layout';
 import { useHardwareBack } from '@/hooks/use-hardware-back';
 
 /** Şehir açılışı (14-sehir-acilisi). Yalnızca ödül akışında `cityUnlocked` varsa açılır. */

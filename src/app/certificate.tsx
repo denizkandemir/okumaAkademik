@@ -108,6 +108,8 @@ export default function CertificateScreen() {
                 collapsable={false}
                 style={styles.card}
                 accessible
+                // Ekranın tek başlığı sertifikanın kendisi; başlıklar arasında gezinirken bulunsun.
+                accessibilityRole="header"
                 accessibilityLabel={`${finished ? '' : 'Önizleme. '}Okuma kâşifi sertifikası, ${name}, ${date}`}>
                 <View style={styles.cardInner}>
                   <Eyebrow align="center">OKUMATİK</Eyebrow>

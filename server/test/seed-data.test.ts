@@ -14,7 +14,7 @@ import { toApiCity } from '../src/lib/city.js';
 import { CHEST_POSITIONS, LESSONS_PER_CITY, TOTAL_LESSONS } from '../src/lib/journey.js';
 
 /**
- * Seed içeriğinin doğrulaması (docs/tasarim/promptlar/P03-icerik-hikayeler.md). İçerik
+ * Seed içeriğinin doğrulaması (48 hikâye ve 144 soru; docs/tasarim/README.md, karar 9). İçerik
  * değiştiğinde bu test kurallara uymayan hikâyeyi adıyla gösterir.
  */
 

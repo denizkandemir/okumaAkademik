@@ -1,10 +1,9 @@
 import { StyleSheet, View } from 'react-native';
 
-import { CITIES } from '@/design/cities';
+import { CITIES, CITY_IDS } from '@/design/cities';
 import { AppText } from '@/design/components/app-text';
 import { CityImage } from '@/design/components/city-image';
 import { colors } from '@/design/tokens';
-import { CITY_IDS } from '@/features/game/theme';
 import type { StatsResponse } from '@/features/game/types';
 
 /** Mührün görsel çapı (panoda 78). */

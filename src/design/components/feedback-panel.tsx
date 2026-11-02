@@ -1,4 +1,5 @@
-import { StyleSheet, View, type ViewProps } from 'react-native';
+import type { Ref } from 'react';
+import { StyleSheet, View, type ViewInstance, type ViewProps } from 'react-native';
 
 import { colors, radius } from '../tokens';
 import { AppText } from './app-text';
@@ -9,6 +10,8 @@ export type FeedbackPanelProps = ViewProps & {
   text: string;
   /** İsteğe bağlı ek satır (ör. "+5 lokum"). */
   extra?: string;
+  /** Ekran okuyucu odağını panele taşımak için (ör. soru ekranı). */
+  ref?: Ref<ViewInstance>;
 };
 
 /** Cevaptan sonraki geri bildirim kutusu. Ekran okuyucu içeriği kendiliğinden okur. */

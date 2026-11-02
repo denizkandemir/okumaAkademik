@@ -4,7 +4,7 @@ import { useState, type ComponentType, type ReactNode } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { CITIES } from '@/design/cities';
+import { CITIES, CITY_IDS } from '@/design/cities';
 import { AppHeader } from '@/design/components/app-header';
 import { AppText } from '@/design/components/app-text';
 import { Button } from '@/design/components/button';
@@ -46,7 +46,6 @@ import {
   type IconProps,
 } from '@/design/icons';
 import { colors, radius, screenPadding, type, type TypeVariant } from '@/design/tokens';
-import { CITY_IDS } from '@/features/game/theme';
 
 const HEADER_OPTIONS = {
   headerShown: true,

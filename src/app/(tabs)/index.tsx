@@ -1,6 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  AccessibilityInfo,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -11,8 +12,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { BottomTabInset } from '@/constants/theme';
-import { CITIES } from '@/design/cities';
+import { CITIES, CITY_IDS, type CityId } from '@/design/cities';
 import { AppHeader } from '@/design/components/app-header';
 import { AppText } from '@/design/components/app-text';
 import { StateView } from '@/design/components/state-view';
@@ -22,7 +22,6 @@ import { CityPreviewSheet } from '@/features/game/home/city-preview-sheet';
 import { JourneyMap, focusIndex, type PirilMessage } from '@/features/game/home/journey-map';
 import { CITY_MAP_LAYOUTS, mapGeometry } from '@/features/game/home/map-layout';
 import type { NextStop } from '@/features/game/home/next-stop-card';
-import { CITY_IDS, type CityId } from '@/features/game/theme';
 import type { JourneyLesson, JourneyResponse } from '@/features/game/types';
 import { useJourney } from '@/features/game/use-journey';
 
@@ -100,7 +99,10 @@ export default function HomeScreen() {
     router.push({ pathname: '/lesson/[id]', params: { id: lesson.id } });
   }, []);
   const showLocked = useCallback(() => {
-    setTip({ text: 'Önce önceki dersi bitirelim.', pose: 'think' });
+    const text = 'Önce önceki dersi bitirelim.';
+    setTip({ text, pose: 'think' });
+    // Balon haritanın içinde; ekran okuyucu kullanıcısı da duysun.
+    AccessibilityInfo.announceForAccessibility(text);
   }, []);
 
   const message = useMemo(() => tip ?? pirilMessage(data), [tip, data]);
@@ -128,7 +130,7 @@ export default function HomeScreen() {
       <ScrollView
         ref={scrollRef}
         style={styles.scroll}
-        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + BottomTabInset }]}
+        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + size.tabBar }]}
         onLayout={onLayout}
         onContentSizeChange={onContentSizeChange}>
         {data && nextStop ? (

@@ -13,7 +13,8 @@ import { useReward } from '@/features/game/reward-store';
 import { RewardLayout } from '@/features/game/rewards/reward-layout';
 import { useHardwareBack } from '@/hooks/use-hardware-back';
 
-const MEDAL_SIZE = 150;
+/** .levelmedal: 140 × 140, üstte 30, altta 20 boşluk. */
+const MEDAL_SIZE = 140;
 
 /** Seviye ödülü (13-seviye-odulu). Yalnızca ödül akışında `level.leveledUp` ise açılır. */
 export default function LevelUpScreen() {
@@ -43,10 +44,11 @@ export default function LevelUpScreen() {
           accessible
           accessibilityRole="image"
           accessibilityLabel={`Seviye ${level}`}>
-          <AppText variant="eyebrow" color={colors.medal.text}>
+          {/* Madalyanın boyutu sabit; en büyük yazıda içine sığsın diye 1,3 ile sınırlı. */}
+          <AppText variant="eyebrow" color={colors.medal.text} maxFontSizeMultiplier={1.3}>
             SEVİYE
           </AppText>
-          <AppText color={colors.medal.text} style={styles.number} maxFontSizeMultiplier={1.2}>
+          <AppText color={colors.medal.text} style={styles.number} maxFontSizeMultiplier={1.3}>
             {level}
           </AppText>
         </Animated.View>
@@ -92,7 +94,8 @@ const styles = StyleSheet.create({
       { offsetX: 0, offsetY: 0, blurRadius: 0, spreadDistance: 2, color: colors.medal.edge },
       { offsetX: 0, offsetY: 8, blurRadius: 0, spreadDistance: 0, color: colors.medal.lip },
     ],
-    marginVertical: 12,
+    marginTop: 22,
+    marginBottom: 12,
   },
   number: {
     fontFamily: fonts.sansBlack,
