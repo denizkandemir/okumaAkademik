@@ -6,6 +6,7 @@ import { radius } from '@/design/tokens';
 import { AuthProvider, useAuth } from '@/features/auth/auth-context';
 import { SplashScreenController } from '@/features/auth/splash-screen-controller';
 import { useGameFonts } from '@/features/game/fonts';
+import { WelcomeBackGate } from '@/features/welcome-back/welcome-back-gate';
 import { useTheme } from '@/hooks/use-theme';
 
 /** Ödül ekranları: tam ekran, başlıksız, kaydırarak kapanmaz. */
@@ -87,12 +88,17 @@ function RootNavigator({ fontsReady }: { fontsReady: boolean }) {
           />
           {/* Eski yolculuk haritası adresi; Pasaport sekmesine yönlendirir. */}
           <Stack.Screen name="journey-map" />
+          {/* Ayarlar kendi geri düğmesini çizer; Profil'den açılır. */}
+          <Stack.Screen name="settings" />
+          {/* Yeniden merhaba: tam ekran; kapat ve Android geri tuşu Yolculuk'a döner. */}
+          <Stack.Screen name="welcome-back" options={{ presentation: 'fullScreenModal' }} />
         </Stack.Protected>
 
         <Stack.Protected guard={!user}>
           <Stack.Screen name="(auth)" />
         </Stack.Protected>
       </Stack>
+      {user ? <WelcomeBackGate /> : null}
     </ThemeProvider>
   );
 }

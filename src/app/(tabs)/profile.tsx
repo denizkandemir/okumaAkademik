@@ -1,8 +1,6 @@
 import { Link, router } from 'expo-router';
-import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { Button } from '@/components/button';
 import { Card } from '@/components/card';
 import { Screen } from '@/components/screen';
 import { ThemedText } from '@/components/themed-text';
@@ -13,9 +11,8 @@ import { Mascot } from '@/features/mascot/mascot';
 import { useTheme } from '@/hooks/use-theme';
 
 export default function ProfileScreen() {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const theme = useTheme();
-  const [signingOut, setSigningOut] = useState(false);
 
   if (!user) return null;
 
@@ -53,14 +50,13 @@ export default function ProfileScreen() {
         onPress={() => router.push('/badges')}
       />
 
-      <Button
-        title="Çıkış yap"
-        variant="danger"
-        loading={signingOut}
-        onPress={() => {
-          setSigningOut(true);
-          void signOut();
-        }}
+      {/* Geçici giriş: T05 Profil'i yeniden kurarken buraya ayarlar (sürgü) düğmesini yerleştirir.
+          Çıkış artık Ayarlar'da. */}
+      <DesignButton
+        title="AYARLAR"
+        accessibilityLabel="Ayarlar"
+        variant="secondary"
+        onPress={() => router.push('/settings')}
       />
 
       {__DEV__ ? (

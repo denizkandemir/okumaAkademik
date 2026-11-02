@@ -9,6 +9,8 @@ export type TextFieldProps = Omit<TextInputProps, 'secureTextEntry'> & {
   label: string;
   /** Alanın altında gösterilir ve ekran okuyucuya ipucu olarak verilir. */
   error?: string;
+  /** Alanın altında soluk yardım satırı (ör. "Giriş yaparken bunu kullanacaksın."); hata varken gizlenir. */
+  helper?: string;
   /** Şifre alanı: gizli yazılır, sağdaki göz düğmesiyle gösterilebilir. */
   secure?: boolean;
   /** Alanın sağına yerleşen öğe (ör. saat ikonu). `secure` ise göz düğmesi kullanılır. */
@@ -22,6 +24,7 @@ export type TextFieldProps = Omit<TextInputProps, 'secureTextEntry'> & {
 export function TextField({
   label,
   error,
+  helper,
   secure = false,
   trailing,
   style,
@@ -42,7 +45,7 @@ export function TextField({
       <View style={[styles.field, { borderColor }]}>
         <TextInput
           accessibilityLabel={label}
-          accessibilityHint={error ?? accessibilityHint}
+          accessibilityHint={error ?? helper ?? accessibilityHint}
           placeholderTextColor={colors.input.placeholder}
           secureTextEntry={secure && !revealed}
           onFocus={(event) => {
@@ -76,6 +79,10 @@ export function TextField({
       {error ? (
         <AppText variant="secondary" color={colors.danger} accessibilityLiveRegion="polite">
           {error}
+        </AppText>
+      ) : helper ? (
+        <AppText variant="secondary" color={colors.textMuted}>
+          {helper}
         </AppText>
       ) : null}
     </View>

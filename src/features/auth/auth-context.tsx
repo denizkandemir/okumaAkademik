@@ -5,6 +5,7 @@ import * as authService from './auth-service';
 import type { AuthResponse, SignUpInput, User } from './types';
 
 import { clearReward } from '@/features/game/reward-store';
+import { clearReminder } from '@/features/reminder/reminder';
 import {
   API_URL,
   API_URL_SOURCE,
@@ -28,6 +29,8 @@ type AuthContextValue = {
   signIn: (username: string, password: string) => Promise<void>;
   signUp: (input: SignUpInput) => Promise<void>;
   signOut: () => Promise<void>;
+  /** Adı sunucuda değiştirir; üst çubuk ve selamlar hemen yeni adı gösterir. */
+  updateName: (name: string) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -90,6 +93,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
     // Son dersin ödülü bir sonraki kullanıcıya taşınmasın.
     clearReward();
     await clearStoredSession().catch((error) => console.warn('Oturum silinemedi:', error));
+    // Hatırlatma çocuğun adını taşır; bir sonraki kullanıcıya kalmasın.
+    await clearReminder().catch((error) => console.warn('Hatırlatma silinemedi:', error));
   };
 
   const signOut = async () => {
@@ -154,6 +159,11 @@ export function AuthProvider({ children }: PropsWithChildren) {
       startSession(await authService.signIn({ username, password })),
     signUp: async (input) => startSession(await authService.signUp(input)),
     signOut,
+    updateName: async (name) => {
+      const updated = await authService.updateName(name);
+      setUser(updated);
+      await storage.setJSON(storage.StorageKeys.authUser, updated);
+    },
   };
 
   return <AuthContext value={value}>{children}</AuthContext>;

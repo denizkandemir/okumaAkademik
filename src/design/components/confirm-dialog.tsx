@@ -16,6 +16,8 @@ export type ConfirmDialogProps = {
   leaveLabel: string;
   onStay: () => void;
   onLeave: () => void;
+  /** Android geri tuşu; varsayılan `onStay`. */
+  onDismiss?: () => void;
 };
 
 /**
@@ -30,9 +32,10 @@ export function ConfirmDialog({
   leaveLabel,
   onStay,
   onLeave,
+  onDismiss = onStay,
 }: ConfirmDialogProps) {
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onStay}>
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
       <View style={styles.backdrop}>
         <View style={styles.dialog} accessibilityViewIsModal>
           <View style={styles.mascot}>

@@ -31,6 +31,13 @@ export function validateSignUp(values: {
   return errors;
 }
 
+/** Ayarlar'daki ad: kayıttaki kural (sunucuda `nameSchema`). */
+export function validateName(name: string) {
+  const errors: FieldErrors<'name'> = {};
+  if (!name.trim()) errors.name = 'Adını yaz.';
+  return errors;
+}
+
 export function hasErrors(errors: object) {
   return Object.keys(errors).length > 0;
 }

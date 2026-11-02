@@ -1,9 +1,15 @@
-import type { FastifyInstance } from 'fastify';
+import type { FastifyInstance, FastifyRequest } from 'fastify';
 import { z } from 'zod';
 
 import { Prisma } from '../../generated/prisma/client.js';
 import { Errors } from '../../lib/errors.js';
-import { gradeSchema, parse, passwordSchema, usernameSchema } from '../../lib/validation.js';
+import {
+  gradeSchema,
+  nameSchema,
+  parse,
+  passwordSchema,
+  usernameSchema,
+} from '../../lib/validation.js';
 import { requireAuth } from '../../plugins/auth.js';
 import { AUTH_RATE_LIMIT, authIpRateLimit, ipAndUsernameKey } from '../../plugins/rate-limit.js';
 import { hashPassword, verifyAgainstDummy, verifyPassword } from './password.js';
@@ -13,13 +19,11 @@ import { publicUserSelect, toPublicUser } from './user.js';
 const registerSchema = z.object({
   username: usernameSchema,
   password: passwordSchema,
-  name: z
-    .string({ error: 'Adını yaz.' })
-    .trim()
-    .min(1, { error: 'Adını yaz.' })
-    .max(40, { error: 'Adın en fazla 40 karakter olabilir.' }),
+  name: nameSchema,
   grade: gradeSchema,
 });
+
+const updateMeSchema = z.object({ name: nameSchema });
 
 // Girişte biçim kontrolü yapılmaz; yalnızca boş olmamalı. Biçim hatası da "hatalı" sayılır.
 const loginSchema = z.object({
@@ -36,6 +40,14 @@ const loginSchema = z.object({
 });
 
 const authRateLimit = { rateLimit: { ...AUTH_RATE_LIMIT, keyGenerator: ipAndUsernameKey } };
+
+// Rate limit kancası route'un `authenticate` kancasından sonra çalışır; anahtar kullanıcıdır.
+const updateMeRateLimit = {
+  rateLimit: {
+    ...AUTH_RATE_LIMIT,
+    keyGenerator: (request: FastifyRequest) => `me|${request.auth?.user.id ?? request.ip}`,
+  },
+};
 
 export async function authRoutes(app: FastifyInstance) {
   const { prisma, config } = app;
@@ -92,5 +104,17 @@ export async function authRoutes(app: FastifyInstance) {
 
   app.get('/me', { preHandler: app.authenticate }, async (request) => {
     return { user: toPublicUser(requireAuth(request).user) };
+  });
+
+  /** Ayarlar ekranından adı değiştirir; GET /me ile aynı şekli döner. */
+  app.patch('/me', { preHandler: app.authenticate, config: updateMeRateLimit }, async (request) => {
+    const { user } = requireAuth(request);
+    const input = parse(updateMeSchema, request.body);
+    const updated = await prisma.user.update({
+      where: { id: user.id },
+      data: { name: input.name },
+      select: publicUserSelect,
+    });
+    return { user: toPublicUser(updated) };
   });
 }

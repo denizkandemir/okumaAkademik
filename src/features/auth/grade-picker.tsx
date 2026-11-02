@@ -1,9 +1,9 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { GRADES, type Grade } from './types';
 
-import { GameColors, GameFonts } from '@/features/game/theme';
-import { GameText } from '@/features/game/ui/game-text';
+import { AppText } from '@/design/components/app-text';
+import { colors, radius, size } from '@/design/tokens';
 
 type GradePickerProps = {
   value: Grade | null;
@@ -11,27 +11,25 @@ type GradePickerProps = {
   error?: string;
 };
 
-/** Seçili sınıf: mavi buton rengi (#2453C9) ve koyu "dudak". */
-const SELECTED = { background: '#2453C9', lip: '#183A99' } as const;
-const ERROR_COLOR = '#B42318';
-const CHIP_SIZE = 56;
+const CHIP_HEIGHT = 56;
 
-/** Sınıf seçimi: 1-8 arası büyük yuvarlak çipler (tek seçimli). */
+/** Sınıf seçimi: 1-8 arası seçenek kartı görünümünde çipler, iki sıra × 4 (tek seçimli). */
 export function GradePicker({ value, onChange, error }: GradePickerProps) {
   return (
     <View style={styles.container}>
-      <GameText variant="label" color={GameColors.warm} nativeID="grade-label">
+      <AppText variant="bodyStrong" color={colors.formLabel} nativeID="grade-label">
         Sınıfın
-      </GameText>
+      </AppText>
       <View
         accessibilityRole="radiogroup"
         accessibilityLabelledBy="grade-label"
         style={styles.grid}>
-        {/* Her zaman iki sıra × 4 çip (en dar ekranda da sığar: 4 × 56 = 224 dp). */}
+        {/* Her zaman iki sıra × 4 çip (en dar ekranda da sığar). */}
         {[GRADES.slice(0, 4), GRADES.slice(4)].map((row) => (
           <View key={row[0]} style={styles.row}>
             {row.map((grade) => {
               const selected = grade === value;
+              const palette = colors.option[selected ? 'selected' : 'default'];
               return (
                 <Pressable
                   key={grade}
@@ -41,12 +39,16 @@ export function GradePicker({ value, onChange, error }: GradePickerProps) {
                   onPress={() => onChange(grade)}
                   style={({ pressed }) => [
                     styles.chip,
-                    selected
-                      ? styles.chipSelected
-                      : { borderColor: error ? ERROR_COLOR : GameColors.inputBorder },
+                    {
+                      backgroundColor: palette.background,
+                      borderColor: error && !selected ? colors.danger : palette.border,
+                      borderBottomColor: error && !selected ? colors.danger : palette.lip,
+                    },
                     pressed && styles.pressed,
                   ]}>
-                  <Text style={[styles.number, selected && styles.numberSelected]}>{grade}</Text>
+                  <AppText variant="heading" maxFontSizeMultiplier={1.5}>
+                    {grade}
+                  </AppText>
                 </Pressable>
               );
             })}
@@ -54,9 +56,9 @@ export function GradePicker({ value, onChange, error }: GradePickerProps) {
         ))}
       </View>
       {error ? (
-        <GameText variant="caption" color={ERROR_COLOR}>
+        <AppText variant="secondary" color={colors.danger} accessibilityLiveRegion="polite">
           {error}
-        </GameText>
+        </AppText>
       ) : null}
     </View>
   );
@@ -67,35 +69,21 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   grid: {
-    gap: 12,
+    gap: 10,
   },
   row: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    gap: 10,
   },
   chip: {
-    width: CHIP_SIZE,
-    height: CHIP_SIZE,
-    borderRadius: CHIP_SIZE / 2,
+    flex: 1,
+    minHeight: CHIP_HEIGHT,
+    minWidth: size.touch,
     borderWidth: 2,
-    backgroundColor: GameColors.inputBackground,
+    borderBottomWidth: size.optionLip,
+    borderRadius: radius.button,
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: '0 3px 0 #F0D3B8',
-  },
-  chipSelected: {
-    backgroundColor: SELECTED.background,
-    borderColor: SELECTED.background,
-    boxShadow: `0 4px 0 ${SELECTED.lip}`,
-  },
-  number: {
-    fontFamily: GameFonts.headingHeavy,
-    fontSize: 24,
-    lineHeight: 30,
-    color: GameColors.warm,
-  },
-  numberSelected: {
-    color: GameColors.white,
   },
   pressed: {
     transform: [{ translateY: 2 }],
