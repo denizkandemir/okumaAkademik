@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 
+import { toApiCity } from '../../lib/city.js';
 import { Errors } from '../../lib/errors.js';
 import { withApiLevel } from '../../lib/reading-level.js';
 import { withApiTheme } from '../../lib/text-theme.js';
@@ -42,17 +43,21 @@ export async function textsRoutes(app: FastifyInstance) {
     return { texts: texts.map((text) => withApiTheme(withApiLevel(text))) };
   });
 
+  /** Metnin tamamı. `city`: metni okutan yolculuk dersinin şehri (dersi yoksa `null`). */
   app.get('/texts/:id', async (request) => {
     const { user } = requireAuth(request);
     const { id } = parse(textParamsSchema, request.params);
-    const text = await prisma.text.findUnique({
+    const row = await prisma.text.findUnique({
       where: { id },
-      select: { ...textSummarySelect, paragraphs: true },
+      select: { ...textSummarySelect, paragraphs: true, lesson: { select: { city: true } } },
     });
-    if (!text) throw Errors.notFound('Bu metni bulamadık.');
+    if (!row) throw Errors.notFound('Bu metni bulamadık.');
     if (lockedTextIds(await loadJourneyState(prisma, user.id)).has(id)) {
       throw Errors.lessonLocked();
     }
-    return { text: withApiTheme(withApiLevel(text)) };
+    const { lesson, ...text } = row;
+    return {
+      text: { ...withApiTheme(withApiLevel(text)), city: lesson ? toApiCity(lesson.city) : null },
+    };
   });
 }

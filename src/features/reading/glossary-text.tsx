@@ -1,6 +1,6 @@
 import { StyleSheet, Text, type StyleProp, type TextStyle } from 'react-native';
 
-import { GameFonts } from '@/features/game/theme';
+import { colors } from '@/design/tokens';
 
 export type GlossaryEntry = { word: string; meaning: string };
 
@@ -52,7 +52,10 @@ type GlossaryTextProps = {
   onWordPress: (entry: GlossaryEntry) => void;
 };
 
-/** Sözlük kelimeleri mor ve noktalı altı çizili, dokunulabilir (S04Okuma). */
+/**
+ * Sözlük kelimeleri vurgu renginde ve noktalı altı çizili, dokunulabilir (08-okuma). Android
+ * noktalı çizgiyi desteklemez; orada düz alt çizgi görünür.
+ */
 export function GlossaryText({ paragraph, glossary, style, onWordPress }: GlossaryTextProps) {
   return (
     <Text style={style}>
@@ -78,11 +81,9 @@ export function GlossaryText({ paragraph, glossary, style, onWordPress }: Glossa
 
 const styles = StyleSheet.create({
   word: {
-    fontFamily: GameFonts.bodyHeavy,
-    color: '#4A2BC2',
-    backgroundColor: '#EDE5FF',
+    color: colors.accent,
     textDecorationLine: 'underline',
     textDecorationStyle: 'dotted',
-    textDecorationColor: '#4A2BC2',
+    textDecorationColor: colors.accent,
   },
 });

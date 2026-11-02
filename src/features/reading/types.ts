@@ -1,3 +1,5 @@
+import type { CityId } from '@/features/game/theme';
+
 export type ReadingLevel = 1 | 2 | 3;
 
 export const LevelLabels: Record<ReadingLevel, string> = {
@@ -20,6 +22,8 @@ export type TextSummary = {
 /** GET /texts/:id */
 export type ReadingText = TextSummary & {
   paragraphs: string[];
+  /** Metni okutan yolculuk dersinin şehri; dersi olmayan metinde `null`. */
+  city: CityId | null;
 };
 
 /** POST /reading-sessions yanıtı (201; server/src/modules/progress/progress.routes.ts). */

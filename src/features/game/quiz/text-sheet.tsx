@@ -1,11 +1,9 @@
-import { Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Modal, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { GameColors, GameFonts } from '../theme';
-import { CloseIcon } from '../ui/icons';
-import { SquareButton } from '../ui/square-button';
-
-import { ReadingFont } from '@/constants/theme';
+import { AppText } from '@/design/components/app-text';
+import { SheetHeader } from '@/design/components/sheet-header';
+import { colors, readingSize, screenPadding, type } from '@/design/tokens';
 
 type TextSheetProps = {
   visible: boolean;
@@ -14,7 +12,12 @@ type TextSheetProps = {
   onClose: () => void;
 };
 
-/** "Metne bak": hikâyeyi salt okunur bir sayfada gösterir; kapatınca soruya dönülür. */
+const FONT_SIZE = readingSize.default;
+
+/**
+ * "Metne bak": hikâyeyi salt okunur bir alt sayfada gösterir (Literata); kapatınca soruya
+ * dönülür. iOS'ta sayfa olarak açılır, Android'de tam ekran; geri tuşu kapatır.
+ */
 export function TextSheet({ visible, title, paragraphs, onClose }: TextSheetProps) {
   const insets = useSafeAreaInsets();
   return (
@@ -23,20 +26,24 @@ export function TextSheet({ visible, title, paragraphs, onClose }: TextSheetProp
       animationType="slide"
       presentationStyle="pageSheet"
       onRequestClose={onClose}>
-      <View style={styles.sheet}>
+      <View
+        style={[styles.sheet, { paddingTop: Platform.OS === 'ios' ? 8 : insets.top + 8 }]}
+        accessibilityViewIsModal>
         <View style={styles.header}>
-          <Text style={styles.title} accessibilityRole="header" numberOfLines={2}>
+          <SheetHeader onClose={onClose} closeLabel="Metni kapat" />
+          <AppText variant="sheetTitle" accessibilityRole="header" maxFontSizeMultiplier={1.3}>
             {title}
-          </Text>
-          <SquareButton accessibilityLabel="Metni kapat" onPress={onClose}>
-            <CloseIcon size={20} color={GameColors.textWarmSecondary} />
-          </SquareButton>
+          </AppText>
         </View>
         <ScrollView contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 32 }]}>
           {paragraphs.map((paragraph, index) => (
-            <Text key={index} style={styles.paragraph}>
+            <AppText
+              key={index}
+              variant="reading"
+              color={colors.readingText}
+              style={styles.paragraph}>
               {paragraph}
-            </Text>
+            </AppText>
           ))}
         </ScrollView>
       </View>
@@ -47,32 +54,23 @@ export function TextSheet({ visible, title, paragraphs, onClose }: TextSheetProp
 const styles = StyleSheet.create({
   sheet: {
     flex: 1,
-    backgroundColor: '#FFF9EF',
+    backgroundColor: colors.surface,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingHorizontal: 20,
-    paddingTop: 20,
+    gap: 4,
+    paddingHorizontal: screenPadding,
     paddingBottom: 8,
-  },
-  title: {
-    flex: 1,
-    fontFamily: GameFonts.headingHeavy,
-    fontSize: 26,
-    lineHeight: 32,
-    color: GameColors.warm,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
   },
   content: {
-    paddingHorizontal: 24,
-    paddingTop: 8,
-    gap: 14,
+    paddingHorizontal: screenPadding,
+    paddingTop: 16,
+    gap: 22,
   },
   paragraph: {
-    fontFamily: GameFonts.body,
-    fontSize: ReadingFont.default,
-    lineHeight: Math.round(ReadingFont.default * ReadingFont.lineHeightRatio),
-    color: GameColors.warm,
+    fontSize: FONT_SIZE,
+    lineHeight: Math.round(FONT_SIZE * readingSize.lineHeightRatio),
+    fontFamily: type.reading.fontFamily,
   },
 });
