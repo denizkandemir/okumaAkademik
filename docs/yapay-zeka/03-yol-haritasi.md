@@ -21,9 +21,24 @@
 ## 2. Sıralama
 
 Yapay zekâ aşaması, yeni tasarımın (Pırıl'ın Atlası, `docs/tasarim/`) T00-T06 görevleri
-bittikten sonra başlar:
+bittikten sonra başladı. Güncel sıra (Kasım 2026):
 
-**T00-T06 → A0 → A1 → A2 → A3 → A4 → A5 → A6**
+**T00-T06 ✓ → A0 ✓ → A3s → A1a → Ö0 → Ö1 → pilot hazırlığı → pilot → A1b → A2 → A4 → A5 → Ö2 →
+Ö3 → A6 → A7 → içerik büyütme → ödeme**
+
+Neden bu sıra:
+
+- **A3s** (48 hikâyenin G1, G3, G4 sürümleri) API kullanmaz; Claude Code ile şehir şehir yazılır
+  ve öğretmen onaylar. Pilotta 7-14 yaş arası her çocuk kendi seviyesinde okusun diye pilottan
+  önce gelir.
+- **A1a** (ilk 5 egzersiz, E11 "hece hece oku" dahil) yapay zekâ kullanmaz. Egzersizler
+  uygulamanın en ayırt edici yanı olduğu için pilottan önce gelir. A1b pilot sırasında gelir.
+- **Ö0 ve Ö1** (öğretmen girişi, sınıf, panel, hikâye ödevi) pilotu kurs merkezinde yaptığımız
+  için pilottan önce gelir (`docs/urun/ogretmen-paneli.md`).
+- **A2 ve sonrası** (API'li canlı özellikler: kişiye özel plan, rapor, Pırıl konuşmaları) pilottan
+  sonra gelir. Böylece API'ye ödeme gerçek kullanıcı verisi ve plan kalitesi için gerçek veri
+  oluşunca başlar.
+- **A3'ün API'li kısmı** (otomatik üretim aracı) içerik büyütme aşamasına kaldı.
 
 Eski planda yapay zekâ aşamaları arasına giren P07 (harita, rozetler, profil), P08 (bildirim,
 geri dönüş) ve P09 (son kontrol), yeni tasarımın T03-T06 görevlerine taşındı.
@@ -33,7 +48,8 @@ A7 (kalite ve güvenlik) A2'den itibaren her aşamaya eşlik eder.
 | Aşama | Ad | Yapay zekâ var mı | Bağımlılık |
 |---|---|---|---|
 | A0 | Ölçüm ve veri temeli | Hayır | T00-T06 |
-| A1 | Egzersiz motoru | Hayır | A0 |
+| A3s | Sınıf grubu sürümleri (statik içerik) | Hayır (Claude Code ile yazılır) | A0 |
+| A1 | Egzersiz motoru | Hayır | A0 (A1a için A3s) |
 | A2 | Yapay zekâ altyapısı | Evet (altyapı) | A0 |
 | A3 | Yapay zekâ ile içerik üretimi | Evet | A1, A2 |
 | A4 | Uyarlanabilir plan (yol haritası) | Evet | A1, A2, A3 |

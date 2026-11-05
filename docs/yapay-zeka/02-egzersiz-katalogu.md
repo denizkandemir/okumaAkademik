@@ -20,6 +20,7 @@ Sınıf grupları: **G1** = 1-2. sınıf, **G2** = 3-4, **G3** = 5-6, **G4** = 7
 | E8 | Anlama stratejileri | Güçlü | Hepsi | Okuduğunu anlama |
 | E9 | LGS tarzı paragraf ve sözel mantık | Güçlü (strateji) + sınav uyumu | G3-G4 | Sınav becerileri |
 | E10 | Görsel okuma (grafik, tablo, infografik) | Sınav uyumu | G2-G4 | Görsel okuma |
+| E11 | Hece hece oku (zıplayan top) | Zayıf–Orta (kendi verimizle ölçülecek) | G1 | Hece çözümleme, takip, sesli okuma |
 
 ### E1 · Tekrarlı okuma ve hedef grafiği
 - **Nasıl:** Aynı kısa metin (60-200 kelime) 2-4 kez okunur. Her okumada süre ölçülür ve
@@ -76,6 +77,9 @@ Sınıf grupları: **G1** = 1-2. sınıf, **G2** = 3-4, **G3** = 5-6, **G4** = 7
   - G1'de (1-2. sınıf) kullanılmaz.
 - **Ölçüm:** ışıklı ve ışıksız okumada hız ve anlama karşılaştırması. Normal okumaya aktarım
   araştırmada zayıf çıktığı için bunu kendi verimizle ayrıca ölçeriz.
+- **Tanıtım dili:** bu bir **okuma temposu** egzersizidir, göz egzersizi değildir. Uygulamada ve
+  velilere "göz takibi" ya da "göz egzersizi" diye anlatılmaz. İşe yarayan kısım tempo ve geri
+  dönüp okumanın azalmasıdır; göz kaslarını çalıştırma iddiasının kanıtı yoktur (§2).
 
 ### E7 · Kök ve ek ustası
 - **Nasıl:** Okunan metinden 3-5 kelime seçilir. Mini oyunlar:
@@ -107,6 +111,34 @@ Okumadan sonra şu kısa görevlerden biri ya da ikisi:
   (SVG) çizilir; yapay zekâ veriyi ve soruları üretir, görselleri değil.
 - **Ayarlar:** veri noktası sayısı, grafik türü (sütun, çizgi, tablo), adım sayısı.
 
+### E11 · Hece hece oku (zıplayan top)
+- **Kimin için:** G1 (1-2. sınıf), okumayı yeni sökmüş ya da hecelerken zorlanan çocuklar. Yalnızca
+  G1; G2'de ancak hızı ve anlaması çok düşük çocuklara (planlayıcının kararıyla).
+- **Nasıl:**
+  1. Kısa bir metin (G1 sürümü, 40-100 kelime) heceleri belli olacak şekilde gösterilir:
+     heceler arasında ince bir boşluk ya da hafif renk farkı ("ka-ra-ka-cı").
+  2. Küçük bir top (ya da Pırıl'ın patisi) heceden heceye zıplar; çocuk topu izleyerek **sesli**
+     okur.
+  3. Topun hızı çocuğun kendi ölçülen hızına göre ayarlanır, **onu zorlamaz**: başlangıçta
+     seviye belirlemeden gelen hızın %90-100'ü. Çocuk "yavaş / normal" seçebilir, her an
+     durdurabilir, bir kelimeye dokunup o kelimeyi tekrar ettirebilir.
+  4. Metnin sonunda 1-2 kolay anlama sorusu.
+- **Ayarlar:** hece/saniye, hece ayrımı biçimi (boşluk, renk, ikisi), metin uzunluğu, top ya da
+  pati.
+- **Ses:** ilk sürümde ses yok (çocuk kendisi sesli okur). Telefonun ses motoru hece hece
+  eşzamanlamayı güvenilir biçimde desteklemediği için sesli sürüm E3'te kelime düzeyinde kalır.
+- **Neden:** Türkçede okuma öğretimi ses temellidir ve hece doğal bir birimdir. Yeni okurlar
+  için hecelere ayrılmış metin ve takip desteği (parmakla izlemenin dijital karşılığı) kod
+  çözmeyi kolaylaştırabilir. Bu, akıcı okurlar için önerilmeyen "çocuğu öne çeken işaretçi"
+  (§2) ile aynı şey değildir: hız çocuğun kendi temposudur, amaç hızlandırmak değil heceleri
+  birleştirmeyi desteklemektir. "Zıplayan top" biçiminin tek başına etkisini ölçen güçlü bir
+  çalışma bilmiyoruz; bu yüzden etkisini kendi verimizle ölçeriz.
+- **Ölçüm:** aynı metni topla ve topsuz okumada hız ve anlama; birkaç hafta içinde G1 okuma
+  hızındaki değişim.
+- **Sınırlar:** günde en fazla 5 dakika; çocuk okumayı topsuz da yapabilmeli, top kalıcı bir
+  koltuk değneği olmamalı (planlayıcı, hız arttıkça E11'i azaltıp E1 ve E2'ye geçer).
+- **Hareketi azalt:** açıkken top zıplamaz; o anki hece yalnızca renkle vurgulanır.
+
 ## 2. Bilinçli olarak eklenmeyenler
 
 | Önerilen | Neden eklenmiyor | Yerine |
@@ -114,7 +146,7 @@ Okumadan sonra şu kısa görevlerden biri ya da ikisi:
 | Ortası soluk, baş ve son harfleri belirgin kelimeler | Hız ve anlama faydası gösterilemedi; küçük yaşta çözümlemeyi zorlaştırabilir | E5 ve E7 |
 | Kelimelerin tek tek yanıp söndüğü hızlı gösterim (RSVP) | Geri dönüp okumayı engelleyip anlamayı bozuyor | E6 (geri dönüşe kısmen izin veren, anlamaya göre ayarlanan hız) |
 | Göz egzersizleri, çevresel görüşü genişletme | Pediatri ve göz hekimliği kuruluşları önermiyor | — |
-| Çocuğu öne çeken hareketli işaretçi | Göz hareketleri darboğaz değil | E6 (arkadan soldurma) |
+| Akıcı okurları öne çeken, hızlandıran hareketli işaretçi | Göz hareketleri darboğaz değil | E6 (arkadan soldurma). Yeni okurlar için kendi temposunda hece takibi: E11 |
 
 ## 3. Soru türleri (sınıflandırma)
 
@@ -140,8 +172,8 @@ Her soru ayrıca şunlarla etiketlenir:
 - **Bilişsel düzey:** hatırlama, anlama, çıkarım, değerlendirme.
 - **MEB kazanım kodu:** resmî programdan, varsa.
 
-**Seçenek sayısı:** G1-G2'de 3, G3-G4'te 4 (LGS biçimi). Not: P02'deki veritabanı kısıtı şu an
-"tam 3 seçenek" diyor; A0'da 3-4 olarak gevşetilecek.
+**Seçenek sayısı:** G1-G2'de 3, G3-G4'te 4 (LGS biçimi). Veritabanı kısıtı A0'da 3-4 olarak
+gevşetildi.
 
 ## 4. Zorluk ayarları (genel)
 
