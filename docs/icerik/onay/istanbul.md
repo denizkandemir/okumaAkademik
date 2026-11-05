@@ -14,6 +14,8 @@ Her metin için şunlara bakmanızı rica ederiz:
 4. **İpucu ve açıklama:** Yanlış cevapta gösterilen ipucu cevabı söylemeden yol gösteriyor mu?
 5. **Bilgiler:** Şehirle ilgili bilgiler (yerler, tarih) doğru mu?
 
+Her sorunun altındaki **Kanıt** satırı doğru cevabın dayanağını gösterir: *italik* yazı metinden birebir alıntıdır, düz yazı ise (ana fikir, başlık gibi türlerde) kısa gerekçedir.
+
 Düzeltmeleri doğrudan bu belgeye not edebilir ya da her metnin altındaki **Onay** satırını doldurabilirsiniz.
 
 ## Ölçütler
@@ -111,6 +113,7 @@ Tema: Paylaşmak · Ders özeti (bütün sürümlerde aynı): Ece’nin dedesiyl
 - C) Üç
 
 - Doğru cevap: **B**
+- Kanıt: *Dedesi iki sıcak simit almıştı.*
 - Soru türü: Bilgi (Q1) · Bilişsel düzey: Hatırlama
 - İpucu (yanlış cevaptan sonra): İkinci paragrafın ilk cümlesine bak.
 - Açıklama (doğru cevaptan sonra): Doğru! Dedesi iki sıcak simit almıştı.
@@ -122,6 +125,7 @@ Tema: Paylaşmak · Ders özeti (bütün sürümlerde aynı): Ece’nin dedesiyl
 - C) Vapur durduğu için
 
 - Doğru cevap: **A**
+- Kanıt: *Ece simitten küçük bir parça kopardı. Elini havaya uzattı. Bir martı geldi, parçayı kaptı.*
 - Soru türü: Neden-sonuç (Q4) · Bilişsel düzey: Anlama
 - İpucu (yanlış cevaptan sonra): Ece elini havaya uzatmadan önce ne yaptı?
 - Açıklama (doğru cevaptan sonra): Aferin! Ece simit uzatınca martı parçayı kapmaya geldi.
@@ -133,6 +137,7 @@ Tema: Paylaşmak · Ders özeti (bütün sürümlerde aynı): Ece’nin dedesiyl
 - C) Önce şaşırdı, sonra güldü ✔
 
 - Doğru cevap: **C**
+- Kanıt: *Ece önce şaşırdı. Sonra güldü de güldü.*
 - Soru türü: Duygu ve karakter (Q5) · Bilişsel düzey: Anlama
 - İpucu (yanlış cevaptan sonra): Dördüncü paragrafın son iki cümlesini oku.
 - Açıklama (doğru cevaptan sonra): Harika! Ece önce şaşırdı, sonra çok güldü.
@@ -166,6 +171,7 @@ Tema: Paylaşmak · Ders özeti (bütün sürümlerde aynı): Ece’nin dedesiyl
 - D) Martı vapura kondu.
 
 - Doğru cevap: **B**
+- Kanıt: *Bir martı ok gibi geldi, parçayı kaptı ve gözden kayboldu.*
 - Soru türü: Cümlede anlam (Q9) · Bilişsel düzey: Anlama
 - İpucu (yanlış cevaptan sonra): Yaydan çıkan bir okun nasıl gittiğini düşün.
 - Açıklama (doğru cevaptan sonra): Aferin! Bu benzetme martının çok hızlı geldiğini anlatıyor.
@@ -178,6 +184,7 @@ Tema: Paylaşmak · Ders özeti (bütün sürümlerde aynı): Ece’nin dedesiyl
 - D) Martının parçayı bir anda kapması onu eğlendirdiği için ✔
 
 - Doğru cevap: **D**
+- Kanıt: *Bir martı ok gibi geldi, parçayı kaptı ve gözden kayboldu. Ece önce ne olduğunu anlayamadı, sonra kahkahalarla gülmeye başladı.*
 - Soru türü: Neden-sonuç (Q4) · Bilişsel düzey: Çıkarım
 - İpucu (yanlış cevaptan sonra): Gülmeden hemen önce ne olduğunu dördüncü paragrafta bul.
 - Açıklama (doğru cevaptan sonra): Harika! Martının ani hareketi önce Ece’yi şaşırttı, sonra çok eğlendirdi.
@@ -190,6 +197,7 @@ Tema: Paylaşmak · Ders özeti (bütün sürümlerde aynı): Ece’nin dedesiyl
 - D) Pazar sabahları vapurlar kalabalık olur.
 
 - Doğru cevap: **A**
+- Kanıt: Metin, simit paylaşmanın getirdiği neşeyi anlatır; son cümle bunu özetler: “Küçük bir simit parçası, o sabahı ikisi için de unutulmaz yapmıştı.”
 - Soru türü: Ana fikir (Q6) · Bilişsel düzey: Çıkarım
 - İpucu (yanlış cevaptan sonra): Metnin son cümlesi sana yol gösterebilir.
 - Açıklama (doğru cevaptan sonra): Çok güzel! Küçücük bir simit parçası o sabahı unutulmaz yapmıştı.
@@ -224,6 +232,7 @@ Tema: Paylaşmak · Ders özeti (bütün sürümlerde aynı): Ece’nin dedesiyl
 - D) Eski alışkanlıklar değiştirilmelidir.
 
 - Doğru cevap: **C**
+- Kanıt: Son paragrafta dede, paylaşılan bir simidin bir fırın dolusu ekmekten daha çok mutluluk verebildiğini düşünür; bütün olaylar bu düşünceye bağlanır.
 - Soru türü: Ana fikir (Q6) · Bilişsel düzey: Çıkarım
 - İpucu (yanlış cevaptan sonra): Dedenin son paragrafta düşündüklerini yeniden oku.
 - Açıklama (doğru cevaptan sonra): Çok güzel! Bir simit parçasını paylaşmak, o sabahın en büyük mutluluğu olmuştu.
@@ -236,6 +245,7 @@ Tema: Paylaşmak · Ders özeti (bütün sürümlerde aynı): Ece’nin dedesiyl
 - D) Rüzgârdan çok korktukları
 
 - Doğru cevap: **A**
+- Kanıt: İpe bağlı bir şey sahibinden ayrılamaz; “Çok geçmeden martılar vapurun peşine takıldı.” cümlesiyle birlikte martıların vapuru bırakmadığı anlaşılır.
 - Soru türü: Cümlede anlam (Q9) · Bilişsel düzey: Anlama
 - İpucu (yanlış cevaptan sonra): İpe bağlı bir uçurtmanın sahibinden uzaklaşıp uzaklaşamayacağını düşün.
 - Açıklama (doğru cevaptan sonra): Aferin! Bu benzetme, martıların vapuru hiç bırakmadan izlediğini anlatıyor.
@@ -248,6 +258,7 @@ Tema: Paylaşmak · Ders özeti (bütün sürümlerde aynı): Ece’nin dedesiyl
 - D) I, II ve III
 
 - Doğru cevap: **C**
+- Kanıt: I doğru (“Burası ona göre vapurun en güzel köşesiydi”). II yanlış: simit Kadıköy İskelesi’nde alınır. III doğru (“Şaşkınlıkla birkaç saniye donup kalan Ece”).
 - Soru türü: Öncüllü yorum (Q13) · Bilişsel düzey: Değerlendirme
 - İpucu (yanlış cevaptan sonra): Her yargıyı tek tek ele al; simidin nerede alındığına birinci paragrafta bak.
 - Açıklama (doğru cevaptan sonra): Harika! Simit Kadıköy’de alındığı için II. yargı yanlış, diğer ikisi doğrudur.
@@ -285,6 +296,7 @@ Tema: Sabır · Ders özeti (bütün sürümlerde aynı): Elif ile dedesinin bah
 - C) Bahçenin kapısı
 
 - Doğru cevap: **A**
+- Kanıt: Elif’in fideleri dikip her gün sulaması ve yaza kadar beklemesi “emek”in bir iş için harcanan çaba olduğunu gösterir.
 - Soru türü: Sözcük anlamı (Q3) · Bilişsel düzey: Anlama
 - İpucu (yanlış cevaptan sonra): Elif domatesler için neler yaptı, düşün.
 - Açıklama (doğru cevaptan sonra): Aferin! Emek, bir iş için harcanan çabadır.
@@ -296,6 +308,7 @@ Tema: Sabır · Ders özeti (bütün sürümlerde aynı): Elif ile dedesinin bah
 - C) Bitki suyu sevdiği için ✔
 
 - Doğru cevap: **C**
+- Kanıt: *Dedesi, “Bitki suyu da güneşi de sever,” dedi.*
 - Soru türü: Neden-sonuç (Q4) · Bilişsel düzey: Anlama
 - İpucu (yanlış cevaptan sonra): İkinci paragrafta dedesinin sözüne bak.
 - Açıklama (doğru cevaptan sonra): Doğru! Bitkiler suyu ve güneşi sever, onlarla büyür.
@@ -307,6 +320,7 @@ Tema: Sabır · Ders özeti (bütün sürümlerde aynı): Elif ile dedesinin bah
 - C) Sıkıldı
 
 - Doğru cevap: **B**
+- Kanıt: *Elif ilk domatesi kopardı. Çok heyecanlandı.*
 - Soru türü: Duygu ve karakter (Q5) · Bilişsel düzey: Anlama
 - İpucu (yanlış cevaptan sonra): Dördüncü paragrafı yeniden oku.
 - Açıklama (doğru cevaptan sonra): Harika! Elif çok heyecanlandı ve koşup dedesine gösterdi.
@@ -341,6 +355,7 @@ Tema: Sabır · Ders özeti (bütün sürümlerde aynı): Elif ile dedesinin bah
 - D) Arılar çiçeklere konduğu için
 
 - Doğru cevap: **C**
+- Kanıt: *İlk günlerde hiçbir değişiklik göremeyince Elif biraz sabırsızlandı*
 - Soru türü: Neden-sonuç (Q4) · Bilişsel düzey: Anlama
 - İpucu (yanlış cevaptan sonra): İkinci paragrafta “sabırsızlandı” kelimesinin geçtiği cümleyi bul.
 - Açıklama (doğru cevaptan sonra): Doğru! Fideler ilk günlerde hiç değişmiyor gibi göründüğü için Elif sabırsızlandı.
@@ -353,6 +368,7 @@ Tema: Sabır · Ders özeti (bütün sürümlerde aynı): Elif ile dedesinin bah
 - D) Sulamaya hemen son vermek gerekir.
 
 - Doğru cevap: **A**
+- Kanıt: Dede bu sözü fideler henüz değişmemişken söyler; birkaç hafta sonra fideler uzar. Söz, büyümenin zaman istediğini anlatır.
 - Soru türü: Cümlede anlam (Q9) · Bilişsel düzey: Çıkarım
 - İpucu (yanlış cevaptan sonra): Dede bu sözü Elif sabırsızlanınca söylüyor.
 - Açıklama (doğru cevaptan sonra): Aferin! Dede, bitkilerin büyümesi için beklemek gerektiğini anlatıyor.
@@ -365,6 +381,7 @@ Tema: Sabır · Ders özeti (bütün sürümlerde aynı): Elif ile dedesinin bah
 - D) Sabrın Kırmızı Meyvesi ✔
 
 - Doğru cevap: **D**
+- Kanıt: Metin, uzun bekleyişin sonunda kızaran domatesleri anlatır; dede “İşte bu, senin sabrının meyvesi,” der. Bu nedenle başlık “Sabrın Kırmızı Meyvesi” olur.
 - Soru türü: Başlık (Q8) · Bilişsel düzey: Çıkarım
 - İpucu (yanlış cevaptan sonra): Metnin tamamında Elif’in neyi öğrendiğini düşün.
 - Açıklama (doğru cevaptan sonra): Çok güzel! Metin, Elif’in sabrının kıpkırmızı domateslerle ödüllendirilmesini anlatıyor.
@@ -400,6 +417,7 @@ Tema: Sabır · Ders özeti (bütün sürümlerde aynı): Elif ile dedesinin bah
 - D) Arılar olmadan salata yapılamaz.
 
 - Doğru cevap: **B**
+- Kanıt: Aylarca süren emek ve bekleyişin sonunda Elif “Emeğimizin tadı başka!” der; metnin bütünü bu düşünceye varır.
 - Soru türü: Ana fikir (Q6) · Bilişsel düzey: Çıkarım
 - İpucu (yanlış cevaptan sonra): Elif’in sofrada söylediği sözü ve dedesinin gülümsemesini birlikte düşün.
 - Açıklama (doğru cevaptan sonra): Çok güzel! Elif, emek verip sabırla beklediği domatesin tadını başka buldu.
@@ -412,6 +430,7 @@ Tema: Sabır · Ders özeti (bütün sürümlerde aynı): Elif ile dedesinin bah
 - D) Domatesi büyük bir gururla taşıdığını ✔
 
 - Doğru cevap: **D**
+- Kanıt: Kupa, kazanılınca gururla taşınır; Elif de yetiştirdiği domatesi iki eliyle tutup bir kupa gibi dedesine götürür.
 - Soru türü: Cümlede anlam (Q9) · Bilişsel düzey: Anlama
 - İpucu (yanlış cevaptan sonra): Kupa kazanan birinin onu nasıl taşıdığını gözünün önüne getir.
 - Açıklama (doğru cevaptan sonra): Aferin! Elif, emeğinin ilk meyvesini bir ödül gibi gururla taşıyordu.
@@ -424,6 +443,7 @@ Tema: Sabır · Ders özeti (bütün sürümlerde aynı): Elif ile dedesinin bah
 - D) Kırmızı domatesler baharda toplanmıştır.
 
 - Doğru cevap: **A**
+- Kanıt: *Bir süre sonra çiçeklerin yerinde yeşil boncukları andıran domatesler belirdi.*
 - Soru türü: Sözel mantık (Q11) · Bilişsel düzey: Çıkarım
 - İpucu (yanlış cevaptan sonra): Üçüncü ve dördüncü paragraflardaki değişimleri sırayla yaz.
 - Açıklama (doğru cevaptan sonra): Harika! Metne göre önce çiçekler açmış, sonra onların yerinde yeşil domatesler belirmiştir.
@@ -461,6 +481,7 @@ Tema: Yardımlaşma · Ders özeti (bütün sürümlerde aynı): Rüzgârda yuva
 - C) Yuva yapardı
 
 - Doğru cevap: **B**
+- Kanıt: *Pıtır her sabah şarkı söylerdi.*
 - Soru türü: Bilgi (Q1) · Bilişsel düzey: Hatırlama
 - İpucu (yanlış cevaptan sonra): İkinci paragrafın ilk cümlesine bak.
 - Açıklama (doğru cevaptan sonra): Doğru! Pıtır her sabah şarkı söylerdi.
@@ -472,6 +493,7 @@ Tema: Yardımlaşma · Ders özeti (bütün sürümlerde aynı): Rüzgârda yuva
 - C) Yuva çok ağır olduğu için
 
 - Doğru cevap: **A**
+- Kanıt: *Bir gün çok güçlü bir rüzgâr esti. Ağacın dalları sallandı. Pıtır’ın yuvası yere düştü.*
 - Soru türü: Neden-sonuç (Q4) · Bilişsel düzey: Anlama
 - İpucu (yanlış cevaptan sonra): Yuva düşmeden önce ne oldu? Üçüncü paragrafı oku.
 - Açıklama (doğru cevaptan sonra): Aferin! Güçlü rüzgâr dalları salladı, yuva da yere düştü.
@@ -483,6 +505,7 @@ Tema: Yardımlaşma · Ders özeti (bütün sürümlerde aynı): Rüzgârda yuva
 - C) Üzgün ✔
 
 - Doğru cevap: **C**
+- Kanıt: *Pıtır’ın yuvası yere düştü. Pıtır çok üzüldü.*
 - Soru türü: Duygu ve karakter (Q5) · Bilişsel düzey: Anlama
 - İpucu (yanlış cevaptan sonra): Üçüncü paragrafın son cümlesine bak.
 - Açıklama (doğru cevaptan sonra): Harika! Pıtır yuvası düşünce çok üzüldü.
@@ -516,6 +539,7 @@ Tema: Yardımlaşma · Ders özeti (bütün sürümlerde aynı): Rüzgârda yuva
 - D) Pıtır onları evlerinde ziyaret ettiği için
 
 - Doğru cevap: **B**
+- Kanıt: *Şarkısını duymayan arkadaşları ise bir şey olduğunu hemen anladı ve yardıma geldi.*
 - Soru türü: Neden-sonuç (Q4) · Bilişsel düzey: Çıkarım
 - İpucu (yanlış cevaptan sonra): Pıtır’ın her gün yaptığı bir şeyi o gün yapmadığını düşün.
 - Açıklama (doğru cevaptan sonra): Aferin! Pıtır’ın sesini duymayınca bir şey olduğunu anladılar.
@@ -528,6 +552,7 @@ Tema: Yardımlaşma · Ders özeti (bütün sürümlerde aynı): Rüzgârda yuva
 - D) Pıtır’ın şarkıları bahçedekileri mutlu ederdi. ✔
 
 - Doğru cevap: **D**
+- Kanıt: *Komşu kuşlar onun sesini çok sever, bahçeye gelen çocuklar bile oyunlarını bırakıp onu dinlerdi.*
 - Soru türü: Yardımcı fikir (Q7) · Bilişsel düzey: Anlama
 - İpucu (yanlış cevaptan sonra): İkinci paragrafta bahçedekilerin Pıtır’ın sesine nasıl davrandığını oku.
 - Açıklama (doğru cevaptan sonra): Doğru! Komşu kuşlar da çocuklar da Pıtır’ın şarkılarını severdi.
@@ -540,6 +565,7 @@ Tema: Yardımlaşma · Ders özeti (bütün sürümlerde aynı): Rüzgârda yuva
 - D) En güzel şarkıyı serçeler söyler.
 
 - Doğru cevap: **A**
+- Kanıt: Pıtır yuvayı tek başına yapamaz, arkadaşlarıyla akşam olmadan bitirir; son bölümdeki “Birlikte olunca her şey kolaylaşıyor” düşüncesi bunu özetler.
 - Soru türü: Ana fikir (Q6) · Bilişsel düzey: Çıkarım
 - İpucu (yanlış cevaptan sonra): Pıtır’ın son paragrafta aklından geçenleri oku.
 - Açıklama (doğru cevaptan sonra): Çok güzel! Arkadaşlar birlikte çalışınca yuva bir günde yeniden yapıldı.
@@ -574,6 +600,7 @@ Tema: Yardımlaşma · Ders özeti (bütün sürümlerde aynı): Rüzgârda yuva
 - D) Bahçedeki Çocuklar
 
 - Doğru cevap: **B**
+- Kanıt: Metin, rüzgârın yuvayı alıp Pıtır’a asıl barınağının dostları olduğunu göstermesini anlatır; son cümle de bu düşünceyle biter.
 - Soru türü: Başlık (Q8) · Bilişsel düzey: Çıkarım
 - İpucu (yanlış cevaptan sonra): Son cümlede rüzgârın Pıtır’a ne gösterdiği yazıyor.
 - Açıklama (doğru cevaptan sonra): Çok güzel! Metin, rüzgârın aldığı yuvayı dostluğun yeniden kurmasını anlatıyor.
@@ -586,6 +613,7 @@ Tema: Yardımlaşma · Ders özeti (bütün sürümlerde aynı): Rüzgârda yuva
 - D) Pıtır’ın şarkı söylememesi arkadaşlarının hemen dikkatini çekmiştir. ✔
 
 - Doğru cevap: **D**
+- Kanıt: Pıtır’ın sesi kesilince “Çok geçmeden arkadaşları çevresini sardı.” Yani sessizliği arkadaşlarının dikkatini hemen çekmiştir.
 - Soru türü: Cümlede anlam (Q9) · Bilişsel düzey: Çıkarım
 - İpucu (yanlış cevaptan sonra): Pıtır’ın her sabah ne yaptığını ve o gün neyin eksik olduğunu düşün.
 - Açıklama (doğru cevaptan sonra): Aferin! Her gün şarkı söyleyen birinin susması, hemen fark edilmişti.
@@ -598,6 +626,7 @@ Tema: Yardımlaşma · Ders özeti (bütün sürümlerde aynı): Rüzgârda yuva
 - D) I, II ve III
 
 - Doğru cevap: **C**
+- Kanıt: I yanlış: “Hiçbiri uzun uzun teselli cümleleri kurmadı”; dal ve tüy getirdiler. II doğru: “Bahçeyi her sabah dolduran ses, o an boğazında düğümlendi.” III doğru: hep birlikte yuva yaptılar.
 - Soru türü: Öncüllü yorum (Q13) · Bilişsel düzey: Değerlendirme
 - İpucu (yanlış cevaptan sonra): Dördüncü paragrafta arkadaşların ne yaptığına dikkat et.
 - Açıklama (doğru cevaptan sonra): Harika! Arkadaşları söz yerine iş getirdi; bu yüzden I. yargı yanlış, diğerleri doğrudur.
@@ -636,6 +665,7 @@ Tema: Merak · Ders özeti (bütün sürümlerde aynı): Mert’in anneannesiyle
 - C) Büyük bir parkta
 
 - Doğru cevap: **B**
+- Kanıt: *Küçük bir adada durur*
 - Soru türü: Bilgi (Q1) · Bilişsel düzey: Hatırlama
 - İpucu (yanlış cevaptan sonra): Anneannenin söylediklerini yeniden oku.
 - Açıklama (doğru cevaptan sonra): Doğru! Kız Kulesi küçük bir adanın üstünde durur.
@@ -647,6 +677,7 @@ Tema: Merak · Ders özeti (bütün sürümlerde aynı): Mert’in anneannesiyle
 - C) Suya battı
 
 - Doğru cevap: **B**
+- Kanıt: Işıkların suda hafifçe kıpırdayıp parladığı anlatılıyor; ışıklar sönmüyor, Mert onlara uzun uzun bakıyor.
 - Soru türü: Sözcük anlamı (Q3) · Bilişsel düzey: Anlama
 - İpucu (yanlış cevaptan sonra): Işığın dalgalı suyun üstünde nasıl göründüğünü düşün.
 - Açıklama (doğru cevaptan sonra): Aferin! Işıklar suda hafif hafif kıpırdayarak parlıyordu.
@@ -658,6 +689,7 @@ Tema: Merak · Ders özeti (bütün sürümlerde aynı): Mert’in anneannesiyle
 - C) Resmi çok sevmiştir. ✔
 
 - Doğru cevap: **C**
+- Kanıt: Bir resmi duvara asmak, onu sevip her gün görmek istemektir; anneanne de Mert’in verdiği resmi duvara asıyor.
 - Soru türü: Duygu ve karakter (Q5) · Bilişsel düzey: Çıkarım
 - İpucu (yanlış cevaptan sonra): İnsanlar neyi duvara asarlar? Düşün.
 - Açıklama (doğru cevaptan sonra): Harika! Sevdiğimiz resimleri her gün görmek için duvara asarız.
@@ -691,6 +723,7 @@ Tema: Merak · Ders özeti (bütün sürümlerde aynı): Mert’in anneannesiyle
 - D) Resim sergilemek için
 
 - Doğru cevap: **C**
+- Kanıt: *Eskiden gemilere yol göstermek için de kullanılmış.*
 - Soru türü: Bilgi (Q1) · Bilişsel düzey: Hatırlama
 - İpucu (yanlış cevaptan sonra): Üçüncü paragrafta anneannenin sözlerini oku.
 - Açıklama (doğru cevaptan sonra): Doğru! Kule eskiden gemilere yol göstermek için de kullanılmış.
@@ -703,6 +736,7 @@ Tema: Merak · Ders özeti (bütün sürümlerde aynı): Mert’in anneannesiyle
 - D) Kulenin ışıkları sabaha kadar söndü.
 
 - Doğru cevap: **A**
+- Kanıt: Kule gerçekten konuşmaz; “sanki” sözü, güneş batarken yanan ışıkların geceye selam verir gibi göründüğünü anlatır.
 - Soru türü: Cümlede anlam (Q9) · Bilişsel düzey: Çıkarım
 - İpucu (yanlış cevaptan sonra): “Sanki” kelimesi gerçekte olmayan bir şeye benzetme yapar.
 - Açıklama (doğru cevaptan sonra): Aferin! Kuleye insan özelliği verilerek ışıkların güzelliği anlatılıyor.
@@ -715,6 +749,7 @@ Tema: Merak · Ders özeti (bütün sürümlerde aynı): Mert’in anneannesiyle
 - D) Birlikte geçirdikleri akşamı çok sevdiği için ✔
 
 - Doğru cevap: **D**
+- Kanıt: Metinde doğrudan söylenmez; ama resimde o akşam gördüklerini çizer ve “güzel akşamı” hatırlar, bu da akşamı çok sevdiğini gösterir.
 - Soru türü: Neden-sonuç (Q4) · Bilişsel düzey: Çıkarım
 - İpucu (yanlış cevaptan sonra): Mert o akşam kuleyi kiminle izledi, neler öğrendi?
 - Açıklama (doğru cevaptan sonra): Harika! Mert, anneannesiyle yaşadığı güzel akşamı resmiyle paylaştı.
@@ -749,6 +784,7 @@ Tema: Merak · Ders özeti (bütün sürümlerde aynı): Mert’in anneannesiyle
 - D) Kulenin kim tarafından yaptırıldığına ✔
 
 - Doğru cevap: **D**
+- Kanıt: Ada, fener ve teknelerden söz edilir; kuleyi kimin yaptırdığı metnin hiçbir yerinde geçmez.
 - Soru türü: Yardımcı fikir (Q7) · Bilişsel düzey: Anlama
 - İpucu (yanlış cevaptan sonra): Üçüncü paragrafta anneannenin verdiği bilgileri tek tek işaretle.
 - Açıklama (doğru cevaptan sonra): Çok güzel! Metinde kuleyi kimin yaptırdığı anlatılmıyor.
@@ -761,6 +797,7 @@ Tema: Merak · Ders özeti (bütün sürümlerde aynı): Mert’in anneannesiyle
 - D) Boyu uzadığı için kuleyi daha iyi gördüğünü
 
 - Doğru cevap: **A**
+- Kanıt: *sorusunun cevabını öğrenmişti, ama merakı yatışacağına büyümüştü.*
 - Soru türü: Cümlede anlam (Q9) · Bilişsel düzey: Çıkarım
 - İpucu (yanlış cevaptan sonra): “Yatışmak” azalmak, sakinleşmek demektir; burada tersi olmuş.
 - Açıklama (doğru cevaptan sonra): Aferin! Öğrendikleri, Mert’in merakını azaltacağına daha da artırdı.
@@ -773,6 +810,7 @@ Tema: Merak · Ders özeti (bütün sürümlerde aynı): Mert’in anneannesiyle
 - D) Soru sorulur → resim çizilir → sahil yürüyüşü
 
 - Doğru cevap: **B**
+- Kanıt: Paragraflar sırayla sahil yürüyüşünü, soru ve cevabı, ışıkların yanmasını ve evde çizilen resmi anlatır.
 - Soru türü: Paragraf yapısı (Q10) · Bilişsel düzey: Anlama
 - İpucu (yanlış cevaptan sonra): Her paragrafın ilk cümlesini sırayla oku.
 - Açıklama (doğru cevaptan sonra): Harika! Metin yürüyüşle başlar, soru ve ışıklarla sürer, resimle biter.
@@ -811,6 +849,7 @@ Tema: Keşif · Ders özeti (bütün sürümlerde aynı): Deniz’in babasıyla 
 - C) Hava karardığı için
 
 - Doğru cevap: **B**
+- Kanıt: *Asansörle yukarı çıktılar.*
 - Soru türü: Neden-sonuç (Q4) · Bilişsel düzey: Çıkarım
 - İpucu (yanlış cevaptan sonra): Deniz şehre nereden bakıyordu?
 - Açıklama (doğru cevaptan sonra): Aferin! Yüksekten bakınca her şey küçük görünür.
@@ -822,6 +861,7 @@ Tema: Keşif · Ders özeti (bütün sürümlerde aynı): Deniz’in babasıyla 
 - C) Saçlarını ıslattı
 
 - Doğru cevap: **A**
+- Kanıt: “Uçuşturdu” havada savrulmak demektir; balkondaki rüzgârın saçlara yaptığı da budur.
 - Soru türü: Sözcük anlamı (Q3) · Bilişsel düzey: Anlama
 - İpucu (yanlış cevaptan sonra): Rüzgârlı bir günde saçlarının ne yaptığını düşün.
 - Açıklama (doğru cevaptan sonra): Doğru! Rüzgâr, Deniz’in saçlarını havada dağıttı.
@@ -833,6 +873,7 @@ Tema: Keşif · Ders özeti (bütün sürümlerde aynı): Deniz’in babasıyla 
 - C) Kuş gibi ✔
 
 - Doğru cevap: **C**
+- Kanıt: *“Kendimi kuş gibi hissediyorum!” dedi.*
 - Soru türü: Duygu ve karakter (Q5) · Bilişsel düzey: Anlama
 - İpucu (yanlış cevaptan sonra): Deniz’in babasına söylediği sözü oku.
 - Açıklama (doğru cevaptan sonra): Harika! Deniz yüksekten bakınca kendini kuş gibi hissetti.
@@ -866,6 +907,7 @@ Tema: Keşif · Ders özeti (bütün sürümlerde aynı): Deniz’in babasıyla 
 - D) Deniz saymayı bilmediği için
 
 - Doğru cevap: **C**
+- Kanıt: *sayı ilerledikçe yeni vapurlar çıkıyor, sayım bir türlü bitmiyordu.*
 - Soru türü: Neden-sonuç (Q4) · Bilişsel düzey: Çıkarım
 - İpucu (yanlış cevaptan sonra): Dördüncü paragrafın ilk cümlesine dikkat et.
 - Açıklama (doğru cevaptan sonra): Aferin! Boğaz’da sürekli yeni vapurlar çıktığı için sayım bitmiyordu.
@@ -878,6 +920,7 @@ Tema: Keşif · Ders özeti (bütün sürümlerde aynı): Deniz’in babasıyla 
 - D) Babası yukarıda kalmıştı.
 
 - Doğru cevap: **B**
+- Kanıt: Deniz aşağı inerken kuleden gördüklerini düşünmeyi sürdürür; hemen ardından yine gelmeye karar verir.
 - Soru türü: Cümlede anlam (Q9) · Bilişsel düzey: Çıkarım
 - İpucu (yanlış cevaptan sonra): Deniz’in yukarıda gördüklerini ne kadar sevdiğini düşün.
 - Açıklama (doğru cevaptan sonra): Harika! Deniz aşağı inse de aklı gördüğü manzaradaydı.
@@ -890,6 +933,7 @@ Tema: Keşif · Ders özeti (bütün sürümlerde aynı): Deniz’in babasıyla 
 - D) Babamın Kuş Kitabı
 
 - Doğru cevap: **A**
+- Kanıt: Metnin özünde Deniz’in şehri kuşların gördüğü gibi görmesi vardır: “Kuşlar da şehri hep böyle görüyor.”
 - Soru türü: Başlık (Q8) · Bilişsel düzey: Çıkarım
 - İpucu (yanlış cevaptan sonra): Metindeki baba ile Deniz’in konuşmasını yeniden oku.
 - Açıklama (doğru cevaptan sonra): Çok güzel! Deniz, şehri kuşların gördüğü gibi yukarıdan görüyor.
@@ -924,6 +968,7 @@ Tema: Keşif · Ders özeti (bütün sürümlerde aynı): Deniz’in babasıyla 
 - D) Eski kuleler yeniden yapılmalıdır.
 
 - Doğru cevap: **C**
+- Kanıt: *Demek ki aynı şehir, bakılan yere göre bambaşka bir yer olabiliyordu.*
 - Soru türü: Ana fikir (Q6) · Bilişsel düzey: Çıkarım
 - İpucu (yanlış cevaptan sonra): Son paragrafta Deniz’in vardığı sonucu bul.
 - Açıklama (doğru cevaptan sonra): Çok güzel! Deniz, aynı şehrin bakılan yere göre bambaşka göründüğünü fark etti.
@@ -936,6 +981,7 @@ Tema: Keşif · Ders özeti (bütün sürümlerde aynı): Deniz’in babasıyla 
 - D) Taşların rüzgârla aşındığı için kullanılmadığı
 
 - Doğru cevap: **A**
+- Kanıt: Taş duvarların yüzyılların rüzgârına “göğüs germesi”, kulenin çok uzun zamandır ayakta kaldığını anlatır.
 - Soru türü: Cümlede anlam (Q9) · Bilişsel düzey: Anlama
 - İpucu (yanlış cevaptan sonra): “Göğüs germek” bir şeye karşı dayanmak demektir.
 - Açıklama (doğru cevaptan sonra): Aferin! Bu söz, kulenin yüzlerce yıldır ayakta durduğunu anlatıyor.
@@ -948,6 +994,7 @@ Tema: Keşif · Ders özeti (bütün sürümlerde aynı): Deniz’in babasıyla 
 - D) Beşinci paragraf
 
 - Doğru cevap: **B**
+- Kanıt: Üçüncü paragraf, kuleden görünen uzak manzarayı anlatır (“Aşağıda İstanbul, ucu bucağı görünmeyen bir harita gibi serilmişti.”); uzaktaki tepeler ancak buraya uyar.
 - Soru türü: Paragraf yapısı (Q10) · Bilişsel düzey: Anlama
 - İpucu (yanlış cevaptan sonra): Şehrin yukarıdan nasıl göründüğünü anlatan paragrafı bul.
 - Açıklama (doğru cevaptan sonra): Harika! Bu cümle manzarayı anlatır; manzara da üçüncü paragraftadır.
@@ -986,6 +1033,7 @@ Tema: Sorumluluk · Ders özeti (bütün sürümlerde aynı): Kapalıçarşı’
 - C) Babaanneye hediye ✔
 
 - Doğru cevap: **C**
+- Kanıt: *Babaanneye hediye alacaklardı.*
 - Soru türü: Bilgi (Q1) · Bilişsel düzey: Hatırlama
 - İpucu (yanlış cevaptan sonra): Birinci paragrafın ikinci cümlesine bak.
 - Açıklama (doğru cevaptan sonra): Doğru! Babaanneye hediye alacaklardı.
@@ -997,6 +1045,7 @@ Tema: Sorumluluk · Ders özeti (bütün sürümlerde aynı): Kapalıçarşı’
 - C) Çok yorulduğu için
 
 - Doğru cevap: **A**
+- Kanıt: *Sonra annesinin sözü aklına geldi. Lambacının önünde durdu ve bekledi.*
 - Soru türü: Neden-sonuç (Q4) · Bilişsel düzey: Anlama
 - İpucu (yanlış cevaptan sonra): İkinci paragrafta annesinin sözünü oku.
 - Açıklama (doğru cevaptan sonra): Aferin! Annesi “Olduğun yerde dur,” demişti, o da öyle yaptı.
@@ -1008,6 +1057,7 @@ Tema: Sorumluluk · Ders özeti (bütün sürümlerde aynı): Kapalıçarşı’
 - C) Çok uykusu geldi
 
 - Doğru cevap: **B**
+- Kanıt: *Annesi yanında yoktu!*
 - Soru türü: Duygu ve karakter (Q5) · Bilişsel düzey: Çıkarım
 - İpucu (yanlış cevaptan sonra): Zeynep başını kaldırınca annesini göremedi. Sen olsan ne hissederdin?
 - Açıklama (doğru cevaptan sonra): Harika! Annesini göremeyince Zeynep biraz endişelendi.
@@ -1041,6 +1091,7 @@ Tema: Sorumluluk · Ders özeti (bütün sürümlerde aynı): Kapalıçarşı’
 - D) Sözü unutmamak üzere iyice belledi. ✔
 
 - Doğru cevap: **D**
+- Kanıt: “Aklına yazmak” deyim olarak iyice bellemek demektir; Zeynep sonra bu sözü gerçekten hatırlar: “sonra annesinin sözünü hatırladı.”
 - Soru türü: Cümlede anlam (Q9) · Bilişsel düzey: Anlama
 - İpucu (yanlış cevaptan sonra): Zeynep annesinin sözünü sonra hatırlıyor. Neden hatırlamış olabilir?
 - Açıklama (doğru cevaptan sonra): Aferin! Aklına yazmak, bir şeyi unutmayacak biçimde öğrenmek demektir.
@@ -1053,6 +1104,7 @@ Tema: Sorumluluk · Ders özeti (bütün sürümlerde aynı): Kapalıçarşı’
 - D) Zeynep yüksek sesle bağırdığı için
 
 - Doğru cevap: **B**
+- Kanıt: *Bekleyiş ona çok uzun geldi, ama yerinden ayrılmadı.*
 - Soru türü: Neden-sonuç (Q4) · Bilişsel düzey: Çıkarım
 - İpucu (yanlış cevaptan sonra): Annesi girişte ne söylemişti, Zeynep ne yaptı?
 - Açıklama (doğru cevaptan sonra): Harika! Zeynep yerinden ayrılmayınca annesi onu kolayca buldu.
@@ -1065,6 +1117,7 @@ Tema: Sorumluluk · Ders özeti (bütün sürümlerde aynı): Kapalıçarşı’
 - D) Kapalı çarşılar yağmurlu günlerde açılır.
 
 - Doğru cevap: **A**
+- Kanıt: Zeynep paniğe kapılmayıp annesinin öğüdünü izler ve kısa sürede bulunur; annesi de “tam söylediğim gibi yaptın” der.
 - Soru türü: Ana fikir (Q6) · Bilişsel düzey: Çıkarım
 - İpucu (yanlış cevaptan sonra): Zeynep hangi davranışı yüzünden övüldü?
 - Açıklama (doğru cevaptan sonra): Çok güzel! Zeynep sakin kalıp öğüdü izledi, annesi de onu hemen buldu.
@@ -1099,6 +1152,7 @@ Tema: Sorumluluk · Ders özeti (bütün sürümlerde aynı): Kapalıçarşı’
 - D) Ona su ikram etti.
 
 - Doğru cevap: **C**
+- Kanıt: *Lambacı amcanın gülümsemesi de yüreğine su serpti.*
 - Soru türü: Cümlede anlam (Q9) · Bilişsel düzey: Anlama
 - İpucu (yanlış cevaptan sonra): Lambacının gülümsemesi Zeynep’i nasıl etkilemiş olabilir?
 - Açıklama (doğru cevaptan sonra): Aferin! Yüreğe su serpmek, birini rahatlatmak demektir.
@@ -1111,6 +1165,7 @@ Tema: Sorumluluk · Ders özeti (bütün sürümlerde aynı): Kapalıçarşı’
 - D) I, II ve III
 
 - Doğru cevap: **B**
+- Kanıt: I doğru: “sıradan bir öğüt gözüyle bakmıştı.” II yanlış: koşmak yalnızca “geçti içinden”, lambacının önünde bekledi. III doğru: öğüdü hatırlayınca durup bekledi.
 - Soru türü: Öncüllü yorum (Q13) · Bilişsel düzey: Değerlendirme
 - İpucu (yanlış cevaptan sonra): Zeynep’in içinden geçenle yaptığını birbirinden ayır.
 - Açıklama (doğru cevaptan sonra): Harika! Koşmak yalnızca içinden geçti, yapmadı; bu yüzden II. yargı yanlıştır.
@@ -1123,6 +1178,7 @@ Tema: Sorumluluk · Ders özeti (bütün sürümlerde aynı): Kapalıçarşı’
 - D) Zor anlarda telaşa kapılmadan düşünmek sorunu çözmeyi sağlar. ✔
 
 - Doğru cevap: **D**
+- Kanıt: *telaşa kapılmadan düşünmenin değerini de hatırlatacaktı.*
 - Soru türü: Ana fikir (Q6) · Bilişsel düzey: Çıkarım
 - İpucu (yanlış cevaptan sonra): Son cümlede lambanın Zeynep’e neyi hatırlatacağını oku.
 - Açıklama (doğru cevaptan sonra): Çok güzel! Zeynep telaşa kapılmadan düşündü ve doğru olanı yaptı.
@@ -1160,6 +1216,7 @@ Tema: Aile · Ders özeti (bütün sürümlerde aynı): Ali’nin Boğaz Köprü
 - C) Şehrin dışında bir köyde
 
 - Doğru cevap: **B**
+- Kanıt: Ali’nin ailesi teyzeye gitmek için köprüyle karşıya geçiyor; “öbür yaka” şehrin diğer tarafıdır.
 - Soru türü: Sözcük anlamı (Q3) · Bilişsel düzey: Anlama
 - İpucu (yanlış cevaptan sonra): Ali teyzesine giderken köprüden geçti. Köprü neyin iki tarafını birleştirir?
 - Açıklama (doğru cevaptan sonra): Aferin! Yaka burada, denizle ayrılan şehrin bir tarafı demektir.
@@ -1171,6 +1228,7 @@ Tema: Aile · Ders özeti (bütün sürümlerde aynı): Ali’nin Boğaz Köprü
 - C) Yeşil ve beyaz
 
 - Doğru cevap: **A**
+- Kanıt: *Işıklar bir mor, bir mavi oluyordu.*
 - Soru türü: Bilgi (Q1) · Bilişsel düzey: Hatırlama
 - İpucu (yanlış cevaptan sonra): Dördüncü paragrafın son cümlesine bak.
 - Açıklama (doğru cevaptan sonra): Doğru! Işıklar bir mor, bir mavi oluyordu.
@@ -1182,6 +1240,7 @@ Tema: Aile · Ders özeti (bütün sürümlerde aynı): Ali’nin Boğaz Köprü
 - C) Köprüyle başka bir kıtaya geçtiği için ✔
 
 - Doğru cevap: **C**
+- Kanıt: *“Biz şimdi Asya’dan Avrupa’ya geçiyoruz.” Ali çok şaşırdı.*
 - Soru türü: Neden-sonuç (Q4) · Bilişsel düzey: Anlama
 - İpucu (yanlış cevaptan sonra): Ali şaşırmadan önce babası ne dedi?
 - Açıklama (doğru cevaptan sonra): Harika! Bir köprüyle Asya’dan Avrupa’ya geçmek Ali’yi çok şaşırttı.
@@ -1215,6 +1274,7 @@ Tema: Aile · Ders özeti (bütün sürümlerde aynı): Ali’nin Boğaz Köprü
 - D) Asya’dan Afrika’ya
 
 - Doğru cevap: **C**
+- Kanıt: *Biz şimdi Asya’dan Avrupa’ya geçiyoruz*
 - Soru türü: Bilgi (Q1) · Bilişsel düzey: Hatırlama
 - İpucu (yanlış cevaptan sonra): Üçüncü paragrafta babasının sözlerini oku.
 - Açıklama (doğru cevaptan sonra): Doğru! Babası Asya’dan Avrupa’ya geçtiklerini söyledi.
@@ -1227,6 +1287,7 @@ Tema: Aile · Ders özeti (bütün sürümlerde aynı): Ali’nin Boğaz Köprü
 - D) Babası yanlış yola girdiği için
 
 - Doğru cevap: **A**
+- Kanıt: *Ali çok şaşırdı, çünkü o zamana kadar kıtaların birbirinden çok uzak olduğunu sanıyordu.*
 - Soru türü: Neden-sonuç (Q4) · Bilişsel düzey: Çıkarım
 - İpucu (yanlış cevaptan sonra): “Çok şaşırdı” kelimelerinden sonra gelen açıklamayı oku.
 - Açıklama (doğru cevaptan sonra): Aferin! Ali kıtaları çok uzak sanıyordu; oysa bir köprü onları birleştiriyordu.
@@ -1239,6 +1300,7 @@ Tema: Aile · Ders özeti (bütün sürümlerde aynı): Ali’nin Boğaz Köprü
 - D) Köprü sayesinde teyzesinin evi Ali’ye artık yakın gelmektedir. ✔
 
 - Doğru cevap: **D**
+- Kanıt: *Eskiden teyzesinin evi ona çok uzak gelirdi, ama bugün o uzaklık bir köprü kadar kısalmıştı.*
 - Soru türü: Cümlede anlam (Q9) · Bilişsel düzey: Çıkarım
 - İpucu (yanlış cevaptan sonra): Ali’nin teyzesinin evi hakkındaki düşüncesi nasıl değişti?
 - Açıklama (doğru cevaptan sonra): Harika! Köprü, Ali’nin gözünde uzak olan yeri yakın yaptı.
@@ -1273,6 +1335,7 @@ Tema: Aile · Ders özeti (bütün sürümlerde aynı): Ali’nin Boğaz Köprü
 - D) Köprüden gemilerin küçük göründüğüne
 
 - Doğru cevap: **B**
+- Kanıt: Kıtalar, ışıkların rengi ve küçük görünen gemiler metinde geçer; köprünün ne zaman yapıldığı hiç söylenmez.
 - Soru türü: Yardımcı fikir (Q7) · Bilişsel düzey: Anlama
 - İpucu (yanlış cevaptan sonra): Şıkları tek tek metinde ara; hangisini bulamıyorsun?
 - Açıklama (doğru cevaptan sonra): Çok güzel! Metinde köprünün ne zaman yapıldığı söylenmiyor.
@@ -1285,6 +1348,7 @@ Tema: Aile · Ders özeti (bütün sürümlerde aynı): Ali’nin Boğaz Köprü
 - D) Deniz, biçimi ve parlaklığı yönünden kurdeleye benzetilmiştir. ✔
 
 - Doğru cevap: **D**
+- Kanıt: “Gibi” sözüyle deniz kurdeleye benzetilir; “parlak” ve “uzanıyordu” sözleri benzetmenin parlaklık ve biçim yönünden yapıldığını gösterir.
 - Soru türü: Cümlede anlam (Q9) · Bilişsel düzey: Anlama
 - İpucu (yanlış cevaptan sonra): “Gibi” kelimesi iki şey arasında nasıl bir bağ kurar?
 - Açıklama (doğru cevaptan sonra): Aferin! “Gibi” kelimesiyle deniz, ince ve parlak bir kurdeleye benzetilmiştir.
@@ -1297,6 +1361,7 @@ Tema: Aile · Ders özeti (bütün sürümlerde aynı): Ali’nin Boğaz Köprü
 - D) Akşam dönüşünde başka bir köprü kullanılmıştır.
 
 - Doğru cevap: **A**
+- Kanıt: Teyzeye giderken Asya’dan Avrupa’ya geçtiklerine göre varılan yer Avrupa yakasıdır: “Biz şimdi Asya’dan Avrupa’ya geçiyoruz”.
 - Soru türü: Sözel mantık (Q11) · Bilişsel düzey: Çıkarım
 - İpucu (yanlış cevaptan sonra): Yola nereden çıkıldığını ve nereye varıldığını düşün.
 - Açıklama (doğru cevaptan sonra): Harika! Asya’dan Avrupa’ya geçip teyzeye vardıklarına göre ev Avrupa yakasındadır.
@@ -1334,6 +1399,7 @@ Tema: Arkadaşlık · Ders özeti (bütün sürümlerde aynı): Pırıl’ın İ
 - C) Antalya’ya
 
 - Doğru cevap: **A**
+- Kanıt: *Önce İzmir’e uğrayacağım*
 - Soru türü: Bilgi (Q1) · Bilişsel düzey: Hatırlama
 - İpucu (yanlış cevaptan sonra): Üçüncü paragrafta Pırıl’ın sözlerini oku.
 - Açıklama (doğru cevaptan sonra): Doğru! Pırıl önce İzmir’e uğrayacak.
@@ -1345,6 +1411,7 @@ Tema: Arkadaşlık · Ders özeti (bütün sürümlerde aynı): Pırıl’ın İ
 - C) Pırıl’ın gözleri farklı renkte olduğu için ✔
 
 - Doğru cevap: **C**
+- Kanıt: *“Bir gözün mavi, öbürü bal rengi. Nerelisin sen?”*
 - Soru türü: Neden-sonuç (Q4) · Bilişsel düzey: Anlama
 - İpucu (yanlış cevaptan sonra): Pamuk sormadan önce Pırıl’ın neyini söylüyor?
 - Açıklama (doğru cevaptan sonra): Aferin! Pamuk, Pırıl’ın iki gözünün farklı renkte olduğunu fark etti.
@@ -1356,6 +1423,7 @@ Tema: Arkadaşlık · Ders özeti (bütün sürümlerde aynı): Pırıl’ın İ
 - C) Orada hep yaşayacağım
 
 - Doğru cevap: **B**
+- Kanıt: Pırıl Van’a dönerken İzmir’de kısa bir mola verecek; “uğramak” yol üstünde gidip kısa süre kalmaktır.
 - Soru türü: Sözcük anlamı (Q3) · Bilişsel düzey: Anlama
 - İpucu (yanlış cevaptan sonra): Pırıl’ın asıl gideceği yer neresi? İzmir yolun neresinde?
 - Açıklama (doğru cevaptan sonra): Harika! Uğramak, giderken bir yere de gidip biraz kalmak demektir.
@@ -1389,6 +1457,7 @@ Tema: Arkadaşlık · Ders özeti (bütün sürümlerde aynı): Pırıl’ın İ
 - D) Yeni dostlar edinmekten hoşlanan ✔
 
 - Doğru cevap: **D**
+- Kanıt: *Pırıl ise yolun uzun olmasından şikâyetçi değildi, çünkü her şehirde yeni dostlar buluyordu.*
 - Soru türü: Duygu ve karakter (Q5) · Bilişsel düzey: Çıkarım
 - İpucu (yanlış cevaptan sonra): Üçüncü paragrafta Pırıl’ın neden yoldan şikâyetçi olmadığı yazıyor.
 - Açıklama (doğru cevaptan sonra): Doğru! Pırıl her şehirde yeni dostlar bulmaktan mutlu oluyor.
@@ -1401,6 +1470,7 @@ Tema: Arkadaşlık · Ders özeti (bütün sürümlerde aynı): Pırıl’ın İ
 - D) Yorgun ve uykulu
 
 - Doğru cevap: **B**
+- Kanıt: Duman’ın küçük bir tüyü çekinerek getirmesi “utangaç”ın çekinen, sıkılgan demek olduğunu gösterir.
 - Soru türü: Sözcük anlamı (Q3) · Bilişsel düzey: Anlama
 - İpucu (yanlış cevaptan sonra): Minik Duman Pırıl’a nasıl yaklaştı? Hediyeyi verirken nasıl hissetmiş olabilir?
 - Açıklama (doğru cevaptan sonra): Aferin! Utangaç, kolay kolay konuşamayan, çekinen kişidir.
@@ -1413,6 +1483,7 @@ Tema: Arkadaşlık · Ders özeti (bütün sürümlerde aynı): Pırıl’ın İ
 - D) Parklarda kediler güneşlenir.
 
 - Doğru cevap: **A**
+- Kanıt: Pırıl yolculuğunda yeni dostlar bulur, onlardan armağan ve tavsiye alır; metin baştan sona bu dostluğu anlatır.
 - Soru türü: Ana fikir (Q6) · Bilişsel düzey: Çıkarım
 - İpucu (yanlış cevaptan sonra): Pırıl’ın yol boyunca neyi sevdiğini ve vedalaşmasını birlikte düşün.
 - Açıklama (doğru cevaptan sonra): Çok güzel! Pırıl’ın yolculuğunu asıl güzelleştiren şey yeni dostlarıdır.
@@ -1448,6 +1519,7 @@ Tema: Arkadaşlık · Ders özeti (bütün sürümlerde aynı): Pırıl’ın İ
 - D) Pırıl’ı hiç merak etmedikleri
 
 - Doğru cevap: **B**
+- Kanıt: Kediler önce uzaktan bakar, sonra yaklaşır; yani merak etmeleri çekinmelerinden daha güçlü gelmiştir.
 - Soru türü: Cümlede anlam (Q9) · Bilişsel düzey: Anlama
 - İpucu (yanlış cevaptan sonra): Kediler önce uzaktan baktı, sonra ne yaptı?
 - Açıklama (doğru cevaptan sonra): Aferin! Merakları çekingenliklerini yenince kediler Pırıl’a yaklaştı.
@@ -1460,6 +1532,7 @@ Tema: Arkadaşlık · Ders özeti (bütün sürümlerde aynı): Pırıl’ın İ
 - D) Parkın Kurulma Hikâyesi
 
 - Doğru cevap: **C**
+- Kanıt: Metnin doruğu, Duman’ın sahip olduğu tek şeyi armağan etmesidir: “Belki de parkın en kıymetli hazinesiydi bu”.
 - Soru türü: Başlık (Q8) · Bilişsel düzey: Çıkarım
 - İpucu (yanlış cevaptan sonra): Pırıl’ın parktan ayrılırken yanına ne aldığını ve neyi anladığını düşün.
 - Açıklama (doğru cevaptan sonra): Çok güzel! Küçücük bir tüy, kısa bir dostluğun değerini anlatıyor.
@@ -1472,6 +1545,7 @@ Tema: Arkadaşlık · Ders özeti (bütün sürümlerde aynı): Pırıl’ın İ
 - D) Kedilerin Pırıl’dan çekinmesi
 
 - Doğru cevap: **A**
+- Kanıt: *Yine de her biri, yolcuya verecek bir şey buldu.*
 - Soru türü: Paragraf yapısı (Q10) · Bilişsel düzey: Anlama
 - İpucu (yanlış cevaptan sonra): Dördüncü paragrafın ilk cümlesi, paragrafın konusunu söylüyor.
 - Açıklama (doğru cevaptan sonra): Harika! Bu paragrafta tavsiyeler ve martı tüyü, yani kedilerin armağanları anlatılıyor.

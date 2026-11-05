@@ -1,7 +1,7 @@
 import type { PrismaClient } from '../src/db.js';
 import { LessonKind, LokumReason, QuestionType } from '../src/generated/prisma/enums.js';
 import { CITY_NAMES } from '../src/lib/city.js';
-import { gradeBandOf, RUSHED_WPM_CEILING } from '../src/lib/grade-band.js';
+import { DEFAULT_GRADE_BAND, gradeBandOf, RUSHED_WPM_CEILING } from '../src/lib/grade-band.js';
 import {
   cityForLevel,
   levelFromCompleted,
@@ -44,10 +44,12 @@ type DemoUser = {
   awayDays?: number;
   /** Raporlarda belirgin zayıf soru türü */
   weakType: QuestionType;
-  /** 6 hafta önceki ve bugünkü dakikadaki kelime (G2, 3. sınıf) */
+  /** 6 hafta önceki ve bugünkü dakikadaki kelime (kullanıcının sınıfına uygun) */
   wpm: { from: number; to: number };
   /** Acele okuma örneği (çok hızlı + anlama düşük) olacak tekrar okuma sayısı */
   rushed?: number;
+  /** Sınıf (varsayılan: DEMO_GRADE) */
+  grade?: number;
 };
 
 const DEMO_USERS: DemoUser[] = [
@@ -138,11 +140,42 @@ const DEMO_USERS: DemoUser[] = [
     weakType: QuestionType.DUYGU_KARAKTER,
     wpm: { from: 82, to: 112 },
   },
+  // Sınıf grubu denemeleri: 60 ders bitmiş, bütün şehirler açık; hikâyeler kendi grubunun sürümüyle.
+  {
+    username: 'demo.g1',
+    name: 'Nil',
+    grade: 2,
+    completed: 60,
+    streakDays: 12,
+    readToday: true,
+    weakType: QuestionType.DUYGU_KARAKTER,
+    wpm: { from: 48, to: 68 },
+  },
+  {
+    username: 'demo.g3',
+    name: 'Arda',
+    grade: 5,
+    completed: 60,
+    streakDays: 12,
+    readToday: true,
+    weakType: QuestionType.ANA_FIKIR,
+    wpm: { from: 88, to: 110 },
+  },
+  {
+    username: 'demo.g4',
+    name: 'Lale',
+    grade: 7,
+    completed: 60,
+    streakDays: 12,
+    readToday: true,
+    weakType: QuestionType.CUMLEDE_ANLAM,
+    wpm: { from: 100, to: 125 },
+  },
 ];
 
 /** Geçmişin başladığı gün (6 hafta önce). */
 const HISTORY_DAYS = 42;
-/** Demo kullanıcılar 3. sınıf (G2). */
+/** Sınıfı belirtilmeyen demo kullanıcılar 3. sınıf (G2). */
 const DEMO_GRADE = 3;
 
 const SECOND = 1000;
@@ -231,17 +264,20 @@ export async function seedDemoUsers(prisma: PrismaClient, now: Date): Promise<De
       question,
     ]);
   }
-  const gradeBand = gradeBandOf(DEMO_GRADE);
-  const textOfLesson = new Map(
-    seedLessonTextRows
-      .filter((row) => row.gradeBand === gradeBand)
-      .map((row) => [row.lessonId, row.textId]),
-  );
   const wordsOfText = new Map(seedTexts.map((text) => [text.id, text.wordCount]));
 
   const summaries: DemoSummary[] = [];
   for (const demo of DEMO_USERS) {
-    const data = { passwordHash, name: demo.name, grade: DEMO_GRADE, dailyGoalMinutes: 10 };
+    const grade = demo.grade ?? DEMO_GRADE;
+    const gradeBand = gradeBandOf(grade);
+    // Grubun sürümü yazılmamış derslerde G2 metni okunur (uygulamadaki kuralla aynı).
+    const textOfLesson = new Map(
+      [
+        ...seedLessonTextRows.filter((row) => row.gradeBand === DEFAULT_GRADE_BAND),
+        ...seedLessonTextRows.filter((row) => row.gradeBand === gradeBand),
+      ].map((row) => [row.lessonId, row.textId]),
+    );
+    const data = { passwordHash, name: demo.name, grade, dailyGoalMinutes: 10 };
     const { id: userId } = await prisma.user.upsert({
       where: { username: demo.username },
       create: { username: demo.username, ...data },
@@ -455,7 +491,7 @@ export async function seedDemoUsers(prisma: PrismaClient, now: Date): Promise<De
     await prisma.userBaseline.create({
       data: {
         userId,
-        grade: DEMO_GRADE,
+        grade,
         gradeBand,
         wordsPerMinute:
           Math.round(demo.wpm.from * (0.9 + 0.08 * noise(demo.username, 'baseline')) * 10) / 10,
