@@ -20,11 +20,16 @@ import {
 import { CITY_NAMES, toApiCity } from '../src/lib/city.js';
 import { ATESMAN_TARGET } from '../src/lib/grade-band.js';
 import { READABILITY_BAND_LABELS, readabilityBand } from '../src/lib/readability.js';
+import { efesNotes } from './onay-notlari/efes.js';
 import { istanbulNotes } from './onay-notlari/istanbul.js';
 import { izmirNotes } from './onay-notlari/izmir.js';
 import type { CityNotes, Evidence } from './onay-notlari/types.js';
 
-const NOTES: Record<string, CityNotes> = { istanbul: istanbulNotes, izmir: izmirNotes };
+const NOTES: Record<string, CityNotes> = {
+  istanbul: istanbulNotes,
+  izmir: izmirNotes,
+  efes: efesNotes,
+};
 
 const TYPE_LABELS: Record<QuestionType, string> = {
   BILGI: 'Bilgi (Q1)',

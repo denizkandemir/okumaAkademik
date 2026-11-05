@@ -330,7 +330,7 @@ derse aittir). Sandıkların satırı yoktur.
 | `grade_band` | `grade_band` enum'u: `G1` (1-2. sınıf), `G2` (3-4), `G3` (5-6), `G4` (7-8) |
 | `text_id`    | Bu grupta okutulan metin; soruları ve kelime anlamları metne bağlıdır      |
 
-- Mevcut 48 hikâye **G2** metnidir. Diğer grupların metinleri A3'te üretilecek.
+- Mevcut 48 hikâye **G2** metnidir. G1, G3 ve G4 sürümleri A3s'te şehir şehir eklenir.
 - Çocuğa kendi grubunun metni, o grupta metin yoksa G2 metni okutulur (`GET /lessons/:id` metinde
   `gradeBand` döner; haritadaki tema ve süre de bu metinden).
 - Sınıf → grup eşlemesi yalnızca [`src/lib/grade-band.ts`](../src/lib/grade-band.ts)'tedir.

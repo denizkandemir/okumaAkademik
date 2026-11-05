@@ -223,7 +223,7 @@ describe('seed içeriği: sınıf grubu metinleri', () => {
 });
 
 /** G1, G3 ve G4 sürümleri yazılmış şehirler; her şehir yazıldıkça eklenir (A3s). */
-const CITIES_WITH_VERSIONS: City[] = [City.ISTANBUL, City.IZMIR];
+const CITIES_WITH_VERSIONS: City[] = [City.ISTANBUL, City.IZMIR, City.EFES];
 
 const VERSION_BANDS = [GradeBand.G1, GradeBand.G3, GradeBand.G4];
 
