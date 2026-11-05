@@ -1,6 +1,7 @@
 import type {
   City,
   CognitiveLevel,
+  GradeBand,
   LessonKind,
   QuestionType,
   ReadingLevel,
@@ -54,12 +55,24 @@ type SeedLessonBase = {
   summary: string;
 };
 
-export type SeedStoryLesson = SeedLessonBase & {
-  kind: typeof LessonKind.STORY;
+/** Hikâyenin G2 dışındaki sınıf grubu sürümü: aynı hikâye, grubun dil düzeyinde. */
+export type SeedStoryVersion = {
+  gradeBand: GradeBand;
   text: SeedText;
   /** Tam 3 soru, sırasıyla */
   questions: SeedQuestion[];
   glossary: SeedGlossary[];
+};
+
+export type SeedStoryLesson = SeedLessonBase & {
+  kind: typeof LessonKind.STORY;
+  /** G2 (3-4. sınıf) metni; grubun sürümü yoksa bu okutulur. */
+  text: SeedText;
+  /** Tam 3 soru, sırasıyla */
+  questions: SeedQuestion[];
+  glossary: SeedGlossary[];
+  /** G1, G3 ve G4 sürümleri; henüz yazılmadıysa boş. */
+  versions: SeedStoryVersion[];
 };
 
 export type SeedChestLesson = SeedLessonBase & { kind: typeof LessonKind.CHEST };

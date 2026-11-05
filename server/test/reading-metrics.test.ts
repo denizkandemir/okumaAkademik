@@ -80,8 +80,9 @@ async function completeLesson(token: string, lessonId: string, readingSessionId:
   return response.json<{ firstTime: boolean; firstTryCorrect: number }>();
 }
 
-/** İlk derse G1 varyantı ekler (3 sorulu, 4 şıklı bir soruyla). */
+/** İlk dersin seed sürümlerini kaldırıp G1 varyantı ekler (3 sorulu, 4 şıklı bir soruyla). */
 async function addVariant(lessonId: string, gradeBand: GradeBand, textId: string) {
+  await ctx.prisma.lessonText.deleteMany({ where: { lessonId, gradeBand: { not: GradeBand.G2 } } });
   await ctx.prisma.text.create({
     data: {
       id: textId,

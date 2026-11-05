@@ -27,12 +27,27 @@ describe('GET /texts', () => {
 
   it('dersler açıldıkça metinler kitaplığa eklenir; yolculuk metinleri her sınıfa açıktır', async () => {
     // 40 ders bitti: Antalya'nın tamamı ve Kapadokya'nın ilk dersi açık, gerisi kilitli.
-    for (const grade of [1, 8]) {
+    for (const [grade, minikSerce] of [
+      [1, 'minik-serce-g1'],
+      [8, 'minik-serce-g4'],
+    ] as const) {
       const ids = (await listTexts(grade, 40)).map((text) => text.id);
-      expect(ids).toEqual(expect.arrayContaining(['minik-serce', 'kayip-anahtar', 'deniz-feneri']));
+      expect(ids).toEqual(expect.arrayContaining([minikSerce, 'kayip-anahtar', 'deniz-feneri']));
       expect(ids).toContain(storyAt('kapadokya', 1).textId);
       expect(ids).not.toContain(storyAt('kapadokya', 2).textId); // kilitli
       expect(ids).not.toContain('gokyuzundeki-haritalar'); // Kapadokya 7, kilitli
+    }
+  });
+
+  it('bir hikâye kitaplıkta bir kez, kullanıcının grubunun sürümüyle görünür', async () => {
+    const first = storyAt('istanbul', 1);
+    for (const [grade, id] of [
+      [1, `${first.textId}-g1`],
+      [3, first.textId],
+      [6, `${first.textId}-g3`],
+      [7, `${first.textId}-g4`],
+    ] as const) {
+      expect((await listTexts(grade)).map((text) => text.id)).toEqual([id]);
     }
   });
 

@@ -33,6 +33,11 @@ import { CHEST_POSITIONS, LESSONS_PER_CITY, TOTAL_LESSONS } from '../src/lib/jou
  * değiştiğinde bu test kurallara uymayan hikâyeyi adıyla gösterir.
  */
 
+/** Yolculuk metinlerinin G2 sürümleri: migration'lar yalnızca bunları bilir; yeni sürümler seed'den gelir. */
+const g2TextIds = new Set(
+  seedLessonTextRows.filter((row) => row.gradeBand === GradeBand.G2).map((row) => row.textId),
+);
+
 const stories = seedCities.flatMap(({ city, lessons }) =>
   lessons
     .filter((lesson): lesson is SeedStoryLesson => lesson.kind === LessonKind.STORY)
@@ -200,7 +205,9 @@ describe('seed içeriği: hikâye temaları', () => {
     }
 
     expect(Object.fromEntries(fromMigration)).toEqual(
-      Object.fromEntries(seedTexts.map((text) => [text.id, text.theme])),
+      Object.fromEntries(
+        seedTexts.filter((text) => g2TextIds.has(text.id)).map((text) => [text.id, text.theme]),
+      ),
     );
   });
 });
@@ -215,7 +222,125 @@ describe('seed içeriği: sınıf grubu metinleri', () => {
   });
 });
 
+/** G1, G3 ve G4 sürümleri yazılmış şehirler; her şehir yazıldıkça eklenir (A3s). */
+const CITIES_WITH_VERSIONS: City[] = [City.ISTANBUL];
+
+const VERSION_BANDS = [GradeBand.G1, GradeBand.G3, GradeBand.G4];
+
+const VERSION_RULES: Partial<
+  Record<GradeBand, { minWords: number; maxWords: number; options: number; minGlossary: number }>
+> = {
+  G1: { minWords: 60, maxWords: 120, options: 3, minGlossary: 1 },
+  G3: { minWords: 180, maxWords: 280, options: 4, minGlossary: 2 },
+  G4: { minWords: 250, maxWords: 380, options: 4, minGlossary: 2 },
+};
+
+const G1_TYPES: QuestionType[] = [
+  QuestionType.BILGI,
+  QuestionType.NEDEN_SONUC,
+  QuestionType.DUYGU_KARAKTER,
+  QuestionType.SOZCUK_ANLAMI,
+];
+const G3_REQUIRED_TYPES: QuestionType[] = [
+  QuestionType.ANA_FIKIR,
+  QuestionType.BASLIK,
+  QuestionType.YARDIMCI_FIKIR,
+  QuestionType.CUMLEDE_ANLAM,
+];
+const G4_REQUIRED_TYPES: QuestionType[] = [
+  QuestionType.ANA_FIKIR,
+  QuestionType.YARDIMCI_FIKIR,
+  QuestionType.BASLIK,
+];
+
+const versionedStories = stories.filter(({ city }) => CITIES_WITH_VERSIONS.includes(city));
+
+describe.each(VERSION_BANDS)('seed içeriği: %s sürümleri', (band) => {
+  const rules = VERSION_RULES[band]!;
+  const target = ATESMAN_TARGET[band];
+
+  it.each(versionedStories.map(({ lesson }) => [lesson.id, lesson] as const))('%s', (_, lesson) => {
+    const version = lesson.versions.find((entry) => entry.gradeBand === band);
+    expect(version, `${band} sürümü yok`).toBeDefined();
+    const { text, questions, glossary } = version!;
+
+    // Aynı hikâye: başlık ve tema G2 metniyle aynı; kimlik ve sınıf aralığı gruba göre.
+    expect(text.id).toBe(`${lesson.text.id}-${band.toLowerCase()}`);
+    expect(text).toMatchObject({ title: lesson.title, theme: lesson.text.theme });
+    expect(gradeBandOf(text.minGrade)).toBe(band);
+    expect(gradeBandOf(text.maxGrade)).toBe(band);
+    expect(text.estimatedMinutes).toBe(readingMinutes(text.paragraphs));
+
+    // Uzunluk ve okunabilirlik gruba uygun; ölçüler araçla aynı.
+    const metrics = textMetrics(text.paragraphs);
+    expect({
+      wordCount: text.wordCount,
+      sentenceCount: text.sentenceCount,
+      avgSentenceLength: text.avgSentenceLength,
+      atesmanScore: text.atesmanScore,
+    }).toEqual(metrics);
+    expect(metrics.wordCount).toBeGreaterThanOrEqual(rules.minWords);
+    expect(metrics.wordCount).toBeLessThanOrEqual(rules.maxWords);
+    expect(metrics.atesmanScore).toBeGreaterThanOrEqual(target.min);
+    expect(metrics.atesmanScore).toBeLessThanOrEqual(target.max);
+
+    // Sorular: tam 3; şık sayısı gruba göre, şıklar farklı, doğru cevap hep aynı yerde değil.
+    expect(questions).toHaveLength(3);
+    for (const question of questions) {
+      expect(question.options).toHaveLength(rules.options);
+      expect(new Set(question.options).size).toBe(rules.options);
+      expect(question.correctIndex).toBeLessThan(rules.options);
+      expect(Object.values(CognitiveLevel)).toContain(question.cognitiveLevel);
+      expect(question.prompt.trim().length).toBeGreaterThan(0);
+      expect(question.hint).toMatch(/^İpucu: /);
+      expect(question.explanation.trim().length).toBeGreaterThan(0);
+    }
+    expect(new Set(questions.map((q) => q.correctIndex)).size).toBeGreaterThan(1);
+
+    // Soru türleri (A3s): BILGI sınırlı, grubun zorunlu türleri var.
+    const types = questions.map((q) => q.type);
+    const bilgi = types.filter((type) => type === QuestionType.BILGI).length;
+    if (band === GradeBand.G1) {
+      expect(bilgi).toBeLessThanOrEqual(1);
+      for (const type of types) expect(G1_TYPES).toContain(type);
+    } else if (band === GradeBand.G3) {
+      expect(bilgi).toBeLessThanOrEqual(1);
+      expect(
+        questions.some(
+          (q) =>
+            G3_REQUIRED_TYPES.includes(q.type) ||
+            (q.type === QuestionType.NEDEN_SONUC && q.cognitiveLevel === CognitiveLevel.CIKARIM),
+        ),
+      ).toBe(true);
+    } else {
+      expect(bilgi).toBe(0);
+      expect(types.some((type) => G4_REQUIRED_TYPES.includes(type))).toBe(true);
+    }
+
+    // Kelime anlamları: tekil, metinde yazıldığı gibi geçer.
+    expect(glossary.length).toBeGreaterThanOrEqual(rules.minGlossary);
+    expect(glossary.length).toBeLessThanOrEqual(4);
+    const words = glossary.map((entry) => entry.word);
+    expect(new Set(words).size).toBe(words.length);
+    const fullText = text.paragraphs.join(' ');
+    for (const { word, meaning } of glossary) {
+      expect(containsWord(fullText, word), `"${word}" metinde yok`).toBe(true);
+      expect(meaning.trim().length).toBeGreaterThan(0);
+    }
+  });
+
+  it.each(CITIES_WITH_VERSIONS)('%s: en az 4 farklı soru türü', (city) => {
+    const types = stories
+      .filter((story) => story.city === city)
+      .flatMap(({ lesson }) => lesson.versions.filter((v) => v.gradeBand === band))
+      .flatMap((version) => version.questions.map((q) => q.type));
+    expect(new Set(types).size).toBeGreaterThanOrEqual(4);
+  });
+});
+
 describe('seed içeriği: soru etiketleri', () => {
+  const g2Questions = seedQuestionRows.filter((q) => g2TextIds.has(q.textId));
+
   it("migration'daki etiketler seed verisiyle aynıdır", () => {
     const migrationsDir = new URL('../prisma/migrations/', import.meta.url);
     const dir = readdirSync(migrationsDir).find((name) => name.endsWith('_question_labels'));
@@ -231,14 +356,14 @@ describe('seed içeriği: soru etiketleri', () => {
 
     expect(Object.fromEntries(fromMigration)).toEqual(
       Object.fromEntries(
-        seedQuestionRows.map((q) => [`${q.textId}#${q.position}`, `${q.type}/${q.cognitiveLevel}`]),
+        g2Questions.map((q) => [`${q.textId}#${q.position}`, `${q.type}/${q.cognitiveLevel}`]),
       ),
     );
   });
 
   it('144 soru etiketli; ana fikir soruları zayıf tür olarak raporlanabilecek kadar çok', () => {
-    expect(seedQuestionRows).toHaveLength(144);
-    const count = (type: QuestionType) => seedQuestionRows.filter((q) => q.type === type).length;
+    expect(g2Questions).toHaveLength(144);
+    const count = (type: QuestionType) => g2Questions.filter((q) => q.type === type).length;
     expect(count(QuestionType.ANA_FIKIR)).toBeGreaterThanOrEqual(10);
     expect(count(QuestionType.BILGI)).toBeGreaterThan(0);
   });

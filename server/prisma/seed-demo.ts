@@ -231,9 +231,13 @@ export async function seedDemoUsers(prisma: PrismaClient, now: Date): Promise<De
       question,
     ]);
   }
-  const textOfLesson = new Map(seedLessonTextRows.map((row) => [row.lessonId, row.textId]));
-  const wordsOfText = new Map(seedTexts.map((text) => [text.id, text.wordCount]));
   const gradeBand = gradeBandOf(DEMO_GRADE);
+  const textOfLesson = new Map(
+    seedLessonTextRows
+      .filter((row) => row.gradeBand === gradeBand)
+      .map((row) => [row.lessonId, row.textId]),
+  );
+  const wordsOfText = new Map(seedTexts.map((text) => [text.id, text.wordCount]));
 
   const summaries: DemoSummary[] = [];
   for (const demo of DEMO_USERS) {

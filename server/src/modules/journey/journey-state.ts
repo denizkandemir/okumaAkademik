@@ -105,6 +105,20 @@ export function lockedTextIds(state: JourneyState): Set<string> {
   );
 }
 
+/**
+ * Kitaplıkta listelenmeyen ders metinleri: kilitli derslerin hepsi, açık derslerde kullanıcıya
+ * okutulmayan grup sürümleri (bir hikâye kitaplıkta bir kez görünür).
+ */
+export function hiddenLibraryTextIds(state: JourneyState): Set<string> {
+  return new Set(
+    state.lessons.flatMap((lesson) =>
+      lesson.status === 'locked'
+        ? lesson.textIds
+        : lesson.textIds.filter((id) => id !== lesson.textId),
+    ),
+  );
+}
+
 /** Şehirlerin durumu ve her şehirde bitirilen ders sayısı, yolculuk sırasıyla. */
 export function citiesOf(state: JourneyState) {
   return CITY_ORDER.map((city) => {
