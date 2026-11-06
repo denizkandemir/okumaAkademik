@@ -20,6 +20,7 @@ import {
 import { CITY_NAMES, toApiCity } from '../src/lib/city.js';
 import { ATESMAN_TARGET } from '../src/lib/grade-band.js';
 import { READABILITY_BAND_LABELS, readabilityBand } from '../src/lib/readability.js';
+import { antalyaNotes } from './onay-notlari/antalya.js';
 import { efesNotes } from './onay-notlari/efes.js';
 import { istanbulNotes } from './onay-notlari/istanbul.js';
 import { izmirNotes } from './onay-notlari/izmir.js';
@@ -29,6 +30,7 @@ const NOTES: Record<string, CityNotes> = {
   istanbul: istanbulNotes,
   izmir: izmirNotes,
   efes: efesNotes,
+  antalya: antalyaNotes,
 };
 
 const TYPE_LABELS: Record<QuestionType, string> = {
