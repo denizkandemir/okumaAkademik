@@ -27,15 +27,15 @@ describe('GET /texts', () => {
 
   it('dersler açıldıkça metinler kitaplığa eklenir; yolculuk metinleri her sınıfa açıktır', async () => {
     // 40 ders bitti: Antalya'nın tamamı ve Kapadokya'nın ilk dersi açık, gerisi kilitli.
-    for (const [grade, minikSerce, kayipAnahtar, denizFeneri] of [
-      [1, 'minik-serce-g1', 'kayip-anahtar-g1', 'deniz-feneri-g1'],
-      [8, 'minik-serce-g4', 'kayip-anahtar-g4', 'deniz-feneri-g4'],
+    for (const [grade, band, minikSerce, kayipAnahtar, denizFeneri] of [
+      [1, 'g1', 'minik-serce-g1', 'kayip-anahtar-g1', 'deniz-feneri-g1'],
+      [8, 'g4', 'minik-serce-g4', 'kayip-anahtar-g4', 'deniz-feneri-g4'],
     ] as const) {
       const ids = (await listTexts(grade, 40)).map((text) => text.id);
       expect(ids).toEqual(expect.arrayContaining([minikSerce, kayipAnahtar, denizFeneri]));
-      expect(ids).toContain(storyAt('kapadokya', 1).textId);
-      expect(ids).not.toContain(storyAt('kapadokya', 2).textId); // kilitli
-      expect(ids).not.toContain('gokyuzundeki-haritalar'); // Kapadokya 7, kilitli
+      expect(ids).toContain(`${storyAt('kapadokya', 1).textId}-${band}`);
+      expect(ids).not.toContain(`${storyAt('kapadokya', 2).textId}-${band}`); // kilitli
+      expect(ids).not.toContain(`gokyuzundeki-haritalar-${band}`); // Kapadokya 7, kilitli
     }
   });
 
