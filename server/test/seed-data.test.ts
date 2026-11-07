@@ -229,6 +229,7 @@ const CITIES_WITH_VERSIONS: City[] = [
   City.EFES,
   City.ANTALYA,
   City.KAPADOKYA,
+  City.VAN,
 ];
 
 const VERSION_BANDS = [GradeBand.G1, GradeBand.G3, GradeBand.G4];

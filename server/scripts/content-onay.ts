@@ -25,6 +25,7 @@ import { efesNotes } from './onay-notlari/efes.js';
 import { istanbulNotes } from './onay-notlari/istanbul.js';
 import { izmirNotes } from './onay-notlari/izmir.js';
 import { kapadokyaNotes } from './onay-notlari/kapadokya.js';
+import { vanNotes } from './onay-notlari/van.js';
 import type { CityNotes, Evidence } from './onay-notlari/types.js';
 
 const NOTES: Record<string, CityNotes> = {
@@ -33,6 +34,7 @@ const NOTES: Record<string, CityNotes> = {
   efes: efesNotes,
   antalya: antalyaNotes,
   kapadokya: kapadokyaNotes,
+  van: vanNotes,
 };
 
 const TYPE_LABELS: Record<QuestionType, string> = {
