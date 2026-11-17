@@ -8,7 +8,7 @@ import { withApiLevel } from '../../lib/reading-level.js';
 import { withApiTheme } from '../../lib/text-theme.js';
 import { parse } from '../../lib/validation.js';
 import { requireAuth } from '../../plugins/auth.js';
-import { loadJourneyState, lockedTextIds } from '../journey/journey-state.js';
+import { hiddenLibraryTextIds, loadJourneyState, lockedTextIds } from '../journey/journey-state.js';
 
 const textSummarySelect = {
   id: true,
@@ -27,17 +27,20 @@ export async function textsRoutes(app: FastifyInstance) {
 
   /**
    * Kullanıcının sınıfına uygun metinler (paragraflar hariç). Yolculukta henüz kilitli olan
-   * derslerin metinleri ve seviye belirleme metinleri listelenmez. `city`: metni okutan dersin şehri (dersi yoksa `null`);
+   * derslerin metinleri, açık derslerin kullanıcıya okutulmayan grup sürümleri ve seviye belirleme
+   * metinleri listelenmez. `city`: metni okutan dersin şehri (dersi yoksa `null`);
    * `read`: kullanıcının bu metinde tamamlanmış bir okuması var mı.
    */
   app.get('/texts', async (request) => {
     const { user } = requireAuth(request);
-    const locked = lockedTextIds(await loadJourneyState(prisma, user.id, gradeBandOf(user.grade)));
+    const hidden = hiddenLibraryTextIds(
+      await loadJourneyState(prisma, user.id, gradeBandOf(user.grade)),
+    );
     const texts = await prisma.text.findMany({
       where: {
         minGrade: { lte: user.grade },
         maxGrade: { gte: user.grade },
-        id: { notIn: [...locked] },
+        id: { notIn: [...hidden] },
         placementText: { is: null },
       },
       select: {

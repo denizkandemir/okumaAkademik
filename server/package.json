@@ -21,6 +21,7 @@
     "db:seed": "prisma db seed",
     "db:reset": "prisma migrate reset && prisma db seed",
     "db:studio": "prisma studio",
+    "content:onay": "tsx scripts/content-onay.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {

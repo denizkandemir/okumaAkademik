@@ -6,7 +6,7 @@ import {
   TextTheme,
 } from '../../src/generated/prisma/enums.js';
 import { textMetrics } from '../../src/lib/readability.js';
-import { readingMinutes } from './build.js';
+import { GRADES, readingMinutes } from './build.js';
 import type { SeedQuestion, SeedText } from './types.js';
 
 /**
@@ -22,14 +22,6 @@ export type SeedPlacement = {
   position: number;
   text: SeedText;
   questions: SeedQuestion[];
-};
-
-/** Sınıf grubunun en küçük ve en büyük sınıfı (src/lib/grade-band.ts ile aynı eşleme). */
-const GRADES: Record<GradeBand, [number, number]> = {
-  G1: [1, 2],
-  G2: [3, 4],
-  G3: [5, 6],
-  G4: [7, 8],
 };
 
 function placement(

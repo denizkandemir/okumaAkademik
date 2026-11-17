@@ -330,7 +330,7 @@ derse aittir). Sandıkların satırı yoktur.
 | `grade_band` | `grade_band` enum'u: `G1` (1-2. sınıf), `G2` (3-4), `G3` (5-6), `G4` (7-8) |
 | `text_id`    | Bu grupta okutulan metin; soruları ve kelime anlamları metne bağlıdır      |
 
-- Mevcut 48 hikâye **G2** metnidir. Diğer grupların metinleri A3'te üretilecek.
+- Mevcut 48 hikâye **G2** metnidir. G1, G3 ve G4 sürümleri A3s'te şehir şehir eklenir.
 - Çocuğa kendi grubunun metni, o grupta metin yoksa G2 metni okutulur (`GET /lessons/:id` metinde
   `gradeBand` döner; haritadaki tema ve süre de bu metinden).
 - Sınıf → grup eşlemesi yalnızca [`src/lib/grade-band.ts`](../src/lib/grade-band.ts)'tedir.
@@ -720,7 +720,7 @@ ORDER BY atesman_score;
 
 ## Demo kullanıcılar (yalnızca geliştirme)
 
-`npm run db:reset` (ya da `npm run db:seed`) yolculuğun farklı noktalarında 8 kullanıcı
+`npm run db:reset` (ya da `npm run db:seed`) yolculuğun farklı noktalarında 12 kullanıcı
 oluşturur; şifre hepsinde `okuma123`. Oyun verileri ve okumaları her seed'de "bugün"e göre
 yeniden yazılır ([`prisma/seed-demo.ts`](../prisma/seed-demo.ts)).
 
@@ -743,6 +743,9 @@ tamamlamaları da silinir.
 | `demo.kapadokya` | 42             | 22     | Kapadokya | 28   | SOZCUK_ANLAMI  |                                 |
 | `demo.van`       | 54             | 28     | Van       | 35   | ANA_FIKIR      | 1 acele okuma                   |
 | `demo.final`     | 60             | 30     | Van       | 42   | DUYGU_KARAKTER | Yolculuk bitti (`finished`)     |
+| `demo.g1`        | 60             | 30     | Van       | 12   | DUYGU_KARAKTER | 2. sınıf: G1 sürümleri          |
+| `demo.g3`        | 60             | 30     | Van       | 12   | ANA_FIKIR      | 5. sınıf: G3 sürümleri          |
+| `demo.g4`        | 60             | 30     | Van       | 12   | CUMLEDE_ANLAM  | 7. sınıf: G4 sürümleri          |
 
 **Okuma geçmişi (A0):** son 6 haftaya yayılır. Seriden önceki haftalarda haftada üç seyrek gün
 okunur (art arda iki gün yok, serinin bir gün öncesi boş; seri ve en iyi seri değişmez), sonra seri
