@@ -69,6 +69,171 @@ export const van: SeedCity = {
         { word: 'sodalı', meaning: 'İçinde soda denen, suyu kaygan yapan bir madde bulunan.' },
         { word: 'turkuaz', meaning: 'Mavi ile yeşil arası, açık bir renk.' },
       ],
+      versions: {
+        G1: {
+          paragraphs: [
+            'Ayşe yazın anneannesine gitti. Anneannesi Van’da oturuyordu. Bir sabah göle indiler. Göl çok büyüktü. Karşı kıyı görünmüyordu. “Bu bir deniz mi?” dedi Ayşe.',
+            '“Hayır, bu bir göl,” dedi anneannesi. “Türkiye’nin en büyük gölü. Bir de sırrı var.”',
+            '“Elini suya sok. Parmaklarını sürt.” Ayşe öyle yaptı. Parmakları kaydı. Sanki sabuna dokunmuştu!',
+            '“Bu göl sodalı,” dedi anneannesi. “Eskiden çamaşır bu suyla yıkanırmış. Gölde tek bir balık yaşar: inci kefali.”',
+            'Akşam Ayşe günlüğünü açtı. “Bugün sabun gibi bir göl gördüm. Doğa ne güzel!” diye yazdı.',
+          ],
+          questions: [
+            {
+              type: QuestionType.NEDEN_SONUC,
+              cognitiveLevel: CognitiveLevel.ANLAMA,
+              prompt: 'Ayşe’nin parmakları neden kaydı?',
+              options: ['Elinde sabun vardı', 'Göl sodalıydı', 'Su çok soğuktu'],
+              correctIndex: 1,
+              hint: 'İpucu: Dördüncü paragrafta anneannesinin anlattıklarını oku.',
+              explanation: 'Aferin! Gölün sodalı suyu parmakları kaygan yapar.',
+            },
+            {
+              type: QuestionType.BILGI,
+              cognitiveLevel: CognitiveLevel.HATIRLAMA,
+              prompt: 'Gölde hangi balık yaşar?',
+              options: ['İnci kefali', 'Hamsi', 'Alabalık'],
+              correctIndex: 0,
+              hint: 'İpucu: Dördüncü paragrafın son cümlesine bak.',
+              explanation: 'Doğru! Van Gölü’nde yalnızca inci kefali yaşar.',
+            },
+            {
+              type: QuestionType.DUYGU_KARAKTER,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt: 'Ayşe göl için ne hissetti?',
+              options: ['Gölden korktu', 'Gölden sıkıldı', 'Göle hayran kaldı'],
+              correctIndex: 2,
+              hint: 'İpucu: Son paragrafta Ayşe’nin günlüğüne yazdıklarını oku.',
+              explanation: 'Harika! Ayşe, “Doğa ne güzel!” diyerek göle hayran kaldığını gösterdi.',
+            },
+          ],
+          glossary: [
+            { word: 'kıyı', meaning: 'Suyun karayla birleştiği yer.' },
+            { word: 'sodalı', meaning: 'İçinde suyu kaygan yapan bir madde olan.' },
+          ],
+        },
+        G3: {
+          paragraphs: [
+            'Ayşe, yaz tatilini Van’daki anneannesinin yanında geçiriyordu. Bir sabah kahvaltıdan sonra birlikte Van Gölü’nün kıyısına indiler. Göl o kadar büyüktü ki karşı kıyısı görünmüyordu, ufukta yalnızca mavi bir çizgi vardı. Ayşe, “Anneanne, bu bir deniz mi?” diye sordu.',
+            'Anneannesi güldü. “Hayır, bu bir göl, hem de Türkiye’nin en büyük gölü. Ama sıradan bir göl değil, bir sırrı var,” dedi. Sonra eğilip avucuna biraz su aldı ve Ayşe’ye uzattı.',
+            '“Elini suya sok ve parmaklarını birbirine sürt,” dedi anneannesi. Ayşe dediğini yaptı ve parmaklarının kaygan kaygan olduğunu hissetti, sanki sabunlu suya dokunmuştu! Kıyıya vuran dalgaların üstünde de beyaz köpükler vardı.',
+            '“Bu göl sodalıdır,” diye anlattı anneannesi. “Eskiden kadınlar çamaşırlarını sabunsuz, bu suyla yıkarmış. Suyu tuzlu ve sodalı olduğu için de içinde yalnızca bir tür balık yaşayabilir: inci kefali. Başka balıklar bu suya dayanamaz.”',
+            'Ayşe hayretle göle baktı; su, güneşin altında turkuaz renginde parlıyordu ve uzaktaki karlı dağlar göle doğru eğilmiş gibiydi. Ayşe, bir gölün bu kadar şaşırtıcı bir sırrı olabileceğini daha önce hiç düşünmemişti.',
+            'O akşam Ayşe günlüğüne şunu yazdı: “Bugün sabun gibi köpüren bir göl gördüm. Doğa ne kadar şaşırtıcı!” Sonra kalemini bıraktı ve ertesi gün göle yine gitmeyi hayal etti.',
+          ],
+          questions: [
+            {
+              type: QuestionType.NEDEN_SONUC,
+              cognitiveLevel: CognitiveLevel.ANLAMA,
+              prompt: 'Anneannesine göre Van Gölü’nde neden yalnızca inci kefali yaşayabiliyor?',
+              options: [
+                'Göl çok soğuk olduğu için',
+                'Balıkçılar öbür balıkları avladığı için',
+                'Suyu tuzlu ve sodalı olduğu, başka balıklar dayanamadığı için',
+                'Gölde yeterince yiyecek olmadığı için',
+              ],
+              correctIndex: 2,
+              hint: 'İpucu: Dördüncü paragrafta anneannesinin anlattıklarını oku.',
+              explanation:
+                'Aferin! Gölün tuzlu ve sodalı suyuna yalnızca inci kefali dayanabiliyor.',
+            },
+            {
+              type: QuestionType.CUMLEDE_ANLAM,
+              cognitiveLevel: CognitiveLevel.ANLAMA,
+              prompt: '“Göl o kadar büyüktü ki karşı kıyısı görünmüyordu.” cümlesi ne anlatıyor?',
+              options: [
+                'Havanın sisli olduğunu',
+                'Gölün çok geniş olduğunu',
+                'Ayşe’nin gözlerinin iyi görmediğini',
+                'Gölün karşı kıyısında hiçbir şey olmadığını',
+              ],
+              correctIndex: 1,
+              hint: 'İpucu: Ayşe bu yüzden gölü neye benzetip sordu?',
+              explanation: 'Harika! Göl o kadar genişti ki Ayşe onu deniz sandı.',
+            },
+            {
+              type: QuestionType.ANA_FIKIR,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt: 'Bu metinden çıkarılabilecek en uygun düşünce hangisidir?',
+              options: [
+                'Doğa, yakından bakanı şaşırtan sırlarla doludur.',
+                'Göllerde yüzmek tehlikelidir.',
+                'Çamaşırlar her zaman sabunsuz yıkanmalıdır.',
+                'Denizler göllerden daha güzeldir.',
+              ],
+              correctIndex: 0,
+              hint: 'İpucu: Ayşe’nin akşam günlüğüne yazdığı cümleyi düşün.',
+              explanation: 'Çok güzel! Ayşe göle yakından bakınca onun şaşırtıcı sırrını keşfetti.',
+            },
+          ],
+          glossary: [
+            { word: 'ufukta', meaning: 'Gökle yerin ya da suyun birleşir gibi göründüğü çizgide.' },
+            { word: 'kaygan', meaning: 'Üstünde kolayca kayılan, sabun gibi.' },
+            { word: 'sodalı', meaning: 'İçinde soda denen, suyu kaygan yapan bir madde bulunan.' },
+            { word: 'turkuaz', meaning: 'Mavi ile yeşil arası, açık bir renk.' },
+          ],
+        },
+        G4: {
+          paragraphs: [
+            'Ayşe, yaz tatilini Van’daki anneannesinin yanında geçiriyordu. Bir sabah, güneş dağların ardından yeni yükselirken birlikte Van Gölü’nün kıyısına indiler. Göl öylesine büyüktü ki karşı kıyısı görünmüyor, su ufukta gökyüzüyle birleşip tek bir mavi örtüye dönüşüyordu. Ayşe, gözlerini bu uçsuz bucaksız maviden ayıramadan, “Anneanne, bu bir deniz mi?” diye sordu.',
+            'Anneannesi, torununun şaşkınlığına gülümsedi ve “Hayır, bu bir göl; hem de Türkiye’nin en büyük gölü. Ama sıradan bir göl değil, bir sırrı var,” dedi. Sonra eğilip avucuna biraz su aldı ve sanki değerli bir hazineyi gösterir gibi Ayşe’ye uzattı.',
+            '“Elini suya sok ve parmaklarını birbirine sürt,” dedi anneannesi. Ayşe dediğini yaptı ve şaşkınlıkla durdu: Parmakları kaygan kaygan olmuştu, sanki sabunlu bir leğene dokunmuştu. Kıyıya vuran dalgaların üstünde de, birinin özenle ördüğü dantel gibi beyaz köpükler oluşuyordu.',
+            '“Bu göl sodalıdır,” diye anlattı anneannesi. “Eskiden kadınlar çamaşırlarını sabun kullanmadan, bu suyla yıkarmış. Suyu hem tuzlu hem sodalı olduğu için içinde yalnızca bir tür balık yaşayabilir: inci kefali. Bu küçük balık, başka balıkların dayanamadığı bu suya uyum sağlamış.”',
+            'Ayşe hayretle göle baktı. Su, güneşin altında turkuaz renginde parlıyor, uzaktaki karlı dağlar ise göle doğru eğilmiş, onun sırlarını dinliyormuş gibi duruyordu. Ayşe o ana kadar gölleri yalnızca içinde yüzülen, kıyısında oturulan yerler sanmıştı; oysa bu göl kendine özgü bir dünyaydı.',
+            'O akşam Ayşe günlüğüne şunu yazdı: “Bugün sabun gibi köpüren bir göl gördüm. Doğa ne kadar şaşırtıcı!” Sonra kalemini bıraktı ve pencereden, ay ışığının altında gümüş gibi parıldayan göle uzun uzun baktı. Bu göl ona, dünyada keşfedilmeyi bekleyen daha nice sır olduğunu düşündürmüştü ve Ayşe, ertesi sabah onun yeni bir sırrını öğrenmek için sabırsızlanıyordu.',
+          ],
+          questions: [
+            {
+              type: QuestionType.BASLIK,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt: 'Bu metnin başlığı değiştirilecek olsa en uygunu hangisi olurdu?',
+              options: [
+                'Anneannenin Çamaşırları',
+                'Karlı Dağların Ardında',
+                'Kendine Özgü Bir Dünya: Sodalı Göl',
+                'Ayşe’nin Yüzme Dersi',
+              ],
+              correctIndex: 2,
+              hint: 'İpucu: Metnin büyük bölümü neyi tanıtıyor? Ayşe neyi keşfediyor?',
+              explanation:
+                'Aferin! Metin, Ayşe’nin sodalı Van Gölü’nün sırrını keşfedişini anlatıyor.',
+            },
+            {
+              type: QuestionType.ONCULLU_YORUM,
+              cognitiveLevel: CognitiveLevel.DEGERLENDIRME,
+              prompt:
+                'Metne göre aşağıdaki yargılardan hangileri doğrudur? I. Van Gölü’nün suyu tuzlu ve sodalıdır. II. Gölde pek çok balık türü yaşar. III. Eskiden çamaşırlar bu suyla sabun kullanılmadan yıkanırmış.',
+              options: ['Yalnız I', 'I ve III', 'II ve III', 'I, II ve III'],
+              correctIndex: 1,
+              hint: 'İpucu: Her yargıyı tek tek ele al; balıklar için dördüncü paragrafa bak.',
+              explanation:
+                'Harika! Gölde yalnızca bir tür balık yaşadığı için II. yargı yanlıştır.',
+            },
+            {
+              type: QuestionType.CUMLEDE_ANLAM,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt:
+                '“Ayşe o ana kadar gölleri yalnızca içinde yüzülen, kıyısında oturulan yerler sanmıştı; oysa bu göl kendine özgü bir dünyaydı.” cümlesinden hangisi çıkarılabilir?',
+              options: [
+                'Ayşe’nin göllere bakışı öğrendikleriyle değişmiştir.',
+                'Ayşe yüzmeyi sevmemektedir.',
+                'Göl, Ayşe’nin kaldığı eve çok uzaktır.',
+                'Ayşe daha önce hiç göl görmemiştir.',
+              ],
+              correctIndex: 0,
+              hint: 'İpucu: “sanmıştı” ve “oysa” sözcükleri, önceki düşünceyle yeni düşünceyi karşılaştırıyor.',
+              explanation:
+                'Çok güzel! Ayşe, gölün sırrını öğrenince göllere bambaşka bir gözle bakmaya başladı.',
+            },
+          ],
+          glossary: [
+            { word: 'sodalı', meaning: 'İçinde soda denen, suyu kaygan yapan bir madde bulunan.' },
+            { word: 'uyum sağlamış', meaning: 'Zor koşullara alışıp onlarla yaşamayı başarmış.' },
+            { word: 'turkuaz', meaning: 'Mavi ile yeşil arası, açık bir renk.' },
+            { word: 'kendine özgü', meaning: 'Başka hiçbir şeye benzemeyen, yalnızca ona ait.' },
+          ],
+        },
+      },
     }),
     story(city, {
       position: 2,
@@ -124,6 +289,171 @@ export const van: SeedCity = {
         { word: 'oymaların', meaning: 'Taşı ya da tahtayı kazıyarak yapılan süslerin.' },
         { word: 'bahar', meaning: 'İlkbahar mevsimi.' },
       ],
+      versions: {
+        G1: {
+          paragraphs: [
+            'Nisan ayıydı. Emre ve ailesi bir tekneye bindi. Tekne gölde ilerledi. Bir adaya gidiyorlardı. Martılar peşlerinden uçtu.',
+            'Ada çiçeklerle doluydu. Beyaz, pembe çiçekler! “Bunlar badem ağacı,” dedi babası. “Baharda hepsi çiçek açar.”',
+            'Ağaçların arasında yürüdüler. Rüzgâr esti. Çiçek yaprakları kar gibi yağdı. Emre kollarını açıp döndü.',
+            'Tepede eski, taş bir yapı vardı. Duvarda aslanlar, kuşlar vardı. Hepsi taşa oyulmuştu. Emre onları saydı. On beşte karıştırdı ve güldü.',
+            'Dönerken arkasına baktı. Ada pembe bir buluta benziyordu. “Yine gelelim,” dedi Emre.',
+          ],
+          questions: [
+            {
+              type: QuestionType.BILGI,
+              cognitiveLevel: CognitiveLevel.HATIRLAMA,
+              prompt: 'Ada neyle doluydu?',
+              options: ['Çiçeklerle', 'Kumla', 'Çamurla'],
+              correctIndex: 0,
+              hint: 'İpucu: İkinci paragrafın ilk cümlesini oku.',
+              explanation: 'Doğru! Ada beyaz ve pembe badem çiçekleriyle doluydu.',
+            },
+            {
+              type: QuestionType.SOZCUK_ANLAMI,
+              cognitiveLevel: CognitiveLevel.ANLAMA,
+              prompt: '“Hepsi taşa oyulmuştu.” Oyulmak ne demek?',
+              options: ['Boyayla çizilmek', 'Taş kazınarak şekil verilmek', 'Kâğıda yapıştırılmak'],
+              correctIndex: 1,
+              hint: 'İpucu: Aslanlar ve kuşlar duvarda, taşın üstündeydi.',
+              explanation: 'Aferin! Usta taşı kazıyarak hayvan şekilleri yapmıştı.',
+            },
+            {
+              type: QuestionType.DUYGU_KARAKTER,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt: 'Emre’nin adayı sevdiğini hangi sözünden anlarız?',
+              options: ['“Eve gidelim.”', '“Çok sıkıldım.”', '“Yine gelelim.”'],
+              correctIndex: 2,
+              hint: 'İpucu: Son paragrafta Emre’nin söylediği söze bak.',
+              explanation: 'Harika! Emre adayı çok sevdi, yine gelmek istedi.',
+            },
+          ],
+          glossary: [
+            { word: 'peşlerinden', meaning: 'Arkalarından.' },
+            { word: 'oyulmuştu', meaning: 'Kazınarak şekil verilmişti.' },
+          ],
+        },
+        G3: {
+          paragraphs: [
+            'Nisan ayında Emre ve ailesi, Gevaş’tan küçük bir tekneye bindiler. Tekne, Van Gölü’nün mavi sularında Akdamar Adası’na doğru ilerlerken martılar teknenin peşinden uçuyordu. Emre elini teknenin kenarından uzatıp serin suya dokundu ve uzakta yavaş yavaş büyüyen adayı izledi.',
+            'Adaya yaklaştıklarında Emre’nin ağzı açık kaldı, çünkü adanın her yeri beyaz ve pembe çiçeklerle kaplıydı. Babası, “Bunlar badem ağaçları. İlkbaharda hepsi birden çiçek açar ama çiçekleri uzun sürmez,” dedi.',
+            'Tekneden inip çiçekli ağaçların arasında yürüdüler. Rüzgâr esince küçük taç yapraklar kar gibi yağıyordu. Emre kollarını açıp döndü ve saçları çiçek yapraklarıyla doldu. Annesi onu görünce gülümsedi ve bu anın fotoğrafını çekti.',
+            'Adanın tepesinde çok eski, taştan bir yapı vardı. Yapının duvarlarına aslanlar, kuşlar ve başka birçok hayvan oyulmuştu. Rehber, bu oymaların bin yıldan daha eski olduğunu ve hepsinin elle, sabırla yapıldığını anlattı.',
+            'Emre duvarlardaki hayvanları saymaya başladı. Onuncuda şaşırdı, on beşincide karıştırdı ve en baştan başlamak zorunda kaldı. Aslanları, kuşları, adını bilmediği başka hayvanları bir türlü bitiremedi. Sonunda gülerek, “Usta bu kadar hayvanı taşa nasıl sığdırmış?” dedi.',
+            'Dönüş yolunda Emre arkasına baktı. Ada, gölün ortasında pembe bir bulut gibi duruyordu. “Gelecek bahar yine gelelim,” dedi. Annesi gülümseyerek söz verdi.',
+          ],
+          questions: [
+            {
+              type: QuestionType.CUMLEDE_ANLAM,
+              cognitiveLevel: CognitiveLevel.ANLAMA,
+              prompt: '“Adaya yaklaştıklarında Emre’nin ağzı açık kaldı.” cümlesi ne anlatıyor?',
+              options: [
+                'Emre’nin çok acıktığını',
+                'Emre’nin gördüğü manzaraya çok şaşırdığını',
+                'Emre’nin üşüdüğünü',
+                'Emre’nin şarkı söylemek istediğini',
+              ],
+              correctIndex: 1,
+              hint: 'İpucu: Aynı cümlenin devamında adanın neyle kaplı olduğunu oku.',
+              explanation: 'Aferin! “Ağzı açık kalmak”, bir şeye çok şaşırmak demektir.',
+            },
+            {
+              type: QuestionType.NEDEN_SONUC,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt: 'Emre neden “Usta bu kadar hayvanı taşa nasıl sığdırmış?” dedi?',
+              options: [
+                'Rehber ona bir bilmece sormuştu',
+                'Duvarlarda yalnızca bir aslan vardı',
+                'Taş yapı çok küçüktü',
+                'Hayvanlar o kadar çoktu ki saymakta zorlandı',
+              ],
+              correctIndex: 3,
+              hint: 'İpucu: Emre hayvanları sayarken neler oldu?',
+              explanation:
+                'Harika! Hayvanlar o kadar çoktu ki Emre onları sayarken defalarca karıştırdı.',
+            },
+            {
+              type: QuestionType.BILGI,
+              cognitiveLevel: CognitiveLevel.HATIRLAMA,
+              prompt: 'Rehbere göre duvardaki oymalar ne kadar eski?',
+              options: ['Bin yıldan daha eski', 'On yıllık', 'Yüz yıllık', 'Geçen yıl yapılmış'],
+              correctIndex: 0,
+              hint: 'İpucu: Dördüncü paragrafta rehberin anlattıklarını oku.',
+              explanation: 'Doğru! Taştaki oymalar bin yıldan daha eskidir.',
+            },
+          ],
+          glossary: [
+            { word: 'taç yapraklar', meaning: 'Çiçeğin renkli, ince yaprakları.' },
+            { word: 'oyulmuştu', meaning: 'Taş kazınarak şekil verilmişti.' },
+            { word: 'oymaların', meaning: 'Taşı ya da tahtayı kazıyarak yapılan süslerin.' },
+            { word: 'sabırla', meaning: 'Acele etmeden, yorulup bırakmadan.' },
+          ],
+        },
+        G4: {
+          paragraphs: [
+            'Nisan ayının ılık bir sabahında Emre ve ailesi, Gevaş’taki küçük iskeleden bir tekneye bindiler. Tekne, Van Gölü’nün masmavi sularını yararak Akdamar Adası’na doğru ilerlerken martılar, bir şey umuyormuşçasına teknenin peşinden uçuyordu. Emre elini teknenin kenarından uzatıp serin suya dokundu ve suyun parmaklarının arasından ipek gibi kayışını izledi.',
+            'Adaya yaklaştıklarında Emre’nin ağzı açık kaldı. Adanın her yeri, sanki biri üstüne beyaz ve pembe bir örtü sermiş gibi çiçeklerle kaplıydı. Babası, “Bunlar badem ağaçları. İlkbaharda hepsi birden çiçek açar ama bu güzellik uzun sürmez; kısa bir süre sonra çiçekler dökülür,” dedi.',
+            'Tekneden inip çiçekli ağaçların arasında yürüdüler. Rüzgâr her estiğinde küçük taç yapraklar kar gibi yağıyor, toprağı pembe beyaz bir halıyla örtüyordu. Emre kollarını açıp kendi etrafında döndü; saçları, omuzları çiçek yapraklarıyla doldu ve kendini bir masalın içinde sandı.',
+            'Adanın tepesinde çok eski, taştan bir yapı vardı. Yapının duvarlarına aslanlar, kuşlar ve başka birçok hayvan oyulmuştu. Rehber, bu oymaların bin yıldan daha eski olduğunu, ustaların bu hayvanları taşa tek tek, büyük bir sabırla işlediğini anlattı. Emre, ellerinde yalnızca bir çekiç ve bir keskiyle günlerce, belki aylarca çalışan ustaları gözünün önüne getirmeye çalıştı.',
+            'Emre duvarlardaki hayvanları saymaya başladı. Onuncuda şaşırdı, on beşincide karıştırdı, sonra yeniden başladı ve yine karıştırdı. Sonunda gülerek, “Usta bu kadar hayvanı taşa nasıl sığdırmış?” dedi. Rehber, “Belki de usta, hepsini saymanı değil, her birine dikkatle bakmanı istemiştir,” diye karşılık verdi.',
+            'Dönüş yolunda Emre arkasına baktı. Ada, gölün ortasında pembe bir bulut gibi duruyordu; çiçekler yakında dökülecek, ama taştaki hayvanlar yüzyıllardır olduğu gibi yerinde kalacaktı. “Gelecek bahar yine gelelim,” dedi. Annesi gülümseyerek söz verdi.',
+          ],
+          questions: [
+            {
+              type: QuestionType.ANA_FIKIR,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt: 'Bu metnin ana fikri hangisidir?',
+              options: [
+                'Adalara yalnızca tekneyle gidilebilir.',
+                'Doğanın kısa süren güzelliği de insan emeğiyle yapılan kalıcı eserler de görülmeye değerdir.',
+                'Martılar her zaman tekneleri izler.',
+                'Badem ağaçları yalnızca adalarda yetişir.',
+              ],
+              correctIndex: 1,
+              hint: 'İpucu: Son paragrafta çiçekler ile taştaki hayvanların nasıl karşılaştırıldığına bak.',
+              explanation:
+                'Aferin! Emre hem kısa süren çiçekleri hem de yüzyıllardır duran taş oymaları gördü.',
+            },
+            {
+              type: QuestionType.SOZEL_MANTIK,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt:
+                'Babasının anlattıklarına göre Emre ve ailesi adaya yazın gelseydi ne olurdu?',
+              options: [
+                'Badem çiçeklerini göremezlerdi.',
+                'Taştaki hayvanları göremezlerdi.',
+                'Adaya tekne gitmezdi.',
+                'Ağaçlar yeniden çiçek açardı.',
+              ],
+              correctIndex: 0,
+              hint: 'İpucu: Babası badem çiçeklerinin ne zaman açtığını ve ne kadar sürdüğünü söyledi?',
+              explanation:
+                'Harika! Badem ağaçları ilkbaharda çiçek açar ve çiçekleri kısa sürede dökülür.',
+            },
+            {
+              type: QuestionType.CUMLEDE_ANLAM,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt:
+                '“Belki de usta, hepsini saymanı değil, her birine dikkatle bakmanı istemiştir.” sözüyle rehber ne anlatmak istiyor?',
+              options: [
+                'Emre’nin saymayı bilmediğini',
+                'Adadan hemen ayrılmaları gerektiğini',
+                'Ustaların hayvanları yanlış oyduğunu',
+                'Bir eserin değerinin, ayrıntılarına özenle bakınca anlaşılacağını',
+              ],
+              correctIndex: 3,
+              hint: 'İpucu: Emre hayvanları sayarken neyi kaçırıyor olabilir?',
+              explanation:
+                'Çok güzel! Rehber, her oymaya dikkatle bakınca ustanın emeğinin görüleceğini anlatıyor.',
+            },
+          ],
+          glossary: [
+            { word: 'iskeleden', meaning: 'Teknelerin yanaştığı yerden.' },
+            { word: 'taç yapraklar', meaning: 'Çiçeğin renkli, ince yaprakları.' },
+            { word: 'oyulmuştu', meaning: 'Taş kazınarak şekil verilmişti.' },
+            { word: 'işlediğini', meaning: 'Taşı oyarak süslediğini.' },
+          ],
+        },
+      },
     }),
     story(city, {
       position: 3,
@@ -180,6 +510,181 @@ export const van: SeedCity = {
         { word: 'bürünmüştü', meaning: 'Bir renge sarılmış gibi olmuştu.' },
         { word: 'nöbetçileri', meaning: 'Bir yeri korumak için sırayla bekleyen kişileri.' },
       ],
+      versions: {
+        G1: {
+          paragraphs: [
+            'Kerim ile ablası Lale kalenin önündeydi. Kale, göl kıyısında uzun bir kayanın üstündeydi. “Bu Van Kalesi,” dedi babası. “Çok, çok eski.”',
+            'Taş merdivenleri çıktılar. Kerim yoruldu ama merak etti. Kayada küçük işaretler gördü. Çivilere benziyordu. “Bunlar ne?” dedi.',
+            '“Bu, çivi yazısı,” dedi babası. “Eskiden kayaya kazınmış.” Kerim yazıya dokunmadı. Ona zarar vermek istemedi.',
+            'Tepeye çıktılar. Güneş batıyordu. Göl turuncu oldu. Dağlar pembe pembe parladı. “Biri göğü boyuyor,” dedi Lale.',
+            'İnerken Kerim sordu: “Kayalar çok şey hatırlıyor, değil mi?” “Evet,” dedi babası. “Onları korursak hatırlarlar.”',
+          ],
+          questions: [
+            {
+              type: QuestionType.NEDEN_SONUC,
+              cognitiveLevel: CognitiveLevel.ANLAMA,
+              prompt: 'Kerim yazıya neden dokunmadı?',
+              options: ['Kaya çok sıcaktı', 'Yazıya zarar vermek istemedi', 'Babası kızdı'],
+              correctIndex: 1,
+              hint: 'İpucu: Üçüncü paragrafın son cümlesine bak.',
+              explanation: 'Aferin! Eski yazılara dokunmadan bakmalıyız.',
+            },
+            {
+              type: QuestionType.SOZCUK_ANLAMI,
+              cognitiveLevel: CognitiveLevel.ANLAMA,
+              prompt: '“Kerim yoruldu ama merak etti.” Merak etmek ne demek?',
+              options: ['Bir şeyi öğrenmeyi çok istemek', 'Çok uykusu gelmek', 'Bir şeye kızmak'],
+              correctIndex: 0,
+              hint: 'İpucu: Kerim işaretleri görünce babasına ne sordu?',
+              explanation: 'Doğru! Kerim işaretlerin ne olduğunu öğrenmek istedi.',
+            },
+            {
+              type: QuestionType.DUYGU_KARAKTER,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt: 'Lale gün batımını görünce ne hissetti?',
+              options: ['Korktu', 'Sıkıldı', 'Çok beğendi'],
+              correctIndex: 2,
+              hint: 'İpucu: Dördüncü paragrafta Lale’nin söylediği söze bak.',
+              explanation:
+                'Harika! Lale renkleri o kadar beğendi ki göğü boyanan bir resme benzetti.',
+            },
+          ],
+          glossary: [
+            {
+              word: 'çivi yazısı',
+              meaning: 'Çiviye benzeyen işaretlerle yazılan çok eski bir yazı.',
+            },
+            { word: 'kazınmış', meaning: 'Sivri bir aletle oyularak yazılmış.' },
+          ],
+        },
+        G3: {
+          paragraphs: [
+            'Kerim ile ablası Lale, Van Gölü’nün kıyısında yükselen uzun bir kayanın önündeydi. Kayanın üstünde surlar, burçlar ve merdivenler vardı. Babaları, “İşte Van Kalesi. Yaklaşık üç bin yıl önce Urartular tarafından yapıldı,” dedi. Kerim başını kaldırıp kaleye baktı, çünkü bu kadar eski bir yapıyı ilk kez görüyordu ve kalenin tepesine çıkmak için sabırsızlanıyordu.',
+            'Taş basamakları tek tek çıktılar. Kerim yorulmuştu ama merakı yorgunluğundan büyüktü. Yolun bir yerinde kayaya kazınmış, çivilere benzeyen küçük işaretler gördü ve hemen durdu. “Bunlar ne?” diye sordu.',
+            '“Bu, çivi yazısı,” dedi babası. “Urartular yazılarını keskilerle kayalara kazırlarmış. Burada bir kralın yaptırdığı işler anlatılıyor.” Kerim parmağıyla işaretlerin üstünden geçmedi, çünkü binlerce yıllık bu eski yazıya en küçük bir zarar bile vermek istemiyordu.',
+            'Kalenin tepesine vardıklarında güneş batmak üzereydi. Göl turuncu ve mor renklere bürünmüş, uzaktaki dağların tepeleri pembe pembe parlıyordu. Lale, “Sanki biri gökyüzünü boyuyor,” diye fısıldadı.',
+            'Kerim, binlerce yıl önce aynı yerde duran nöbetçileri düşündü. Onlar da bu gün batımını izlemiş miydi? Belki onlar da tıpkı kendisi gibi gökyüzünün renklerine hayran kalmış, bir an için nöbeti unutmuştu.',
+            'İnerken Kerim babasına döndü: “Kayalar çok şey hatırlıyor, değil mi baba?” Babası gülümsedi. “Evet. Biz de onları korursak hatırlamaya devam edecekler,” dedi.',
+          ],
+          questions: [
+            {
+              type: QuestionType.BILGI,
+              cognitiveLevel: CognitiveLevel.HATIRLAMA,
+              prompt: 'Babasına göre Urartular yazılarını nasıl yazarmış?',
+              options: [
+                'Kâğıda mürekkeple',
+                'Keskilerle kayalara kazıyarak',
+                'Kumun üstüne çizerek',
+                'Ağaç kabuklarına boyayla',
+              ],
+              correctIndex: 1,
+              hint: 'İpucu: Üçüncü paragrafta babasının anlattıklarını oku.',
+              explanation: 'Doğru! Urartular yazılarını keskilerle kayalara kazırlarmış.',
+            },
+            {
+              type: QuestionType.CUMLEDE_ANLAM,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt: '“Kayalar çok şey hatırlıyor” sözüyle Kerim ne demek istiyor?',
+              options: [
+                'Kayaların konuşabildiğini',
+                'Kayaların çok sert olduğunu',
+                'Kalenin yakında yıkılacağını',
+                'Kayaların, üstlerindeki yazılarla geçmişi bugüne taşıdığını',
+              ],
+              correctIndex: 3,
+              hint: 'İpucu: Kerim kalede kayaların üstünde ne görmüştü?',
+              explanation:
+                'Aferin! Kayalardaki yazılar, binlerce yıl önce olanları bize anlatıyor.',
+            },
+            {
+              type: QuestionType.NEDEN_SONUC,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt:
+                'Kerim, nöbetçilerin de gün batımına hayran kalmış olabileceğini neden düşündü?',
+              options: [
+                'Kendisi de aynı yerde aynı manzaraya hayran kalmıştı',
+                'Babası ona öyle söylemişti',
+                'Nöbetçilerin yazdığı bir mektubu okumuştu',
+                'Nöbetçiler hâlâ kalede bekliyordu',
+              ],
+              correctIndex: 0,
+              hint: 'İpucu: Beşinci paragrafta “tıpkı kendisi gibi” sözüne dikkat et.',
+              explanation: 'Harika! Kerim kendi duygusundan yola çıkarak eski nöbetçileri düşündü.',
+            },
+          ],
+          glossary: [
+            { word: 'surlar', meaning: 'Bir kaleyi ya da şehri çevreleyen kalın duvarlar.' },
+            {
+              word: 'keskilerle',
+              meaning: 'Taşı ya da tahtayı oymaya yarayan sivri uçlu aletlerle.',
+            },
+            { word: 'bürünmüş', meaning: 'Bir renge sarılmış gibi olmuş.' },
+            { word: 'nöbetçileri', meaning: 'Bir yeri korumak için sırayla bekleyen kişileri.' },
+          ],
+        },
+        G4: {
+          paragraphs: [
+            'Kerim ile ablası Lale, Van Gölü’nün kıyısında dev bir gemi gibi yükselen uzun bir kayanın önündeydi. Kayanın sırtında surlar, burçlar ve dolambaçlı merdivenler vardı. Babaları, “İşte Van Kalesi, yaklaşık üç bin yıl önce Urartular tarafından yapıldı. O zamanlar bu şehrin adı Tuşpa’ymış ve Urartuların başkentiymiş,” dedi.',
+            'Taş basamakları tek tek çıktılar. Kerim’in bacakları yorulmuştu ama merakı yorgunluğundan büyüktü; her basamakta biraz daha eski bir zamana yürüyormuş gibi hissediyordu. Yolun bir yerinde kayaya kazınmış, çivilere benzeyen küçük işaretler gördü ve sanki biri ona seslenmiş gibi olduğu yerde durdu. “Bunlar ne?” diye sordu.',
+            '“Bu, çivi yazısı,” dedi babası. “Urartular yazılarını keskilerle kayalara kazırlarmış. Burada bir kralın yaptırdığı işler anlatılıyor.” Kerim elini uzattı, sonra vazgeçip geri çekti ve parmağıyla işaretlerin üstünden geçmedi; üç bin yıldır dayanan bir yazının, kendi elinin dokunuşuyla bile yıpranmasını istemiyordu.',
+            'Kalenin tepesine vardıklarında güneş batmak üzereydi. Göl turuncu ve mor renklere bürünmüş, uzaktaki dağların karlı tepeleri pembe pembe parlıyordu. Lale, nefesini tutarak, “Sanki biri gökyüzünü boyuyor,” diye fısıldadı. Rüzgâr dinmiş, kuşlar susmuştu; sanki bütün şehir, bu renk gösterisini izlemek için bir anlığına durmuştu.',
+            'Kerim, binlerce yıl önce aynı yerde duran nöbetçileri düşündü. Onlar da bu gün batımını izlemiş miydi? Belki onlar da nöbet tutarken bir an durup gökyüzünün renklerine hayran kalmıştı. Kerim, aradaki binlerce yıla rağmen kendini onlara garip bir şekilde yakın hissetti.',
+            'Hava kararmaya başlayınca yavaş yavaş aşağı indiler. İnerken Kerim, son bir kez kayadaki yazılara baktı ve babasına döndü: “Kayalar çok şey hatırlıyor, değil mi baba?” Babası gülümseyerek “Evet, biz de onları korursak hatırlamaya devam edecekler. Unutma, geçmişi korumak, geleceğe bir mektup bırakmak gibidir,” dedi.',
+          ],
+          questions: [
+            {
+              type: QuestionType.ANA_FIKIR,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt: 'Bu metinde verilmek istenen ana düşünce hangisidir?',
+              options: [
+                'Kalelere çıkmak çok yorucudur.',
+                'Gün batımı en güzel kalelerden izlenir.',
+                'Çivi yazısını herkes kolayca okuyabilir.',
+                'Tarihî yerler geçmişi bugüne taşır; onları korumak hepimizin sorumluluğudur.',
+              ],
+              correctIndex: 3,
+              hint: 'İpucu: Son paragrafta babanın kayalar için söylediklerini düşün.',
+              explanation:
+                'Aferin! Kayalardaki yazılar geçmişi anlatır; onları korursak anlatmaya devam ederler.',
+            },
+            {
+              type: QuestionType.ONCULLU_YORUM,
+              cognitiveLevel: CognitiveLevel.DEGERLENDIRME,
+              prompt:
+                'Metne göre aşağıdaki yargılardan hangileri doğrudur? I. Kalenin bulunduğu şehir, Urartuların başkentiydi. II. Kerim çivi yazısına parmağıyla dokundu. III. Urartular yazılarını kayalara kazırdı.',
+              options: ['Yalnız II', 'I ve III', 'II ve III', 'I, II ve III'],
+              correctIndex: 1,
+              hint: 'İpucu: Her yargıyı tek tek ele al; Kerim’in ne yaptığına üçüncü paragrafta bak.',
+              explanation: 'Harika! Kerim elini geri çekti, yazıya dokunmadı; II. yargı yanlıştır.',
+            },
+            {
+              type: QuestionType.CUMLEDE_ANLAM,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt:
+                '“Geçmişi korumak, geleceğe bir mektup bırakmak gibidir.” sözüyle anlatılmak istenen nedir?',
+              options: [
+                'Eski yerleri korursak bizden sonra gelenler de onları görüp öğrenebilir.',
+                'Tarihî yerlere mektup yazılmalıdır.',
+                'Geçmişte yaşayanlar bize mektuplar bırakmıştır.',
+                'Kalelerin duvarlarına not yazmak gerekir.',
+              ],
+              correctIndex: 0,
+              hint: 'İpucu: Bir mektubu kim okur? Bugün koruduğumuz yerleri yarın kim görecek?',
+              explanation:
+                'Çok güzel! Koruduğumuz her eser, gelecekteki insanlara geçmişi anlatmaya devam eder.',
+            },
+          ],
+          glossary: [
+            { word: 'başkentiymiş', meaning: 'Bir devletin yönetildiği en önemli şehriymiş.' },
+            {
+              word: 'keskilerle',
+              meaning: 'Taşı ya da tahtayı oymaya yarayan sivri uçlu aletlerle.',
+            },
+            { word: 'yıpranmasını', meaning: 'Eskiyip zarar görmesini.' },
+            { word: 'bürünmüş', meaning: 'Bir renge sarılmış gibi olmuş.' },
+          ],
+        },
+      },
     }),
     story(city, {
       position: 4,
@@ -236,6 +741,173 @@ export const van: SeedCity = {
         { word: 'demledi', meaning: 'Çayı demliğe koyup yavaşça pişmeye bıraktı.' },
         { word: 'şenlendi', meaning: 'Neşe ve hareketle doldu.' },
       ],
+      versions: {
+        G1: {
+          paragraphs: [
+            'Pazar sabahıydı. Elif’in teyzesi herkesi kahvaltıya çağırdı. Elif ile kuzeni Can yardım edecekti. Mutfakta bir sürü küçük tabak vardı.',
+            'Teyzesi tabakları gösterdi. “Bu otlu peynir. Bu bal, bu kaymak. Bu da murtuğa. Sıcak sıcak yenir.”',
+            'Can tabakları saydı. Yirmiye gelince durdu. “Teyze, bu bir şölen mi?” dedi. Herkes güldü.',
+            'Sofrayı birlikte kurdular. Dede çayı demledi. Herkes sofraya oturdu. Dede eski günleri anlattı. Küçük Mina bal yedi.',
+            'Kahvaltı bitti. Elif teyzesine sarıldı. “En güzeli birlikte olmamız,” dedi.',
+          ],
+          questions: [
+            {
+              type: QuestionType.BILGI,
+              cognitiveLevel: CognitiveLevel.HATIRLAMA,
+              prompt: 'Can tabakları kaça kadar saydı?',
+              options: ['Yirmiye', 'Beşe', 'Yüze'],
+              correctIndex: 0,
+              hint: 'İpucu: Üçüncü paragrafın ilk cümlelerini oku.',
+              explanation: 'Doğru! Can yirmiye gelince saymayı bıraktı.',
+            },
+            {
+              type: QuestionType.SOZCUK_ANLAMI,
+              cognitiveLevel: CognitiveLevel.ANLAMA,
+              prompt: '“Bu bir şölen mi?” Şölen ne demek?',
+              options: ['Bir çeşit peynir', 'Bol yemekli, neşeli sofra', 'Küçük bir tabak'],
+              correctIndex: 1,
+              hint: 'İpucu: Can bunu kaç tabak saydıktan sonra söyledi?',
+              explanation: 'Aferin! Şölen, bol yemekli ve neşeli büyük bir sofradır.',
+            },
+            {
+              type: QuestionType.DUYGU_KARAKTER,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt: 'Kahvaltının sonunda Elif nasıl hissediyordu?',
+              options: ['Kızgın', 'Aç ve yorgun', 'Mutlu ve sevgi dolu'],
+              correctIndex: 2,
+              hint: 'İpucu: Son paragrafta Elif’in ne yaptığına ve ne dediğine bak.',
+              explanation:
+                'Harika! Elif teyzesine sarıldı, çünkü herkesle birlikte olmak onu mutlu etti.',
+            },
+          ],
+          glossary: [
+            { word: 'kuzeni', meaning: 'Teyzesinin, halasının ya da amcasının çocuğu.' },
+            { word: 'şölen', meaning: 'Bol yemekli, neşeli büyük sofra.' },
+            { word: 'demledi', meaning: 'Çayı demliğe koyup yavaşça pişmeye bıraktı.' },
+          ],
+        },
+        G3: {
+          paragraphs: [
+            'Pazar sabahı Elif’in teyzesi bütün aileyi Van kahvaltısına çağırdı. Elif ile kuzeni Can, sofrayı kurmaya yardım edecekti. Mutfağa girdiklerinde tezgâhın küçük tabaklarla dolu olduğunu gördüler ve şaşkınlıkla birbirlerine baktılar, çünkü tezgâhta boş yer kalmamıştı.',
+            'Teyzesi tabakları tek tek tanıttı: “Bu otlu peynir, içinde dağlarda yetişen kokulu otlar var; bu bal ve kaymak, bu da murtuğa. Murtuğa un, tereyağı ve yumurtayla yapılır, sıcak sıcak yenir.” Elif bu kadar çok çeşidi bir arada ilk kez görüyordu ve hangisinden başlayacağını bilemiyordu.',
+            'Can tabakları saymaya başladı. “On, on bir, on iki…” Yirmiye gelince saymayı bıraktı ve güldü. “Teyze, bu bir kahvaltı mı, yoksa bir şölen mi?”',
+            'Teyzesi, “Van’da kahvaltı acele edilmez; sofra kalabalık olur, herkes sohbet eder,” dedi. Elif ile Can tabakları masaya dizdiler, Elif’in dedesi de çayı demledi. Mutfaktan yayılan taze çay kokusu kısa sürede bütün evi sardı.',
+            'Herkes sofraya oturunca ev şenlendi. Dedesi eski günleri anlattı, kuzenler güldü, küçük Mina bal sürülmüş ekmeğini parmaklarına kadar yedi. Çaylar defalarca tazelendi ama kimse saatin nasıl geçtiğini fark etmedi.',
+            'Kahvaltı bittiğinde Elif teyzesine sarıldı. “Bence bu sofranın en güzel yanı yemekler değil, hep birlikte olmamız,” dedi. Teyzesi onun yanaklarından öptü.',
+          ],
+          questions: [
+            {
+              type: QuestionType.YARDIMCI_FIKIR,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt: 'Aşağıdakilerden hangisi Van’da kahvaltının acele edilmediğini gösterir?',
+              options: [
+                'Tezgâhın küçük tabaklarla dolu olması',
+                'Çayların defalarca tazelenmesi ve kimsenin saati fark etmemesi',
+                'Murtuğanın sıcak sıcak yenmesi',
+                'Otlu peynirde kokulu otlar olması',
+              ],
+              correctIndex: 1,
+              hint: 'İpucu: Beşinci paragrafın son cümlesine bak.',
+              explanation:
+                'Aferin! Herkes sofrada o kadar uzun kaldı ki saatin nasıl geçtiğini fark etmedi.',
+            },
+            {
+              type: QuestionType.SOZCUK_ANLAMI,
+              cognitiveLevel: CognitiveLevel.ANLAMA,
+              prompt:
+                '“Herkes sofraya oturunca ev şenlendi.” cümlesindeki “şenlendi” sözcüğünün anlamı nedir?',
+              options: ['Neşe ve hareketle doldu', 'Sessizleşti', 'Temizlendi', 'Karardı'],
+              correctIndex: 0,
+              hint: 'İpucu: Sonraki cümlede sofrada neler olduğunu oku.',
+              explanation: 'Harika! Sohbetler ve gülüşmelerle ev neşeyle doldu.',
+            },
+            {
+              type: QuestionType.ANA_FIKIR,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt: 'Bu metnin ana fikri hangisidir?',
+              options: [
+                'Kahvaltıda çok çeşit olmalıdır.',
+                'Murtuğa sıcak yenmelidir.',
+                'Çayı en iyi dedeler demler.',
+                'Sofrayı güzel yapan, sevdiklerimizle birlikte olmaktır.',
+              ],
+              correctIndex: 3,
+              hint: 'İpucu: Son paragrafta Elif’in teyzesine söylediği söze bak.',
+              explanation:
+                'Çok güzel! Elif, sofranın en güzel yanının birlikte olmak olduğunu fark etti.',
+            },
+          ],
+          glossary: [
+            { word: 'tezgâhın', meaning: 'Mutfakta yemek hazırlanan düz yerin.' },
+            { word: 'şölen', meaning: 'Bol yemekli, neşeli büyük sofra.' },
+            { word: 'sohbet', meaning: 'Tatlı tatlı, uzun uzun konuşma.' },
+            { word: 'demledi', meaning: 'Çayı demliğe koyup yavaşça pişmeye bıraktı.' },
+          ],
+        },
+        G4: {
+          paragraphs: [
+            'Pazar sabahı Elif’in teyzesi, bütün aileyi geleneksel bir Van kahvaltısına çağırmıştı. Elif ile kuzeni Can, misafirler gelmeden sofrayı kurmaya yardım edecekti ve ikisi de bu görev için sabahın erken saatinde uyanmıştı. Mutfağa girdiklerinde ikisi de olduğu yerde kaldı: Tezgâh, renk renk küçük tabaklarla öyle doluydu ki üstünde boş bir yer bile kalmamıştı.',
+            'Teyzesi, bir müze rehberi gibi tabakları tek tek tanıttı: “Bu otlu peynir, içinde dağlarda yetişen kokulu otlar var; bu bal ve kaymak, bu da un, tereyağı ve yumurtayla yapılan, sıcak sıcak yenen murtuğa.” Elif bu kadar çok çeşidi bir arada ilk kez görüyor, hangisinin tadına önce bakacağını şimdiden düşünüyordu.',
+            'Can, her zamanki gibi işi şakaya vurup tabakları saymaya başladı. “On, on bir, on iki…” Yirmiye gelince saymayı bıraktı, kahkahayı bastı ve teyzesine dönüp sordu: “Teyze, bu bir kahvaltı mı, yoksa bir şölen mi?”',
+            'Teyzesi gülümsedi: “Van’da kahvaltı acele edilmez, evladım; sofra kalabalık olur, herkes sohbet eder; kimse kalkmak için bahane aramaz,” dedi. Elif ile Can tabakları masaya özenle dizdiler, Elif’in dedesi de mis kokulu çayı demledi.',
+            'Herkes sofraya oturunca ev bir anda şenlendi. Dedesi gençlik yıllarını anlattı, kuzenler birbirine takıldı, küçük Mina bal sürülmüş ekmeğini parmaklarına kadar yedi. Çaydanlık defalarca doldu, boşaldı; pencereden giren güneş masanın bir ucundan öbür ucuna kaydı ama kimse saatin nasıl geçtiğini fark etmedi.',
+            'Kahvaltı bittiğinde Elif, boşalan tabaklara ve hâlâ gülüşen akrabalarına baktı. Sonra yavaşça yerinden kalkıp teyzesine sıkıca sarıldı. “Bence bu sofranın en güzel yanı yemekler değil, hep birlikte olmamız,” dedi. Teyzesi onun yanaklarından öptü; çünkü Elif, sofranın asıl tadını yemeklerde değil, insanlarda bulmuştu.',
+          ],
+          questions: [
+            {
+              type: QuestionType.BASLIK,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt: 'Bu metnin başlığı değiştirilecek olsa en uygunu hangisi olurdu?',
+              options: [
+                'Murtuğa Nasıl Yapılır?',
+                'Can’ın Sayı Oyunu',
+                'Sofranın Asıl Tadı',
+                'Teyzenin Mutfağı',
+              ],
+              correctIndex: 2,
+              hint: 'İpucu: Metnin son cümlesinde Elif’in neyi fark ettiği söyleniyor?',
+              explanation:
+                'Aferin! Metin, sofranın asıl tadının birlikte olmakta olduğunu anlatıyor.',
+            },
+            {
+              type: QuestionType.PARAGRAF_YAPISI,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt: 'Metnin son cümlesinin metindeki görevi nedir?',
+              options: [
+                'Yeni bir olayı başlatmak',
+                'Hikâyenin ana düşüncesini vurgulamak',
+                'Kahvaltıdaki yemekleri saymak',
+                'Teyzenin nasıl biri olduğunu anlatmak',
+              ],
+              correctIndex: 1,
+              hint: 'İpucu: Son cümle, Elif’in sözlerini nasıl bir sonuca bağlıyor?',
+              explanation:
+                'Harika! Son cümle, sofranın asıl tadının insanlarda olduğunu bir kez daha vurguluyor.',
+            },
+            {
+              type: QuestionType.CUMLEDE_ANLAM,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt: '“Kimse kalkmak için bahane aramaz” sözüyle teyze ne anlatmak istiyor?',
+              options: [
+                'Herkesin sofrada uzun süre keyifle oturduğunu',
+                'Misafirlerin kahvaltıya geç geldiğini',
+                'Sofradan kalkmanın yasak olduğunu',
+                'Kimsenin kahvaltıyı sevmediğini',
+              ],
+              correctIndex: 0,
+              hint: 'İpucu: Aynı cümlenin başında Van’da kahvaltının nasıl yapıldığı anlatılıyor.',
+              explanation:
+                'Çok güzel! Van kahvaltısında herkes sofrada keyifle oturur, kalkmak istemez.',
+            },
+          ],
+          glossary: [
+            { word: 'geleneksel', meaning: 'Eskiden beri süregelen, kuşaktan kuşağa aktarılan.' },
+            { word: 'şölen', meaning: 'Bol yemekli, neşeli büyük sofra.' },
+            { word: 'bahane', meaning: 'Bir şeyi yapmak için öne sürülen sebep.' },
+            { word: 'şenlendi', meaning: 'Neşe ve hareketle doldu.' },
+          ],
+        },
+      },
     }),
     chest(city, 5, 'Van Gölü kıyısında mavi bir sandık bulundu; aç, içindeki lokumlar senin!'),
     story(city, {
@@ -297,6 +969,168 @@ export const van: SeedCity = {
         { word: 'sıçrayışla', meaning: 'Bir anda havaya fırlayarak yapılan atlayışla.' },
         { word: 'inatçı', meaning: 'Kolay kolay vazgeçmeyen.' },
       ],
+      versions: {
+        G1: {
+          paragraphs: [
+            'Mayıs ayıydı. Deniz, dedesiyle bir çayın kenarına gitti. Bu çay, Van Gölü’ne akıyordu.',
+            'Suda yüzlerce balık vardı. Gümüş gibi parlıyorlardı. Balıklar suyun tersine yüzüyordu. Bazıları havaya sıçradı!',
+            '“Bunlar inci kefali,” dedi dedesi. “Her bahar gölden çaya gelirler. Burada yumurta bırakırlar.”',
+            'Bir balık sıçradı ama düştü. Yine denedi, yine düştü. Sonunda şelalenin üstüne çıktı. Deniz alkışladı.',
+            '“Şimdi balık tutmak yasak,” dedi dedesi. “Rahat bırakırsak her yıl gelirler.”',
+            'Deniz o balığı düşündü. “Ben de vazgeçmeyeceğim. Tekrar tekrar deneyeceğim,” dedi.',
+          ],
+          questions: [
+            {
+              type: QuestionType.NEDEN_SONUC,
+              cognitiveLevel: CognitiveLevel.ANLAMA,
+              prompt: 'Balıklar her bahar çaya neden gelir?',
+              options: ['Güneşlenmek için', 'Yumurta bırakmak için', 'Saklanmak için'],
+              correctIndex: 1,
+              hint: 'İpucu: Üçüncü paragrafta dedesinin anlattıklarını oku.',
+              explanation: 'Aferin! İnci kefalleri yumurtalarını çaylara bırakır.',
+            },
+            {
+              type: QuestionType.DUYGU_KARAKTER,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt: 'Balık şelalenin üstüne çıkınca Deniz ne hissetti?',
+              options: ['Sevindi', 'Üzüldü', 'Korktu'],
+              correctIndex: 0,
+              hint: 'İpucu: Dördüncü paragrafın son cümlesine bak. Deniz ne yaptı?',
+              explanation: 'Harika! Deniz sevinçle balığı alkışladı.',
+            },
+            {
+              type: QuestionType.SOZCUK_ANLAMI,
+              cognitiveLevel: CognitiveLevel.ANLAMA,
+              prompt: '“Ben de vazgeçmeyeceğim.” Vazgeçmemek ne demek?',
+              options: ['Hemen bırakmak', 'Uyumak', 'Denemeye devam etmek'],
+              correctIndex: 2,
+              hint: 'İpucu: Aynı paragrafta Deniz başka ne dedi?',
+              explanation: 'Doğru! Deniz de balık gibi tekrar tekrar deneyecek.',
+            },
+          ],
+          glossary: [
+            { word: 'çayın', meaning: 'Küçük akarsuyun.' },
+            { word: 'sıçradı', meaning: 'Bir anda havaya fırladı.' },
+            { word: 'şelalenin', meaning: 'Yüksekten dökülen suyun.' },
+          ],
+        },
+        G3: {
+          paragraphs: [
+            'Mayıs ayının ılık bir gününde Deniz, dedesiyle birlikte Van Gölü’ne dökülen bir çayın kenarına gitti. Dedesi, “Bugün sana gölün en büyük yolculuğunu göstereceğim,” dedi. Deniz, bir gölün nasıl yolculuğu olabileceğini merak ederek kıpırdayan suya dikkatle baktı.',
+            'Çayın suyu köpürerek akıyordu. Birden Deniz, suyun içinde gümüş gibi parlayan yüzlerce balık gördü. Balıklar akıntının tersine, yukarıya doğru yüzmeye çalışıyordu ve bazıları bütün güçlerini toplayarak küçük şelalelerin üstünden sıçrayıp atlıyordu.',
+            '“Bunlar inci kefali,” dedi dedesi. “Her ilkbahar tuzlu gölden çıkıp tatlı sulu çaylara gelirler, yumurtalarını da burada bırakırlar. Yavrular biraz büyüyünce göle dönerler.”',
+            'Deniz, bir balığın defalarca denediğini ve her seferinde suya geri düştüğünü gördü. Sonunda balık güçlü bir sıçrayışla şelalenin üstüne çıktı. Deniz sevinçle alkışladı, sanki uzun bir yarışın bitişini izlemişti ve kazanan da en inatçı koşucuydu.',
+            'Dedesi, bu dönemde balık avlamanın yasak olduğunu anlattı. “Onları rahat bırakırsak her yıl geri gelirler. Göl de onlarla yaşamaya devam eder,” dedi. Deniz başını sallayarak dedesini dikkatle dinledi ve bundan sonra balıkları hiç rahatsız etmemeye karar verdi.',
+            'Eve dönerken Deniz o inatçı balığı düşündü. “Ben de zor bir şeyi başaramadığımda o balık gibi tekrar tekrar deneyeceğim,” dedi. Dedesi onu gururla omzundan tuttu.',
+          ],
+          questions: [
+            {
+              type: QuestionType.NEDEN_SONUC,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt:
+                'Dedesine göre balıkları rahat bırakmak, gölün yaşamaya devam etmesini neden sağlar?',
+              options: [
+                'Balıklar yumurtlayıp çoğalır, yavrular da göle döner.',
+                'Rahat bırakılan balıklar daha hızlı yüzer.',
+                'Balıklar gölün suyunu temizler.',
+                'Göl, balıklar gidince tatlı suya döner.',
+              ],
+              correctIndex: 0,
+              hint: 'İpucu: Üçüncü paragrafta balıkların çaylarda ne yaptığını ve yavruların nereye döndüğünü oku.',
+              explanation:
+                'Aferin! Rahat bırakılan balıklar yumurtlar; yavrular büyüyüp göle döner ve göl canlı kalır.',
+            },
+            {
+              type: QuestionType.BILGI,
+              cognitiveLevel: CognitiveLevel.HATIRLAMA,
+              prompt: 'İnci kefalleri ilkbaharda nereye gelir?',
+              options: ['Denize', 'Gölün en derin yerine', 'Tatlı sulu çaylara', 'Kumsala'],
+              correctIndex: 2,
+              hint: 'İpucu: Üçüncü paragrafta dedesinin anlattıklarını oku.',
+              explanation: 'Doğru! İnci kefalleri ilkbaharda tatlı sulu çaylara gelir.',
+            },
+            {
+              type: QuestionType.ANA_FIKIR,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt: 'Deniz’in inatçı balıktan çıkardığı ders hangisidir?',
+              options: [
+                'Zor işlerden uzak durulmalıdır.',
+                'Suya yaklaşmak tehlikelidir.',
+                'Balıklar insanlardan daha hızlıdır.',
+                'Başaramayınca vazgeçmeden yeniden denemek gerekir.',
+              ],
+              correctIndex: 3,
+              hint: 'İpucu: Son paragrafta Deniz’in söylediği söze bak.',
+              explanation: 'Harika! Vazgeçmeden denemeye devam eden sonunda başarır.',
+            },
+          ],
+          glossary: [
+            { word: 'ılık', meaning: 'Ne sıcak ne soğuk, hafif sıcak.' },
+            { word: 'akıntının', meaning: 'Suyun aktığı yönün.' },
+            { word: 'sıçrayışla', meaning: 'Bir anda havaya fırlayarak yapılan atlayışla.' },
+            { word: 'inatçı', meaning: 'Kolay kolay vazgeçmeyen.' },
+          ],
+        },
+        G4: {
+          paragraphs: [
+            'Mayıs ayının ılık bir gününde Deniz, dedesiyle birlikte Van Gölü’ne dökülen bir çayın kenarına gitti. Dedesi, gözlerinde bir sır saklıyormuş gibi gülümseyerek, “Bugün sana gölün en büyük yolculuğunu göstereceğim,” dedi. Deniz, bir gölün nasıl olup da yolculuğa çıkabileceğini anlayamadı ama merakla dedesinin peşine takılıp çayın kıyısındaki taşlara oturdu.',
+            'Çayın suyu taşların arasından köpürerek akıyordu. Birden Deniz, suyun içinde gümüş gibi parlayan yüzlerce balık gördü. Balıklar akıntının tersine, yukarıya doğru inatla yüzüyor; bazıları küçük şelalelerin üstünden sıçrayarak atlıyordu. Güneş ışığı pullarına vurdukça çay, sanki binlerce minik ayna taşıyormuş gibi ışıldıyordu.',
+            '“Bunlar inci kefali,” dedi dedesi. “Her ilkbahar tuzlu gölden çıkıp tatlı sulu çaylara gelirler, çünkü yumurtalarını tatlı suya bırakırlar. Yavrular biraz büyüyünce göle dönerler. Gölün yolculuğu dediğim işte bu; her yıl yeniden başlayan, binlerce yıldır süren bir yolculuk.”',
+            'Deniz, bir balığın defalarca denediğini, her seferinde suya geri düştüğünü gördü. Balık her düşüşten sonra biraz soluklanıyor, sonra yeniden hamle yapıyordu. Sonunda güçlü bir sıçrayışla şelalenin üstüne çıktı. Deniz, sanki bu kendi zaferiymiş gibi sevinçle alkışladı ve yanındaki dedesinin de gülümsediğini gördü.',
+            'Dedesi, bu dönemde balık avlamanın yasak olduğunu anlattı. “Onları rahat bırakırsak her yıl geri gelirler. Göl de onlarla yaşamaya devam eder. Doğadan bir şey almadan önce, ona geri vermeyi de düşünmeliyiz,” dedi. Deniz, bu sözü uzun süre aklından çıkaramadı.',
+            'Eve dönerken Deniz o inatçı balığı düşündü. Okulda ilk seferde çözemediği zor problemleri, bisiklete binmeyi öğrenirken dizlerini sıyırdığı günleri ve sonunda pedalları çevirmeyi başardığı o güzel sabahı hatırladı. “Ben de zor bir şeyi başaramadığımda o balık gibi tekrar tekrar deneyeceğim,” dedi. Dedesi onu gururla omzundan tuttu.',
+          ],
+          questions: [
+            {
+              type: QuestionType.YARDIMCI_FIKIR,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt: 'Aşağıdakilerden hangisi balığın kararlılığını en iyi gösterir?',
+              options: [
+                'Her düşüşten sonra soluklanıp yeniden hamle yapması',
+                'Pullarının güneşte parlaması',
+                'Tatlı sulu çaya gelmesi',
+                'Yüzlerce balıkla birlikte yüzmesi',
+              ],
+              correctIndex: 0,
+              hint: 'İpucu: Dördüncü paragrafta balığın düştükten sonra ne yaptığını oku.',
+              explanation: 'Aferin! Balık her düşüşten sonra yeniden denedi ve sonunda başardı.',
+            },
+            {
+              type: QuestionType.ONCULLU_YORUM,
+              cognitiveLevel: CognitiveLevel.DEGERLENDIRME,
+              prompt:
+                'Metne göre aşağıdaki yargılardan hangileri doğrudur? I. İnci kefalleri yumurtalarını tuzlu göle bırakır. II. Yavrular biraz büyüyünce göle döner. III. Bu dönemde balık avlamak yasaktır.',
+              options: ['Yalnız I', 'Yalnız II', 'I ve III', 'II ve III'],
+              correctIndex: 3,
+              hint: 'İpucu: Her yargıyı tek tek ele al; yumurtalar için üçüncü paragrafa bak.',
+              explanation:
+                'Harika! Balıklar yumurtalarını tatlı suya bırakır; bu yüzden I. yargı yanlıştır.',
+            },
+            {
+              type: QuestionType.CUMLEDE_ANLAM,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt:
+                '“Doğadan bir şey almadan önce, ona geri vermeyi de düşünmeliyiz.” sözüyle dede ne anlatmak istiyor?',
+              options: [
+                'Doğadan hiçbir şey alınmamalıdır.',
+                'Doğadan yararlanırken onun yenilenmesine de fırsat tanımalıyız.',
+                'Tutulan balıklar hemen göle geri atılmalıdır.',
+                'Doğa, insanlara her şeyi borç verir.',
+              ],
+              correctIndex: 1,
+              hint: 'İpucu: Dede, balıkları rahat bırakırsak ne olacağını söylüyor?',
+              explanation:
+                'Çok güzel! Balıklar çoğalabilsin diye avlanmayız; böylece göl yaşamaya devam eder.',
+            },
+          ],
+          glossary: [
+            { word: 'akıntının', meaning: 'Suyun aktığı yönün.' },
+            { word: 'soluklanıyor', meaning: 'Kısa bir süre durup nefes alıyor.' },
+            { word: 'hamle', meaning: 'Bir işi başarmak için yapılan ani, güçlü hareket.' },
+            { word: 'inatçı', meaning: 'Kolay kolay vazgeçmeyen.' },
+          ],
+        },
+      },
     }),
     story(city, {
       position: 7,
@@ -352,6 +1186,180 @@ export const van: SeedCity = {
         { word: 'şapırdatarak', meaning: 'Suya vurup şap şap ses çıkararak.' },
         { word: 'veteriner', meaning: 'Hayvanları muayene edip tedavi eden doktor.' },
       ],
+      versions: {
+        G1: {
+          paragraphs: [
+            'Berk’in sınıfı Van Kedisi Evi’ne gitti. İçeride bir sürü beyaz kedi vardı. Kimi uyuyor, kimi oynuyordu.',
+            'Görevli Zehra Hanım kedileri anlattı. “Bazılarının gözleri farklıdır. Biri mavi, biri sarı.” Berk böyle bir kedi buldu. Adı Fındık’tı.',
+            '“Van kedileri suyu sever,” dedi Zehra Hanım. “Bazıları yüzer bile!” Çocuklar çok şaşırdı.',
+            'Fındık su kabına patisini soktu. Suyla oynamaya başladı. Bütün sınıf güldü.',
+            '“Onları sevmeli ve korumalıyız,” dedi Zehra Hanım. Berk, Fındık’ı okşadı. Fındık mırladı. Berk, “Büyüyünce veteriner olacağım,” dedi.',
+          ],
+          questions: [
+            {
+              type: QuestionType.BILGI,
+              cognitiveLevel: CognitiveLevel.HATIRLAMA,
+              prompt: 'Zehra Hanım’a göre Van kedileri neyi sever?',
+              options: ['Ağaca tırmanmayı', 'Suyu', 'Hiç uyumamayı'],
+              correctIndex: 1,
+              hint: 'İpucu: Üçüncü paragrafta Zehra Hanım’ın söylediklerini oku.',
+              explanation: 'Doğru! Van kedileri suyu sever, bazıları yüzer bile.',
+            },
+            {
+              type: QuestionType.NEDEN_SONUC,
+              cognitiveLevel: CognitiveLevel.ANLAMA,
+              prompt: 'Bütün sınıf neden güldü?',
+              options: [
+                'Fındık suyla oynamaya başladı',
+                'Fındık kaçtı',
+                'Zehra Hanım şarkı söyledi',
+              ],
+              correctIndex: 0,
+              hint: 'İpucu: Dördüncü paragrafta Fındık’ın ne yaptığını oku.',
+              explanation: 'Aferin! Fındık patisiyle suyla oynayınca herkes güldü.',
+            },
+            {
+              type: QuestionType.DUYGU_KARAKTER,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt: 'Berk hayvanlar için ne hissediyor?',
+              options: ['Onlardan korkuyor', 'Onları sevmiyor', 'Onları çok seviyor'],
+              correctIndex: 2,
+              hint: 'İpucu: Berk, Fındık’a ne yaptı? Büyüyünce ne olmak istiyor?',
+              explanation: 'Harika! Berk hayvanları çok seviyor, onlara yardım etmek istiyor.',
+            },
+          ],
+          glossary: [
+            { word: 'patisini', meaning: 'Kedinin ya da köpeğin ayağını.' },
+            { word: 'mırladı', meaning: 'Kedi gibi hafif, tatlı bir ses çıkardı.' },
+            { word: 'veteriner', meaning: 'Hayvanları muayene edip tedavi eden doktor.' },
+          ],
+        },
+        G3: {
+          paragraphs: [
+            'Berk’in sınıfı, Van’daki Van Kedisi Evi’ni ziyaret etti. İçeri girer girmez onlarca bembeyaz kedi çocukları karşıladı. Kimi minderlerde uyuyor, kimi oyuncak toplarla oynuyor, kimi de meraklı gözlerle yeni gelenleri izliyordu. Çocuklar böyle bir yeri ilk kez görüyordu.',
+            'Görevli Zehra Hanım kedileri tanıttı. “Van kedilerinin tüyleri genellikle bembeyaz ve yumuşaktır. Bazılarının gözleri farklı renktedir: biri mavi, biri kehribar,” dedi. Berk etrafına dikkatle bakınca iki gözü farklı renkte bir kedi buldu. Adı Fındık’tı ve köşedeki minderde tembel tembel uzanıyordu.',
+            'Zehra Hanım bir sır daha verdi: “Çoğu kedi sudan hoşlanmaz ama Van kedileri suyla oynamayı sever. Bazıları yüzebilir bile!” Çocuklar şaşkınlıkla bakıştı, çünkü kedilerin sudan kaçtığını sanıyorlardı.',
+            'Tam o sırada Fındık tembelliğini bir kenara bırakıp yerinden kalktı, köşedeki su kabına patisini daldırdı ve suyu şapırdatarak oynamaya başladı. Bütün sınıf kahkahalarla güldü.',
+            'Zehra Hanım, bu evde Van kedilerinin korunduğunu ve bakıldığını anlattı. “Onlar Van’ın bir hazinesidir. Onları sevmek kadar korumak da bizim görevimiz,” dedi. Çocuklar kedileri ürkütmemek için sessizce dolaşmaya özen gösterdi.',
+            'Ayrılırken Berk, Fındık’ın başını nazikçe okşadı. Fındık mırlayarak gözlerini kırptı. Berk, “Sanki bana teşekkür ediyor,” dedi. O gün büyüyünce hayvanlara yardım eden bir veteriner olmaya karar verdi.',
+          ],
+          questions: [
+            {
+              type: QuestionType.YARDIMCI_FIKIR,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt:
+                'Aşağıdakilerden hangisi Zehra Hanım’ın Van kedileri hakkında söylediğini doğrular?',
+              options: [
+                'Kedilerin minderlerde uyuması',
+                'Fındık’ın su kabına patisini daldırıp oynaması',
+                'Kedilerin yeni gelenleri izlemesi',
+                'Berk’in Fındık’ı okşaması',
+              ],
+              correctIndex: 1,
+              hint: 'İpucu: Zehra Hanım’ın verdiği sırdan hemen sonra ne oldu?',
+              explanation:
+                'Aferin! Fındık suyla oynayarak Van kedilerinin suyu sevdiğini gösterdi.',
+            },
+            {
+              type: QuestionType.BILGI,
+              cognitiveLevel: CognitiveLevel.HATIRLAMA,
+              prompt: 'Zehra Hanım’a göre Van kedilerinin tüyleri genellikle nasıldır?',
+              options: [
+                'Siyah ve kısa',
+                'Gri ve sert',
+                'Bembeyaz ve yumuşak',
+                'Kahverengi ve kıvırcık',
+              ],
+              correctIndex: 2,
+              hint: 'İpucu: İkinci paragrafta Zehra Hanım’ın kedileri tanıttığı yeri oku.',
+              explanation: 'Doğru! Van kedilerinin tüyleri genellikle bembeyaz ve yumuşaktır.',
+            },
+            {
+              type: QuestionType.DUYGU_KARAKTER,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt: 'Berk’in veteriner olmaya karar vermesi onun hakkında ne söyler?',
+              options: [
+                'Hayvanları sevdiğini ve onlara yardım etmek istediğini',
+                'Okuldan sıkıldığını',
+                'Kedilerden korktuğunu',
+                'Zehra Hanım’a kızdığını',
+              ],
+              correctIndex: 0,
+              hint: 'İpucu: Berk, Fındık’a nasıl davrandı? Veteriner ne iş yapar?',
+              explanation: 'Harika! Berk hayvanları seviyor ve onlara yardım etmek istiyor.',
+            },
+          ],
+          glossary: [
+            { word: 'minderlerde', meaning: 'Yere ya da koltuğa konan yumuşak yastıklarda.' },
+            { word: 'kehribar', meaning: 'Bal gibi sarı ile turuncu arası bir renk.' },
+            { word: 'şapırdatarak', meaning: 'Suya vurup şap şap ses çıkararak.' },
+            { word: 'veteriner', meaning: 'Hayvanları muayene edip tedavi eden doktor.' },
+          ],
+        },
+        G4: {
+          paragraphs: [
+            'Berk’in sınıfı, bir sonbahar sabahı Van’daki Van Kedisi Evi’ni ziyaret etti. Kapıdan girer girmez onlarca bembeyaz kedi, sanki misafirlerini bekleyen ev sahipleri gibi çocukları karşıladı. Kimi minderlerde kıvrılmış uyuyor, kimi oyuncak topların peşinden koşuyor, kimi de pencerenin önüne kurulup yeni gelenleri merakla süzüyordu.',
+            'Görevli Zehra Hanım kedileri tek tek tanıttı. “Van kedilerinin tüyleri genellikle bembeyaz ve yumuşaktır. Bazılarının gözleri farklı renktedir: biri mavi, biri kehribar,” dedi. Berk’in gözleri hemen kedilerin arasında dolaşmaya başladı ve çok geçmeden iki gözü farklı renkte bir kedi buldu. Adı Fındık’tı ve sanki Berk’i bekliyormuş gibi kuyruğunu dikip ona doğru yürüyordu.',
+            'Zehra Hanım bir sır daha verdi: “Çoğu kedi sudan hoşlanmaz ama Van kedileri suyla oynamayı sever. Bazıları yüzebilir bile!” Çocuklar şaşkınlıkla bakıştı; o güne dek kedilerin sudan kaçtığını sanıyorlardı ve aralarında bu sözlere inanmakta zorlanıp kaşlarını kaldıranlar da vardı.',
+            'Tam o sırada Fındık, sanki Zehra Hanım’ın sözlerini kanıtlamak istercesine köşedeki su kabına patisini daldırdı ve suyu şapırdatarak oynamaya başladı. Bütün sınıf kahkahalarla güldü; az önce şüpheyle bakanlar bile alkışlıyordu.',
+            'Zehra Hanım, bu evde Van kedilerinin korunduğunu ve bakıldığını anlattı. “Onlar Van’ın bir hazinesidir. Ama bir hazineyi yalnızca sevmek yetmez, onu korumak da gerekir. Onları sevmek kadar korumak da bizim görevimiz,” dedi. Çocuklar, kedileri ürkütmemek için evin içinde sessizce, parmak uçlarında dolaşmaya ve yüksek sesle konuşmamaya özen gösterdi.',
+            'Ayrılırken Berk, Fındık’ın başını nazikçe okşadı. Fındık mırlayarak gözlerini yavaşça kırptı ve başını Berk’in avucuna dayadı. Berk, “Sanki bana teşekkür ediyor,” dedi. O gün, büyüyünce hayvanlara yardım eden bir veteriner olmaya karar verdi; çünkü bir hazineyi korumanın yolunun, önce onu tanımaktan geçtiğini anlamıştı.',
+          ],
+          questions: [
+            {
+              type: QuestionType.ANA_FIKIR,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt: 'Bu metinde verilmek istenen ana düşünce hangisidir?',
+              options: [
+                'Kediler sudan hoşlanmaz.',
+                'Değerli canlıları sevmekle yetinmeyip onları korumak da gerekir.',
+                'Her kedinin gözleri farklı renktedir.',
+                'Okul gezileri çok eğlencelidir.',
+              ],
+              correctIndex: 1,
+              hint: 'İpucu: Beşinci paragrafta Zehra Hanım’ın hazine için söylediklerini düşün.',
+              explanation:
+                'Aferin! Zehra Hanım, bir hazineyi yalnızca sevmenin yetmediğini, korumak da gerektiğini söylüyor.',
+            },
+            {
+              type: QuestionType.SOZEL_MANTIK,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt: 'Metne göre aşağıdakilerden hangisi kesin olarak söylenebilir?',
+              options: [
+                'Bütün Van kedileri yüzebilir.',
+                'Bütün Van kedilerinin gözleri farklı renktedir.',
+                'Fındık, suyla oynamayı seven bir Van kedisidir.',
+                'Van kedileri yalnızca bu evde yaşar.',
+              ],
+              correctIndex: 2,
+              hint: 'İpucu: Zehra Hanım “bazıları” sözcüğünü nerelerde kullanıyor? Fındık ne yaptı?',
+              explanation:
+                'Harika! Metinde yalnızca “bazı” kedilerin yüzebildiği ve gözlerinin farklı olduğu söyleniyor; Fındık’ın suyla oynadığını ise gördük.',
+            },
+            {
+              type: QuestionType.PARAGRAF_YAPISI,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt: 'Dördüncü paragrafın metindeki görevi nedir?',
+              options: [
+                'Zehra Hanım’ın söylediğinin doğru olduğunu bir olayla göstermek',
+                'Kedi Evi’nin nerede olduğunu bildirmek',
+                'Hikâyenin sonucunu özetlemek',
+                'Berk’in geleceğe dair kararını anlatmak',
+              ],
+              correctIndex: 0,
+              hint: 'İpucu: Üçüncü paragrafta çocuklar neye inanmakta zorlanıyordu?',
+              explanation:
+                'Çok güzel! Fındık’ın suyla oynaması, Zehra Hanım’ın sözlerini kanıtlıyor.',
+            },
+          ],
+          glossary: [
+            { word: 'süzüyordu', meaning: 'Dikkatle, uzun uzun bakıyordu.' },
+            { word: 'kehribar', meaning: 'Bal gibi sarı ile turuncu arası bir renk.' },
+            { word: 'kanıtlamak', meaning: 'Bir şeyin doğru olduğunu göstermek.' },
+            { word: 'şüpheyle', meaning: 'İnanmayarak, emin olmadan.' },
+          ],
+        },
+      },
     }),
     story(city, {
       position: 8,
@@ -411,6 +1419,173 @@ export const van: SeedCity = {
         },
         { word: 'çözgülerin', meaning: 'Dokuma tezgâhında boyuna gerilmiş ipliklerin.' },
       ],
+      versions: {
+        G1: {
+          paragraphs: [
+            'Zehra’nın ninesi kilim dokurdu. Zehra okuldan gelince ona koştu. Tezgâhta yarım bir kilim vardı.',
+            '“Nine, bu şekiller ne?” dedi Zehra. Ninesi bir şekli gösterdi. “Bu koçboynuzu. Güç demek. Bu da elibelinde. Anneyi anlatır.”',
+            'Zehra çok şaşırdı. Demek kilimdeki her şekil bir söz gibiydi!',
+            'Zehra da denedi. İlk sırası eğri oldu. Ninesi gülümsedi. “Benim ilk kilimim de eğriydi. El alışır.”',
+            'Zehra her gün okuldan sonra biraz dokudu. Kilimin köşesine bir kedi yaptı. Beyaz bir kedi!',
+            'Kilim bitince ninesi onu duvara astı. Zehra kedisini gururla gösterdi. “Bu kilimde benim hikâyem de var,” dedi.',
+          ],
+          questions: [
+            {
+              type: QuestionType.BILGI,
+              cognitiveLevel: CognitiveLevel.HATIRLAMA,
+              prompt: 'Ninesine göre koçboynuzu ne demek?',
+              options: ['Güç', 'Yağmur', 'Uyku'],
+              correctIndex: 0,
+              hint: 'İpucu: İkinci paragrafta ninesinin gösterdiği ilk şekle bak.',
+              explanation: 'Doğru! Koçboynuzu güç demektir.',
+            },
+            {
+              type: QuestionType.NEDEN_SONUC,
+              cognitiveLevel: CognitiveLevel.ANLAMA,
+              prompt: 'Ninesi neden “El alışır” dedi?',
+              options: [
+                'Kilim bittiği için',
+                'Zehra’nın ilk sırası eğri olduğu için',
+                'Zehra okula geç kaldığı için',
+              ],
+              correctIndex: 1,
+              hint: 'İpucu: Dördüncü paragrafta Zehra’nın ilk sırası nasıl oldu?',
+              explanation: 'Aferin! Ninesi, Zehra’nın üzülmemesi için böyle söyledi.',
+            },
+            {
+              type: QuestionType.DUYGU_KARAKTER,
+              cognitiveLevel: CognitiveLevel.ANLAMA,
+              prompt: 'Kilim bitince Zehra nasıl hissetti?',
+              options: ['Üzüldü', 'Sıkıldı', 'Gurur duydu'],
+              correctIndex: 2,
+              hint: 'İpucu: Son paragrafta Zehra kedisini nasıl gösterdi?',
+              explanation: 'Harika! Zehra kendi yaptığı kediyle gurur duydu.',
+            },
+          ],
+          glossary: [
+            { word: 'dokurdu', meaning: 'İpleri birbirinin arasından geçirerek kilim yapardı.' },
+            { word: 'Tezgâhta', meaning: 'Kilim dokunan araçta.' },
+            { word: 'eğri', meaning: 'Düz olmayan, yamuk.' },
+          ],
+        },
+        G3: {
+          paragraphs: [
+            'Zehra’nın ninesi, Van’daki evinin bir köşesinde tezgâhının başında oturur, kilim dokurdu. Zehra okuldan dönünce çantasını bırakıp hemen onun yanına koştu. Tezgâhta renkli iplerden yarım bir kilim vardı ve ninesinin parmakları iplerin arasında hızla gidip geliyordu.',
+            '“Nine, bu şekiller ne anlatıyor?” diye sordu Zehra. Ninesi parmağıyla bir deseni gösterdi. “Bu koçboynuzu, güç ve cesaret demek. Bu da elibelinde; anneliği ve bereketi anlatır,” dedi.',
+            'Zehra şaşırdı. Demek kilimdeki her şekil bir kelime gibiydi! Ninesi, “Eskiden kadınlar duygularını, dileklerini kilimlere dokurdu. Kilime bakan, onların hikâyesini okurdu,” diye anlattı.',
+            'Zehra da denemek istedi. Ninesi ona ipi çözgülerin arasından nasıl geçireceğini gösterdi. Zehra’nın ilk sırası biraz eğri oldu ve yüzü asıldı. Ninesi gülümsedi: “Benim ilk kilimim de eğriydi. El alıştıkça düzelir.”',
+            'Günler geçti. Zehra her gün okuldan sonra birkaç sıra dokudu ve sıraları gittikçe düzgünleşti; artık ninesinin yardımına bile pek ihtiyaç duymuyordu. Sonunda kilimin bir köşesine kendi küçük desenini ekledi: iki gözü farklı renkte, beyaz bir kedi.',
+            'Kilim bitince ninesi onu duvara astı. Zehra kendi kedisini gururla gösterdi ve “Artık bu kilimde benim hikâyem de var,” dedi. Ninesi onu sevgiyle kucakladı, çünkü torununun bu eski sanatı sevdiğini görmek onu çok mutlu etmişti.',
+          ],
+          questions: [
+            {
+              type: QuestionType.CUMLEDE_ANLAM,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt:
+                '“Kilime bakan, onların hikâyesini okurdu.” cümlesiyle anlatılmak istenen nedir?',
+              options: [
+                'Kilimlerin üstüne yazı yazıldığı',
+                'Kilimdeki desenlerden, dokuyan kişinin duygu ve dileklerinin anlaşıldığı',
+                'Kilimlerin kitap gibi sayfaları olduğu',
+                'Kadınların kilim dokurken kitap okuduğu',
+              ],
+              correctIndex: 1,
+              hint: 'İpucu: Ninesi, kadınların kilimlere neler dokuduğunu söylüyor?',
+              explanation:
+                'Aferin! Desenler kelimeler gibidir; onlara bakan, dokuyanın duygularını anlar.',
+            },
+            {
+              type: QuestionType.NEDEN_SONUC,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt: 'Ninesi “Benim ilk kilimim de eğriydi” sözünü neden söylemiş olabilir?',
+              options: [
+                'Zehra’yı cesaretlendirmek için',
+                'Kendi kilimini övmek için',
+                'Zehra’nın dokumayı bırakmasını istediği için',
+                'Kilimi yeniden dokumak istediği için',
+              ],
+              correctIndex: 0,
+              hint: 'İpucu: İlk sırası eğri olunca Zehra’nın yüzü nasıl oldu?',
+              explanation:
+                'Harika! Ninesi, Zehra’nın üzülüp vazgeçmemesi için kendi ilk kilimini anlattı.',
+            },
+            {
+              type: QuestionType.BILGI,
+              cognitiveLevel: CognitiveLevel.HATIRLAMA,
+              prompt: 'Zehra kilimin köşesine hangi deseni ekledi?',
+              options: ['Bir koçboynuzu', 'Bir elibelinde', 'Bir çiçek', 'Beyaz bir kedi'],
+              correctIndex: 3,
+              hint: 'İpucu: Beşinci paragrafın son cümlesini oku.',
+              explanation: 'Doğru! Zehra, iki gözü farklı renkte beyaz bir kedi dokudu.',
+            },
+          ],
+          glossary: [
+            { word: 'tezgâhının', meaning: 'Kilim ya da halı dokumaya yarayan aracının.' },
+            { word: 'bereketi', meaning: 'Bolluğu, verimliliği.' },
+            { word: 'çözgülerin', meaning: 'Dokuma tezgâhında boyuna gerilmiş ipliklerin.' },
+          ],
+        },
+        G4: {
+          paragraphs: [
+            'Zehra’nın ninesi, Van’daki evinin aydınlık bir köşesinde tezgâhının başında oturur, saatlerce kilim dokurdu. Zehra okuldan dönünce çantasını kapının yanına bırakıp hemen onun yanına koştu, çünkü ninesinin ellerinde renkli iplerin nasıl bir resme dönüştüğünü izlemeye doyamıyordu. Tezgâhta, renk renk iplerden dokunmuş yarım bir kilim, tamamlanmayı bekleyen bir masal gibi duruyordu.',
+            '“Nine, bu şekiller ne anlatıyor?” diye sordu Zehra. Ninesi, yılların emeğiyle nasırlanmış parmağıyla bir deseni gösterdi. “Bu koçboynuzu, güç ve cesaret demek. Bu da elibelinde; anneliği ve bereketi anlatır,” dedi.',
+            'Zehra şaşırdı: Demek kilimdeki her şekil bir kelime, her sıra da bir cümle gibiydi! Ninesi, “Eskiden kadınlar duygularını, dileklerini kilimlere dokurdu. Sözle anlatamadıklarını, içlerinde sakladıkları sevinçleri ve özlemleri iplerle anlatırlardı. Kilime bakan, onların hikâyesini okurdu,” diye anlattı.',
+            'Zehra da denemek istedi. Ninesi ona ipi çözgülerin arasından nasıl geçireceğini sabırla, defalarca gösterdi. Zehra’nın ilk sırası eğri oldu; yüzü asıldı, bir an her şeyi bırakmak istedi. Ninesi gülümsedi: “Benim ilk kilimim de eğriydi ama el alıştıkça düzelir. Önemli olan, ipi bırakmamaktır.”',
+            'Günler, haftalar geçti ve Zehra her gün okuldan sonra, ödevlerini bitirir bitirmez tezgâhın başına oturup birkaç sıra dokudu; parmakları ipleri tanıdıkça sıraları da düzgünleşti. Sonunda kilimin bir köşesine kendi küçük desenini ekledi: iki gözü farklı renkte, beyaz bir kedi. Bu desen hiçbir eski kilimde yoktu, çünkü Zehra’nın kendi hikâyesinden doğmuştu.',
+            'Kilim bitince ninesi onu duvara astı. Zehra, eve gelen herkese kendi kedisini gururla gösterdi ve “Artık bu kilimde benim hikâyem de var,” dedi. Ninesi, gözleri mutluluktan parlayarak onu sevgiyle kucakladı. Duvardaki kilimde artık iki kuşağın hikâyesi yan yana duruyordu: ninesinin koçboynuzları ve Zehra’nın beyaz kedisi.',
+          ],
+          questions: [
+            {
+              type: QuestionType.ANA_FIKIR,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt: 'Bu metnin ana fikri hangisidir?',
+              options: [
+                'Kilim dokumak çok kolaydır.',
+                'Gelenekler, yeni kuşakların kendi hikâyelerini katmasıyla yaşamaya devam eder.',
+                'Eski kilimlerde kedi deseni bulunur.',
+                'Desenlerin anlamını yalnızca nineler bilir.',
+              ],
+              correctIndex: 1,
+              hint: 'İpucu: Son paragrafta duvardaki kilimde kimlerin hikâyesi yan yana duruyor?',
+              explanation: 'Aferin! Zehra, ninesinin sanatını öğrenip ona kendi hikâyesini ekledi.',
+            },
+            {
+              type: QuestionType.CUMLEDE_ANLAM,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt: '“Önemli olan, ipi bırakmamaktır.” sözüyle ninesi ne anlatmak istiyor?',
+              options: [
+                'İpin kopmaması gerektiğini',
+                'Zehra’nın ipleri toplaması gerektiğini',
+                'Zorlandığında vazgeçmeyip devam etmenin önemini',
+                'Kilimin çok uzun olması gerektiğini',
+              ],
+              correctIndex: 2,
+              hint: 'İpucu: Ninesi bunu, Zehra her şeyi bırakmak isteyince söyledi.',
+              explanation: 'Harika! Ninesi, zorlansa da vazgeçmezse elinin alışacağını anlatıyor.',
+            },
+            {
+              type: QuestionType.ONCULLU_YORUM,
+              cognitiveLevel: CognitiveLevel.DEGERLENDIRME,
+              prompt:
+                'Metne göre aşağıdaki yargılardan hangileri doğrudur? I. Koçboynuzu deseni güç ve cesareti anlatır. II. Zehra’nın ilk sırası düzgündü. III. Zehra’nın kedi deseni eski kilimlerde de vardı.',
+              options: ['Yalnız I', 'I ve II', 'I ve III', 'II ve III'],
+              correctIndex: 0,
+              hint: 'İpucu: Her yargıyı tek tek ele al; dördüncü ve beşinci paragraflara bak.',
+              explanation:
+                'Çok güzel! İlk sıra eğriydi, kedi deseni de hiçbir eski kilimde yoktu; yalnız I doğrudur.',
+            },
+          ],
+          glossary: [
+            { word: 'tezgâhının', meaning: 'Kilim ya da halı dokumaya yarayan aracının.' },
+            { word: 'nasırlanmış', meaning: 'Çok çalışmaktan derisi kalınlaşıp sertleşmiş.' },
+            { word: 'çözgülerin', meaning: 'Dokuma tezgâhında boyuna gerilmiş ipliklerin.' },
+            {
+              word: 'kuşağın',
+              meaning: 'Aynı yıllarda doğmuş insanların; burada nine ile torunun.',
+            },
+          ],
+        },
+      },
     }),
     story(city, {
       position: 9,
@@ -471,6 +1646,181 @@ export const van: SeedCity = {
         { word: 'kehribar', meaning: 'Bal gibi sarı ile turuncu arası bir renk.' },
         { word: 'kıvrıldı', meaning: 'Vücudunu yuvarlak yapıp büzülerek yattı.' },
       ],
+      versions: {
+        G1: {
+          paragraphs: [
+            'Pırıl sonunda Van Gölü’ne vardı. Göl masmaviydi. Pırıl derin bir nefes aldı. Bu, evinin kokusuydu.',
+            'Bahçede beyaz bir kedi vardı. Bu, Pırıl’ın annesiydi! İki küçük kardeşi de koşup geldi. Hepsi Pırıl’a sarıldı.',
+            'Akşam herkes göl kıyısında toplandı. “Neler gördün?” dedi kardeşleri. Pırıl anlattı: vapurları, eski taşları, balonları…',
+            '“Bu yolu nasıl geldin?” dedi annesi. Pırıl gülümsedi. “Yalnız değildim. Bana hikâye okuyan bir arkadaşım vardı.”',
+            'Sonra Pırıl sana baktı. “Evet, sen! Teşekkür ederim, arkadaşım.”',
+            'Gece Pırıl annesinin yanında uyudu. Rüyasında yeni hikâyeler gördü.',
+          ],
+          questions: [
+            {
+              type: QuestionType.BILGI,
+              cognitiveLevel: CognitiveLevel.HATIRLAMA,
+              prompt: 'Bahçedeki beyaz kedi kimdi?',
+              options: ['Pırıl’ın annesi', 'Bir komşu kedi', 'Pırıl’ın ninesi'],
+              correctIndex: 0,
+              hint: 'İpucu: İkinci paragrafın ilk cümlelerini oku.',
+              explanation: 'Doğru! Bahçedeki beyaz kedi Pırıl’ın annesiydi.',
+            },
+            {
+              type: QuestionType.NEDEN_SONUC,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt: 'Pırıl neden “Yalnız değildim” dedi?',
+              options: [
+                'Annesi yanındaydı',
+                'Ona hikâye okuyan bir arkadaşı vardı',
+                'Bir kuş ona yol gösterdi',
+              ],
+              correctIndex: 1,
+              hint: 'İpucu: Dördüncü paragrafta Pırıl’ın cevabını oku.',
+              explanation: 'Aferin! Ona hikâye okuyan bir arkadaşı vardı: sen!',
+            },
+            {
+              type: QuestionType.DUYGU_KARAKTER,
+              cognitiveLevel: CognitiveLevel.ANLAMA,
+              prompt: 'Pırıl sana ne hissediyor?',
+              options: ['Kızgınlık', 'Korku', 'Sevgi ve teşekkür'],
+              correctIndex: 2,
+              hint: 'İpucu: Beşinci paragrafta Pırıl sana ne dedi?',
+              explanation: 'Harika! Pırıl sana çok teşekkür ediyor. Sen harika bir okursun!',
+            },
+          ],
+          glossary: [
+            { word: 'masmaviydi', meaning: 'Çok maviydi, baştan sona maviydi.' },
+            { word: 'vapurları', meaning: 'Yolcu taşıyan büyük gemileri.' },
+          ],
+        },
+        G3: {
+          paragraphs: [
+            'Uzun bir yolculuğun sonunda Pırıl, Van Gölü’nün kıyısına vardı. Göl gökyüzü kadar maviydi ve uzakta, suyun ortasında Akdamar Adası görünüyordu. Pırıl derin bir nefes aldı. Bu kokuyu çok iyi tanıyordu: memleketinin kokusu.',
+            'Kıyıdaki küçük evin bahçesinde beyaz bir kedi oturuyordu. Pırıl’ı görünce ayağa fırladı. Bu, Pırıl’ın annesiydi! Arkasından iki küçük kardeşi koşarak geldi ve hepsi birden Pırıl’ın etrafını sardı. Pırıl, onları ne kadar çok özlediğini o an daha iyi anladı ve gözleri sevinçle parladı.',
+            'O akşam bütün aile göl kıyısında toplandı. Kardeşleri, “Nerelere gittin? Neler gördün?” diye sordular. Pırıl anlatmaya başladı: İstanbul’un vapurlarını, İzmir’in imbatını, Efes’in eski taşlarını, Antalya’nın portakallarını, Kapadokya’nın balonlarını… Kardeşleri her şehirde gözlerini kocaman açıp “Sonra?” diye soruyordu.',
+            'Annesi şaşkınlıkla dinledi. “Bu kadar uzun yolu nasıl geldin?” diye sordu. Pırıl gülümsedi. “Yalnız değildim. Her şehirde benim için hikâyeler okuyan bir arkadaşım vardı,” dedi.',
+            'Sonra Pırıl, bir gözü mavi, bir gözü kehribar, doğrudan sana baktı. “Evet, sen! Okuduğun her hikâye bana bir adım attırdı. Teşekkür ederim, sevgili arkadaşım,” dedi.',
+            'Güneş gölün üstünde batarken Pırıl, yorgun ama mutlu, annesinin yanına kıvrıldı. Uyurken rüyasında yeni şehirler ve yeni hikâyeler gördü, çünkü artık biliyordu: Okumayı seven biri için yolculuklar hiç bitmez.',
+          ],
+          questions: [
+            {
+              type: QuestionType.CUMLEDE_ANLAM,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt:
+                '“Okuduğun her hikâye bana bir adım attırdı.” cümlesiyle Pırıl ne anlatmak istiyor?',
+              options: [
+                'Okuduğun her hikâyenin onu evine biraz daha yaklaştırdığını',
+                'Hikâyelerin çok uzun olduğunu',
+                'Yürümekten çok yorulduğunu',
+                'Hikâyeleri kendisinin yazdığını',
+              ],
+              correctIndex: 0,
+              hint: 'İpucu: Pırıl annesine bu uzun yolu nasıl geldiğini anlatırken ne demişti?',
+              explanation:
+                'Aferin! Sen okudukça Pırıl ilerledi; her hikâye onu evine biraz daha yaklaştırdı.',
+            },
+            {
+              type: QuestionType.BASLIK,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt: 'Bu metnin başlığı değiştirilecek olsa en uygunu hangisi olurdu?',
+              options: [
+                'Antalya’nın Portakalları',
+                'Göl Kıyısında Bir Uyku',
+                'Hikâyelerle Gelen Kavuşma',
+                'Kardeşlerin Oyunu',
+              ],
+              correctIndex: 2,
+              hint: 'İpucu: Pırıl kime kavuştu? Bu yolu neyin sayesinde geldi?',
+              explanation:
+                'Harika! Metin, Pırıl’ın okunan hikâyeler sayesinde ailesine kavuşmasını anlatıyor.',
+            },
+            {
+              type: QuestionType.NEDEN_SONUC,
+              cognitiveLevel: CognitiveLevel.ANLAMA,
+              prompt: 'Pırıl annesine neden “Yalnız değildim” dedi?',
+              options: [
+                'Kardeşleri onunla birlikte yolculuk etmişti',
+                'Her şehirde ona hikâye okuyan bir arkadaşı vardı',
+                'Bir martı ona yol göstermişti',
+                'Annesi onu her şehirde bekliyordu',
+              ],
+              correctIndex: 1,
+              hint: 'İpucu: Dördüncü paragrafta Pırıl’ın annesine verdiği cevabı oku.',
+              explanation: 'Çok güzel! Yolculuk boyunca ona hikâye okuyan bir arkadaşı vardı: sen!',
+            },
+          ],
+          glossary: [
+            { word: 'memleketinin', meaning: 'Doğup büyüdüğü yerin.' },
+            { word: 'imbatını', meaning: 'Yazın denizden karaya esen serin rüzgârını.' },
+            { word: 'kehribar', meaning: 'Bal gibi sarı ile turuncu arası bir renk.' },
+            { word: 'kıvrıldı', meaning: 'Vücudunu yuvarlak yapıp büzülerek yattı.' },
+          ],
+        },
+        G4: {
+          paragraphs: [
+            'Uzun bir yolculuğun sonunda Pırıl, Van Gölü’nün kıyısına vardı. Göl, gökyüzünün yere inmiş bir parçası gibi masmaviydi; uzakta, suyun ortasında Akdamar Adası görünüyordu. Pırıl derin bir nefes aldı; bu kokuyu, şehir şehir dolaşırken bile hiç unutmamıştı: memleketinin kokusu.',
+            'Kıyıdaki küçük evin bahçesinde beyaz bir kedi oturuyordu. Pırıl’ı görünce bir an donup kaldı, sonra ayağa fırladı, çünkü bu, Pırıl’ın annesiydi! Arkasından iki küçük kardeşi koşarak geldi ve hepsi birden Pırıl’ın etrafını sardı. Pırıl, uzun zamandır yüreğinde bir taş gibi taşıdığı özlemin bir anda sevince dönüştüğünü hissetti.',
+            'O akşam bütün aile göl kıyısında toplandı. Kardeşleri, “Nerelere gittin? Neler gördün?” diye bir ağızdan sorup duruyordu. Pırıl anlatmaya başladı: İstanbul’un vapurlarını, İzmir’in imbatını, Efes’in eski taşlarını, Antalya’nın portakallarını, Kapadokya’nın balonlarını… Anlattığı her şehirde kardeşlerinin gözleri biraz daha büyüdü, kulakları biraz daha dikildi ve göl kıyısını kahkahalar doldurdu.',
+            'Annesi bütün bunları şaşkınlıkla dinledikten sonra, “Bu kadar uzun yolu nasıl geldin?” diye sordu. Pırıl gülümseyerek cevap verdi: “Yalnız değildim, her şehirde benim için hikâyeler okuyan bir arkadaşım vardı. Yorulduğumda ya da yolumu kaybettiğimde onun okuduğu hikâyeler bana güç verdi,” dedi.',
+            'Sonra Pırıl, bir gözü mavi, bir gözü kehribar, doğrudan sana baktı. “Evet, sen! Okuduğun her hikâye bana bir adım attırdı. Bu uzun yolu, şehir şehir, hikâye hikâye birlikte yürüdük. Teşekkür ederim, sevgili arkadaşım,” dedi.',
+            'Güneş gölün üstünde turuncu bir iz bırakarak batarken Pırıl, yorgun ama huzurlu, annesinin yanına kıvrıldı. Uyurken rüyasında henüz görmediği yeni şehirler, okunmayı bekleyen yeni hikâyeler gördü, çünkü artık biliyordu: Okumayı seven biri için yolculuklar hiç bitmez; her kitap, yeni bir yolun başlangıcıdır.',
+          ],
+          questions: [
+            {
+              type: QuestionType.ANA_FIKIR,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt: 'Bu metinde verilmek istenen ana düşünce hangisidir?',
+              options: [
+                'Uzun yolculuklar çok yorucudur.',
+                'Kediler göl kıyısında yaşamayı sever.',
+                'Her şehrin ünlü bir yemeği vardır.',
+                'Okumak, insanı yeni yerlere götüren ve hiç bitmeyen bir yolculuktur.',
+              ],
+              correctIndex: 3,
+              hint: 'İpucu: Son paragrafta Pırıl’ın artık bildiği şeyi oku.',
+              explanation:
+                'Aferin! Okumayı seven biri için her kitap yeni bir yolculuğun başlangıcıdır.',
+            },
+            {
+              type: QuestionType.PARAGRAF_YAPISI,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt: 'Beşinci paragrafı öbür paragraflardan ayıran özellik nedir?',
+              options: [
+                'Pırıl’ın doğrudan okurla konuşması',
+                'Şehirlerin tek tek sayılması',
+                'Göl manzarasının anlatılması',
+                'Annesinin Pırıl’a soru sorması',
+              ],
+              correctIndex: 0,
+              hint: 'İpucu: Beşinci paragrafta Pırıl kime bakıyor ve kime “sen” diyor?',
+              explanation:
+                'Harika! Bu paragrafta Pırıl hikâyeden çıkıp doğrudan sana, okura sesleniyor.',
+            },
+            {
+              type: QuestionType.SOZEL_MANTIK,
+              cognitiveLevel: CognitiveLevel.CIKARIM,
+              prompt: 'Metne göre aşağıdakilerden hangisi kesin olarak söylenebilir?',
+              options: [
+                'Pırıl yolculuğa annesiyle çıkmıştır.',
+                'Pırıl, Van’a gelmeden önce Kapadokya’nın balonlarını görmüştür.',
+                'Pırıl bir daha hiç yolculuğa çıkmayacaktır.',
+                'Kardeşleri de bütün şehirleri gezmiştir.',
+              ],
+              correctIndex: 1,
+              hint: 'İpucu: Pırıl akşam kardeşlerine nereleri anlattı?',
+              explanation:
+                'Çok güzel! Pırıl, gördüklerini anlatırken Kapadokya’nın balonlarından da söz etti.',
+            },
+          ],
+          glossary: [
+            { word: 'memleketinin', meaning: 'Doğup büyüdüğü yerin.' },
+            { word: 'özlemin', meaning: 'Birini ya da bir yeri görmeyi çok istemenin.' },
+            { word: 'imbatını', meaning: 'Yazın denizden karaya esen serin rüzgârını.' },
+            { word: 'kehribar', meaning: 'Bal gibi sarı ile turuncu arası bir renk.' },
+          ],
+        },
+      },
     }),
     chest(
       city,
