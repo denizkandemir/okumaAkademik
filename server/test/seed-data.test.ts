@@ -3,7 +3,14 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 import { readingMinutes, wordCount } from '../prisma/seed-data/build.js';
-import { E1_WORDS, E11_WORDS } from '../prisma/seed-data/exercises.js';
+import {
+  E1_WORDS,
+  E11_WORDS,
+  E5_MAX_LENGTH_GAP,
+  E5_MIN_SIMILARITY,
+  letterSimilarity,
+  looksSimilar,
+} from '../prisma/seed-data/exercises.js';
 import {
   seedCities,
   seedExerciseItemRows,
@@ -30,7 +37,6 @@ import { toApiCity } from '../src/lib/city.js';
 import { ATESMAN_TARGET, gradeBandOf } from '../src/lib/grade-band.js';
 import { textMetrics } from '../src/lib/readability.js';
 import { CHEST_POSITIONS, LESSONS_PER_CITY, TOTAL_LESSONS } from '../src/lib/journey.js';
-import { syllableCountOf } from '../src/lib/syllables.js';
 import { EXERCISE_MODULES } from '../src/modules/exercises/types/index.js';
 
 /**
@@ -475,7 +481,19 @@ describe('egzersiz örnekleri (seed)', () => {
     }
   });
 
-  it('E5 kelimeleri metinde geçer; çeldiriciler farklı ve aynı hece sayısında', () => {
+  it('E5 benzerliği: ilk iki harf aynı, yakın uzunluk, harflerin en az %60’ı ortak', () => {
+    expect(letterSimilarity('kuşlar', 'kuşkular')).toBeCloseTo(6 / 8);
+    expect(looksSimilar('martılar', 'martıyı')).toBe(true);
+    expect(looksSimilar('İskele', 'iskelede')).toBe(true); // tr-TR küçük harf: İ → i
+    expect(looksSimilar('martılar', 'artılar')).toBe(false); // ilk harf farklı
+    expect(looksSimilar('martılar', 'merakla')).toBe(false); // ikinci harf farklı
+    expect(looksSimilar('kalemler', 'kalıbı')).toBe(false); // ortak harf %60'ın altında
+    expect(looksSimilar('kapı', 'kapılarımız')).toBe(false); // uzunluk farkı büyük
+    expect(looksSimilar('kalem', 'kuzgun')).toBe(false); // ortak harf az
+    expect(looksSimilar('İskele', 'iskele')).toBe(false); // aynı kelime
+  });
+
+  it('E5 kelimeleri metinde geçer; çeldiriciler görsel olarak benzer ve farklı', () => {
     for (const item of seedExerciseItemRows.filter((i) => i.type === ExerciseType.HIZLI_KELIME)) {
       const text = textById.get(item.textId)?.paragraphs.join(' ') ?? '';
       const words = (item.data as { words: { word: string; distractors: string[] }[] }).words;
@@ -485,7 +503,11 @@ describe('egzersiz örnekleri (seed)', () => {
         expect(new Set(distractors).size).toBe(distractors.length);
         for (const distractor of distractors) {
           expect(distractor).not.toBe(word.toLocaleLowerCase('tr-TR'));
-          expect(syllableCountOf(distractor)).toBe(syllableCountOf(word));
+          expect(Array.from(distractor).slice(0, 2).join(''), `${word}/${distractor}`).toBe(
+            Array.from(word.toLocaleLowerCase('tr-TR')).slice(0, 2).join(''),
+          );
+          expect(Math.abs(distractor.length - word.length)).toBeLessThanOrEqual(E5_MAX_LENGTH_GAP);
+          expect(letterSimilarity(word, distractor)).toBeGreaterThanOrEqual(E5_MIN_SIMILARITY);
         }
       }
     }

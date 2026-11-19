@@ -58,6 +58,40 @@ export type ChunkReadingParams = { cueLevel: CueLevel };
 export type ChunkReadingData = { chunks: string[][]; questionPositions: number[] };
 export type ChunkReadingResult = { readSeconds: number };
 
+/** E5 Hızlı kelime */
+export type QuickWordsParams = { flashMs: number; minFlashMs: number };
+export type QuickWordsData = {
+  words: { word: string; syllables: number; distractors: string[] }[];
+};
+export type QuickWordsResult = {
+  cards: { word: string; correct: boolean; flashMs: number }[];
+  readSeconds: number;
+};
+
+/** E6 Pırıl'ın ışığı */
+export type PirilLightParams = {
+  speedFactor: number;
+  segmentWords: number;
+  fadeUnit: 'line' | 'word';
+};
+export type PirilLightResult = {
+  baselineWords: number;
+  baselineSeconds: number;
+  lightSeconds: number;
+  pauses: number;
+};
+
+/** E11 Hece hece oku (zıplayan top) */
+export type SyllableBallParams = {
+  marker: 'gap' | 'color' | 'both';
+  pointer: 'ball' | 'paw';
+  /** Topun hızı (hece/saniye); sunucu çocuğun temposuna göre verir. */
+  syllablesPerSecond?: number;
+};
+/** Paragraf → kelime → hece */
+export type SyllableBallData = { words: string[][][]; questionPositions: number[] };
+export type SyllableBallResult = { readSeconds: number; slowUsed: boolean; restarts: number };
+
 /** PATCH /exercise-sessions/:id gövdesi. */
 export type FinishExerciseRequest<R> = { durationSeconds: number; result: R };
 
@@ -72,6 +106,9 @@ export type FinishExerciseResponse = {
   comprehension: number | null;
   questionsTotal: number | null;
   firstTryCorrect: number | null;
+  /** E5: kart sayısı ve doğru tanınanlar */
+  wordsTotal: number | null;
+  wordsCorrect: number | null;
   lokum: { earned: number; balance: number };
   streak: number;
 };

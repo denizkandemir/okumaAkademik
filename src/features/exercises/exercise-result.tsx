@@ -24,19 +24,46 @@ export function formatComprehension(result: FinishExerciseResponse): string | nu
   return `${result.firstTryCorrect}/${result.questionsTotal}`;
 }
 
+/** E5: "5/6" tanınan kelime; kart yoksa null. */
+export function formatWords(result: FinishExerciseResponse): string | null {
+  if (result.wordsTotal == null || result.wordsCorrect == null) return null;
+  return `${result.wordsCorrect}/${result.wordsTotal}`;
+}
+
+/** Hız yalnızca anlamayla birlikte gösterilir; sorusuz egzersizde (E5) hiç gösterilmez. */
+function speedOf(result: FinishExerciseResponse) {
+  if (formatComprehension(result) == null) return null;
+  if (result.score != null) {
+    return {
+      summary: `Hız ${formatChange(result.score)}`,
+      value: formatChange(result.score),
+      label: 'hız (ilk okumaya göre)',
+    };
+  }
+  if (result.wpmLast != null) {
+    return {
+      summary: `Hız dakikada ${Math.round(result.wpmLast)} kelime`,
+      value: String(Math.round(result.wpmLast)),
+      label: 'kelime / dakika',
+    };
+  }
+  return null;
+}
+
 /**
  * Hız hiçbir zaman tek başına gösterilmez: hep anlamayla birlikte (01-arastirma.md §1). E1'de
- * "Hız +18%, anlama 3/3"; tek okumalı egzersizde dakikadaki kelime.
+ * "Hız +18%, anlama 3/3"; tek okumalı egzersizde dakikadaki kelime; E5'te "kelime 5/6".
  */
 export function resultSummary(result: FinishExerciseResponse): string {
-  const speed =
-    result.score != null
-      ? `Hız ${formatChange(result.score)}`
-      : result.wpmLast != null
-        ? `Hız dakikada ${Math.round(result.wpmLast)} kelime`
-        : null;
   const comprehension = formatComprehension(result);
-  return [speed, comprehension ? `anlama ${comprehension}` : null].filter(Boolean).join(', ');
+  const words = formatWords(result);
+  return [
+    speedOf(result)?.summary,
+    comprehension ? `anlama ${comprehension}` : null,
+    words ? `kelime ${words}` : null,
+  ]
+    .filter(Boolean)
+    .join(', ');
 }
 
 type ExerciseResultProps = {
@@ -54,12 +81,8 @@ export function ExerciseResult({ title, result }: ExerciseResultProps) {
   const comprehension = formatComprehension(result);
   const allRight =
     result.questionsTotal != null && result.firstTryCorrect === result.questionsTotal;
-  const speed =
-    result.score != null
-      ? { value: formatChange(result.score), label: 'hız (ilk okumaya göre)' }
-      : result.wpmLast != null
-        ? { value: String(Math.round(result.wpmLast)), label: 'kelime / dakika' }
-        : null;
+  const speed = speedOf(result);
+  const words = formatWords(result);
 
   return (
     <RewardLayout
@@ -80,6 +103,9 @@ export function ExerciseResult({ title, result }: ExerciseResultProps) {
         ) : null}
         {comprehension ? (
           <StatTile value={comprehension} label="anlama" align="center" style={styles.tile} />
+        ) : null}
+        {words ? (
+          <StatTile value={words} label="kelimeyi tanıdın" align="center" style={styles.tile} />
         ) : null}
       </View>
       <RewardRow

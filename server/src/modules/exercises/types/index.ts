@@ -20,13 +20,13 @@ export const EXERCISE_MODULES: Partial<Record<ExerciseType, AnyExerciseModule>> 
   [ExerciseType.HECE_TOPU]: heceTopu,
 };
 
-/**
- * Uygulamanın şu an oynatabildiği türler; günlük antrenman yalnızca bunları önerir. E5, E6 ve E11
- * ekranları gelince (A1a-2) buraya eklenir.
- */
+/** Uygulamanın şu an oynatabildiği türler; günlük antrenman yalnızca bunları önerir. */
 export const PLAYABLE_TYPES: readonly ExerciseType[] = [
   ExerciseType.TEKRARLI_OKUMA,
   ExerciseType.OBEK_OKUMA,
+  ExerciseType.HIZLI_KELIME,
+  ExerciseType.PIRIL_ISIGI,
+  ExerciseType.HECE_TOPU,
 ];
 
 /** Türün modülü; tanımlı değilse hata (veritabanında yalnızca tanımlı türlerin örneği olur). */

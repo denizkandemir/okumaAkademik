@@ -8,18 +8,26 @@ import { StateView } from '@/design/components/state-view';
 import { ChunkReading } from '@/features/exercises/chunk-reading';
 import { startExercise } from '@/features/exercises/exercise-api';
 import { ExerciseShell, leaveExercise } from '@/features/exercises/exercise-shell';
+import { PirilLight } from '@/features/exercises/piril-light';
+import { QuickWords } from '@/features/exercises/quick-words';
 import { RepeatedReading } from '@/features/exercises/repeated-reading';
+import { SyllableBall } from '@/features/exercises/syllable-ball';
 import type {
   ChunkReadingData,
   ChunkReadingParams,
+  PirilLightParams,
+  QuickWordsData,
+  QuickWordsParams,
   RepeatedReadingParams,
   StartExerciseResponse,
+  SyllableBallData,
+  SyllableBallParams,
 } from '@/features/exercises/types';
 import { Mascot } from '@/features/mascot/mascot';
 
 /**
  * Egzersiz ekranı: açılınca oturumu başlatır (POST /exercises/:itemId/sessions) ve türüne göre
- * egzersizi gösterir. E5, E6 ve E11'in ekranları A1a-2'de gelir.
+ * egzersizi gösterir. Ekranı olmayan türlerde "çok yakında" görünür.
  */
 export default function ExerciseScreen() {
   const { itemId } = useLocalSearchParams<{ itemId: string }>();
@@ -70,6 +78,18 @@ export default function ExerciseScreen() {
       return (
         <ChunkReading
           start={start as StartExerciseResponse<ChunkReadingParams, ChunkReadingData>}
+        />
+      );
+    case 'HIZLI_KELIME':
+      return (
+        <QuickWords start={start as StartExerciseResponse<QuickWordsParams, QuickWordsData>} />
+      );
+    case 'PIRIL_ISIGI':
+      return <PirilLight start={start as StartExerciseResponse<PirilLightParams, unknown>} />;
+    case 'HECE_TOPU':
+      return (
+        <SyllableBall
+          start={start as StartExerciseResponse<SyllableBallParams, SyllableBallData>}
         />
       );
     default:

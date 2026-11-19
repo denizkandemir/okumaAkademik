@@ -559,6 +559,16 @@ kelime sayısından, anlamayı ilk cevaplardan hesaplar. Tekrar gelen PATCH ayn�
 | `score`         | Türe özel puan; E1'de ilk okumaya göre hız değişimi (yüzde)      |
 | `details`       | Okuma süreleri, cevaplar, soru sayısı, ilk denemede doğru        |
 
+- **Türe özel ayrıntılar:** E5'te `score` doğru tanınan kart yüzdesidir, `details` kartları
+  (`cards`, `wordsTotal`, `wordsCorrect`) içerir; soru yoktur, `comprehension` boştur. E6'da
+  `wpm_first` ilk bölümün (temel) hızı, `wpm_last` ışıklı bölümün hızıdır. E11'de `details`
+  kullanılan hece hızını (`syllablesPerSecond`), "Yavaş" kullanımını ve yeniden başlatmaları tutar.
+- **Etkin ayarlar (E6, E11):** oturum başlarken aynı türün son biten oturumunun `details`'i
+  okunur. E6: `nextSpeedFactor` (anlama ≥ 0,8 ise +0,03, değilse −0,03; 1,05-1,20). E11:
+  `nextSyllablesPerSecond` (anlama ≥ 0,8 ve "Yavaş" yoksa ×1,05, değilse ×0,95); geçmiş yoksa en
+  yeni `user_baselines` hızından (kelime/dk × ort. hece/kelime ÷ 60 × 0,95), o da yoksa 1,5
+  hece/sn. Kullanılan değer `params_used`'a yazılır.
+
 - **Seriye ve günlük hedefe sayılır:** bitiş anının günü seri günüdür; süresi başladığı günün
   okuma dakikalarına eklenir (`/me/progress`, `/me/stats`, `v_daily_reading`).
 - **Okuma ölçümlerine girmez:** `reading_metrics` satırı yazılmaz; `v_reading_metrics` ve

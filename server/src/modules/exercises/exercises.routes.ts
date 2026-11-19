@@ -130,6 +130,9 @@ function resultOf(session: SessionRow, lokumEarned: number) {
     comprehension: session.comprehension,
     questionsTotal: number(details.questionsTotal),
     firstTryCorrect: number(details.firstTryCorrect),
+    /** E5: kart sayısı ve doğru tanınanlar */
+    wordsTotal: number(details.wordsTotal),
+    wordsCorrect: number(details.wordsCorrect),
     reads: Array.isArray(details.reads) ? details.reads : null,
     lokumEarned,
   };
@@ -244,12 +247,37 @@ export async function exercisesRoutes(app: FastifyInstance) {
       throw Errors.lessonLocked();
     }
 
-    // Etkin ayarlar: şimdilik örneğin kendi ayarları (E6 ve E11 uyarlaması A1a-2'de).
-    const params = module.paramsSchema.parse(item.params) as Prisma.InputJsonValue;
+    // Etkin ayarlar: örneğin ayarları, türün uyarlaması varsa çocuğun geçmişine göre (E6, E11).
+    const itemParams = module.paramsSchema.parse(item.params);
     const data = module.dataSchema.parse(item.data);
+    let params = itemParams;
+    if (module.effectiveParams) {
+      const [last, baseline] = await Promise.all([
+        prisma.exerciseSession.findFirst({
+          where: { userId: user.id, finishedAt: { not: null }, item: { type: item.type } },
+          orderBy: { finishedAt: 'desc' },
+          select: { details: true },
+        }),
+        prisma.userBaseline.findFirst({
+          where: { userId: user.id },
+          orderBy: { measuredAt: 'desc' },
+          select: { wordsPerMinute: true },
+        }),
+      ]);
+      params = module.paramsSchema.parse(
+        module.effectiveParams({
+          params: itemParams,
+          data,
+          gradeBand: item.gradeBand,
+          wordCount: wordCountOf(item.text),
+          lastDetails: last ? detailsOf(last.details) : null,
+          baselineWpm: baseline?.wordsPerMinute ?? null,
+        }),
+      );
+    }
     const [session, questions] = await Promise.all([
       prisma.exerciseSession.create({
-        data: { userId: user.id, itemId: item.id, paramsUsed: params },
+        data: { userId: user.id, itemId: item.id, paramsUsed: params as Prisma.InputJsonValue },
         select: { id: true },
       }),
       questionsFor(prisma, item.text?.id ?? null, module.questionPositions(data)),
@@ -392,9 +420,11 @@ export async function exercisesRoutes(app: FastifyInstance) {
       );
       const metrics = module.finish.metrics({
         params,
+        data,
         result: outcome,
         wordCount: wordCountOf(session.item.text),
         durationSeconds,
+        comprehension,
       });
 
       const updated = await tx.exerciseSession.update({

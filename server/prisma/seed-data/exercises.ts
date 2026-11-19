@@ -102,46 +102,85 @@ function plainWord(word: string): boolean {
   return /^[a-zçğıöşüâîû]+$/.test(word) && word === word.toLocaleLowerCase(LOCALE);
 }
 
+/** E5 çeldiricisinde kelimeyle uzunluk farkı en fazla bu kadar. */
+export const E5_MAX_LENGTH_GAP = 2;
+/** E5 çeldiricisinin kelimeyle en az bu oranda ortak harfi olmalı. */
+export const E5_MIN_SIMILARITY = 0.6;
+/** E5 çeldiricisi kelimeyle aynı ilk bu kadar harfle başlar (tr-TR küçük harfle). */
+export const E5_SAME_PREFIX = 2;
+
+/**
+ * İki kelimenin ortak harf oranı (0-1): ortak harfler (tekrarlar dahil, sırasız) / uzun olanın
+ * harf sayısı. "kuşlar" ile "kuşkular" → 6/8.
+ */
+export function letterSimilarity(a: string, b: string): number {
+  const left = Array.from(a.toLocaleLowerCase(LOCALE));
+  const right = Array.from(b.toLocaleLowerCase(LOCALE));
+  const counts = new Map<string, number>();
+  for (const char of right) counts.set(char, (counts.get(char) ?? 0) + 1);
+  let shared = 0;
+  for (const char of left) {
+    const count = counts.get(char) ?? 0;
+    if (count > 0) {
+      shared++;
+      counts.set(char, count - 1);
+    }
+  }
+  return shared / Math.max(left.length, right.length, 1);
+}
+
+/** Görsel olarak benzer mi: ilk iki harfi aynı, uzunluğu yakın, harflerinin çoğu ortak. */
+export function looksSimilar(word: string, other: string): boolean {
+  const a = word.toLocaleLowerCase(LOCALE);
+  const b = other.toLocaleLowerCase(LOCALE);
+  return (
+    a !== b &&
+    Array.from(a).slice(0, E5_SAME_PREFIX).join('') ===
+      Array.from(b).slice(0, E5_SAME_PREFIX).join('') &&
+    Math.abs(Array.from(a).length - Array.from(b).length) <= E5_MAX_LENGTH_GAP &&
+    letterSimilarity(a, b) >= E5_MIN_SIMILARITY
+  );
+}
+
 /**
  * E5 kelimeleri: önce sözlük kelimeleri, sonra 3 ve daha fazla heceli kelimeler (en uzundan),
- * en fazla 6. Çeldiriciler aynı grubun başka metinlerinden, aynı hece sayısında ve uzunluğu en
- * yakın olanlardan.
+ * en fazla 6. Yalnızca metinde küçük harfle geçen düz kelimeler (seçenekler hep küçük harfle
+ * görünür). Çeldiriciler aynı grubun başka metinlerinden ve kelimeye görsel olarak benzer:
+ * ilk iki harfi aynı, uzunluğu yakın, harflerinin çoğu ortak (en benzer 3). En az 2 benzer
+ * çeldiricisi bulunmayan kelime atlanır.
  */
 function quickWords(variant: Variant, pool: readonly string[]) {
-  const textWords = variant.text.paragraphs.join(' ').split(' ').map(bareWord).filter(Boolean);
+  const textWords = variant.text.paragraphs.join(' ').split(' ').map(bareWord).filter(plainWord);
   const candidates = [
     ...variant.glossary.map((entry) => entry.word).filter((word) => textWords.includes(word)),
     ...[...textWords]
-      .filter((word) => syllableCountOf(word) >= 3 && !word.includes("'"))
+      .filter((word) => syllableCountOf(word) >= 3)
       .sort((a, b) => b.length - a.length || a.localeCompare(b, LOCALE)),
   ];
   const seen = new Set<string>();
-  const chosen = candidates
+  return candidates
     .filter((word) => {
-      const key = word.toLocaleLowerCase(LOCALE);
-      if (seen.has(key)) return false;
-      seen.add(key);
+      if (seen.has(word)) return false;
+      seen.add(word);
       return true;
     })
+    .map((word) => {
+      const syllables = syllableCountOf(word);
+      const length = Array.from(word).length;
+      const distractors = pool
+        .filter((other) => looksSimilar(word, other))
+        .sort(
+          (a, b) =>
+            letterSimilarity(word, b) - letterSimilarity(word, a) ||
+            Math.abs(Array.from(a).length - length) - Math.abs(Array.from(b).length - length) ||
+            Number(syllableCountOf(b) === syllables) - Number(syllableCountOf(a) === syllables) ||
+            a.localeCompare(b, LOCALE),
+        )
+        .slice(0, 3);
+      return { word, syllables, distractors };
+    })
+    .filter((entry) => entry.distractors.length >= 2)
     .slice(0, 6);
-
-  return chosen.map((word, index) => {
-    const lower = word.toLocaleLowerCase(LOCALE);
-    const syllables = syllableCountOf(word);
-    const options = pool
-      .filter((other) => other !== lower && syllableCountOf(other) === syllables)
-      .sort(
-        (a, b) =>
-          Math.abs(a.length - word.length) - Math.abs(b.length - word.length) ||
-          a.localeCompare(b, LOCALE),
-      )
-      .slice(0, 12);
-    // Her kelimede farklı çeldiriciler: en yakın 12 aday içinde kelimenin sırası kadar kaydırılır.
-    const distractors = [0, 1, 2].map(
-      (offset) => options[(index * 3 + offset) % Math.max(1, options.length)] as string,
-    );
-    return { word, syllables, distractors: [...new Set(distractors)] };
-  });
 }
 
 /** E11 soruları: en kolay 2 soru (bilişsel düzeyi en düşük), metindeki sırasıyla. */

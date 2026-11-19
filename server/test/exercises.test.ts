@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { seedQuestionRows } from '../prisma/seed-data/index.js';
+import { seedExerciseItemRows, seedQuestionRows } from '../prisma/seed-data/index.js';
 import { bearer, registerUser, useTestContext } from './helpers.js';
 
 const ctx = useTestContext();
@@ -9,6 +9,11 @@ const E1 = 'e1-g2-istanbul-01-vapurda-simit';
 const E1_LOCKED = 'e1-g2-istanbul-02-bahcedeki-domatesler';
 const E4 = 'e4-g2-istanbul-01-vapurda-simit';
 const E5 = 'e5-g2-istanbul-01-vapurda-simit';
+const E6 = 'e6-g2-istanbul-01-vapurda-simit';
+/** İstanbul'un ilk dersinin G1 sürümünden E11 örneği (yeni kullanıcıya açık). */
+const E11 = seedExerciseItemRows.find(
+  (item) => item.type === 'HECE_TOPU' && item.id.includes('istanbul-01-'),
+)?.id as string;
 
 type StartResponse = {
   sessionId: string;
@@ -26,6 +31,8 @@ type FinishResponse = {
   comprehension: number | null;
   questionsTotal: number | null;
   firstTryCorrect: number | null;
+  wordsTotal: number | null;
+  wordsCorrect: number | null;
   lokum: { earned: number; balance: number };
   streak: number;
 };
@@ -112,8 +119,8 @@ describe('günlük antrenman', () => {
     expect(body.items.length).toBeGreaterThanOrEqual(1);
     expect(body.done).toBe(false);
     for (const item of body.items) {
-      expect(['TEKRARLI_OKUMA', 'OBEK_OKUMA']).toContain(item.type);
-      expect(item.itemId).toMatch(/^e[14]-g2-istanbul-01-/);
+      expect(['TEKRARLI_OKUMA', 'OBEK_OKUMA', 'HIZLI_KELIME', 'PIRIL_ISIGI']).toContain(item.type);
+      expect(item.itemId).toMatch(/^e[1456]-g2-istanbul-01-/);
       expect(item.minutes).toBeGreaterThan(0);
     }
     expect(new Set(body.items.map((item) => item.type)).size).toBe(body.items.length);
@@ -162,10 +169,9 @@ describe('egzersiz oturumu', () => {
     expect(JSON.stringify(body.questions)).not.toContain('correctIndex');
   });
 
-  it('kilitli metnin egzersizi açılmaz; henüz oynatılamayan tür 404', async () => {
+  it('kilitli metnin egzersizi açılmaz; olmayan egzersiz 404', async () => {
     const { token } = await registerUser(ctx.app);
     expect((await start(token, E1_LOCKED)).statusCode).toBe(403);
-    expect((await start(token, E5)).statusCode).toBe(404);
     expect((await start(token, 'yok-boyle-bir-egzersiz')).statusCode).toBe(404);
   });
 
@@ -237,6 +243,134 @@ describe('egzersiz oturumu', () => {
     expect(body.durationSeconds).toBeLessThanOrEqual(61);
     expect(body.wpmFirst).toBe(body.wpmLast);
     expect(body.comprehension).toBe(1);
+  });
+
+  it('E5: sorusuz; kartlar örneğin kelimeleriyle sayılır, okuma hızı metinden', async () => {
+    const { token } = await registerUser(ctx.app);
+    const started = (await start(token, E5)).json<StartResponse>();
+    expect(started.questions).toEqual([]);
+    const words = (started.item.data as { words: { word: string }[] }).words;
+    await backdate(started.sessionId, 5);
+    const body = (
+      await finish(token, started.sessionId, {
+        durationSeconds: 200,
+        result: {
+          cards: [
+            ...words.map((entry, index) => ({
+              word: entry.word,
+              correct: index !== 0,
+              flashMs: 900,
+            })),
+            // Örnekte olmayan kelime sayılmaz.
+            { word: 'uydurma', correct: true, flashMs: 900 },
+          ],
+          readSeconds: 60,
+        },
+      })
+    ).json<FinishResponse>();
+    expect(body).toMatchObject({
+      comprehension: null,
+      questionsTotal: 0,
+      wordsTotal: words.length,
+      wordsCorrect: words.length - 1,
+      lokum: { earned: 3, balance: 3 },
+    });
+    expect(body.wpmFirst).toBeCloseTo((started.text?.wordCount ?? 0) as number, 0);
+    expect(body.score).toBe(Math.round(((words.length - 1) / words.length) * 100));
+  });
+
+  it('E6: temel hız ve ışıklı hız; çarpan anlamaya göre ±0,03, 1,05-1,20 arasında', async () => {
+    const { token } = await registerUser(ctx.app);
+    const playE6 = async (wrongFirst: number[]) => {
+      const started = (await start(token, E6)).json<StartResponse>();
+      await answerAll(token, started, wrongFirst);
+      await backdate(started.sessionId, 10);
+      const response = await finish(token, started.sessionId, {
+        durationSeconds: 200,
+        result: { baselineWords: 30, baselineSeconds: 30, lightSeconds: 60, pauses: 1 },
+      });
+      expect(response.statusCode).toBe(200);
+      return { started, body: response.json<FinishResponse>() };
+    };
+
+    const first = await playE6([]);
+    expect(first.started.item.params).toMatchObject({ speedFactor: 1.1 });
+    const words = first.started.text?.wordCount ?? 0;
+    expect(first.body.wpmFirst).toBe(60);
+    expect(first.body.wpmLast).toBeCloseTo(words - 30, 0);
+    expect(first.body.comprehension).toBe(1);
+
+    // İyi anlama → bir sonraki oturumda 1,13; kötü anlama → 1,10.
+    const second = await playE6([1, 2]);
+    expect(second.started.item.params).toMatchObject({ speedFactor: 1.13 });
+    const third = await playE6([]);
+    expect(third.started.item.params).toMatchObject({ speedFactor: 1.1 });
+    const session = await ctx.prisma.exerciseSession.findFirstOrThrow({
+      where: { id: third.started.sessionId },
+    });
+    expect(session.paramsUsed).toMatchObject({ speedFactor: 1.1 });
+    expect(session.details).toMatchObject({ speedFactor: 1.1, nextSpeedFactor: 1.13 });
+
+    // Üst sınır: 1,20'nin üstüne çıkmaz.
+    await ctx.prisma.exerciseSession.update({
+      where: { id: third.started.sessionId },
+      data: { details: { nextSpeedFactor: 1.2 } },
+    });
+    const fourth = await playE6([]);
+    expect(fourth.started.item.params).toMatchObject({ speedFactor: 1.2 });
+    const stored = await ctx.prisma.exerciseSession.findFirstOrThrow({
+      where: { id: fourth.started.sessionId },
+    });
+    expect(stored.details).toMatchObject({ nextSpeedFactor: 1.2 });
+  });
+
+  it('E11: hız seviye belirlemeden; sonra en fazla ±%5, yalnız iyi anlamada artar', async () => {
+    const { token, user } = await registerUser(ctx.app, { grade: 1 });
+    const playE11 = async (wrongFirst: number[], slowUsed: boolean) => {
+      const started = (await start(token, E11)).json<StartResponse>();
+      expect(started.questions.length).toBeGreaterThanOrEqual(1);
+      expect(started.questions.length).toBeLessThanOrEqual(2);
+      await answerAll(token, started, wrongFirst);
+      await backdate(started.sessionId, 5);
+      const response = await finish(token, started.sessionId, {
+        durationSeconds: 120,
+        result: { readSeconds: 90, slowUsed, restarts: 2 },
+      });
+      expect(response.statusCode).toBe(200);
+      return started;
+    };
+
+    // Seviye belirleme yokken sakin G1 hızı.
+    const calm = await playE11([], true);
+    expect(calm.item.params).toMatchObject({ syllablesPerSecond: 1.5 });
+
+    const round2 = (value: number) => Math.round(value * 100) / 100;
+    // Sonraki oturum: "Yavaş" kullanıldı → ×0,95.
+    const slowPace = round2(1.5 * 0.95);
+    const slower = await playE11([], false);
+    expect(slower.item.params).toMatchObject({ syllablesPerSecond: slowPace });
+    // İyi anlama ve "Yavaş" yok → ×1,05.
+    const fastPace = round2(slowPace * 1.05);
+    const faster = await playE11([1], false);
+    expect(faster.item.params).toMatchObject({ syllablesPerSecond: fastPace });
+    // Düşük anlama (ilk soruda yanlış) → ×0,95.
+    const after = await start(token, E11);
+    expect(after.json<StartResponse>().item.params).toMatchObject({
+      syllablesPerSecond: round2(fastPace * 0.95),
+    });
+
+    // Geçmiş yoksa seviye belirleme hızından: kelime/dk × ort. hece/kelime ÷ 60 × 0,95.
+    await ctx.prisma.exerciseSession.deleteMany({ where: { userId: user.id } });
+    await ctx.prisma.userBaseline.create({
+      data: { userId: user.id, grade: 1, gradeBand: 'G1', wordsPerMinute: 40, comprehension: 0.8 },
+    });
+    const words = (calm.item.data as { words: string[][][] }).words.flat();
+    const average = words.reduce((sum, word) => sum + word.length, 0) / words.length;
+    const fromBaseline = (await start(token, E11)).json<StartResponse>();
+    expect(fromBaseline.item.params.syllablesPerSecond).toBeCloseTo(
+      ((40 * average) / 60) * 0.95,
+      2,
+    );
   });
 
   it('günde en fazla 3 egzersiz lokum kazandırır', async () => {

@@ -20,6 +20,17 @@ describe('hece ayırıcı', () => {
     expect(split('sevinçle')).toBe('se-vinç-le');
   });
 
+  it('üç ünsüzün son ikisi başlangıç kümesiyse ikisi birlikte geçer', () => {
+    expect(split('elektrik')).toBe('e-lek-trik');
+    expect(split('kontrol')).toBe('kon-trol');
+    expect(split('ekstra')).toBe('eks-tra');
+    expect(split('İNGİLTERE')).toBe('İN-GİL-TE-RE');
+    expect(split('KONTROL')).toBe('KON-TROL');
+    // Küme değilse yalnız sonuncu geçer.
+    expect(split('Türkçe')).toBe('Türk-çe');
+    expect(split('üstte')).toBe('üst-te');
+  });
+
   it('yan yana ünlüler ayrı hecedir', () => {
     expect(split('saat')).toBe('sa-at');
     expect(split('şiir')).toBe('şi-ir');
@@ -47,10 +58,28 @@ describe('hece ayırıcı', () => {
 
   it('kesme işareti ve noktalama bitişik kalır', () => {
     expect(split("İstanbul'da")).toBe("İs-tan-bul'-da");
-    expect(split("Efes'e")).toBe("E-fes'-e");
     expect(split('kapı,')).toBe('ka-pı,');
     expect(split('“Geleceğiz!”')).toBe('“Ge-le-ce-ğiz!”');
     expect(syllabify('yavaş-yavaş')).toEqual(['ya', 'vaş-', 'ya', 'vaş']);
+  });
+
+  it('kesmeden sonra ünlüyle başlayan ekte kökün son ünsüzü eke geçer', () => {
+    expect(split("Efes'e")).toBe("E-fe-s'e");
+    expect(split("Van'a")).toBe("Va-n'a");
+    expect(split("Van'ın")).toBe("Va-n'ın");
+    expect(split("Türk'e")).toBe("Tür-k'e");
+    expect(split('Efes’e,')).toBe('E-fe-s’e,');
+    expect(split("İZMİR'E")).toBe("İZ-Mİ-R'E");
+    // Ünsüzle başlayan ek ve ünlüyle biten kök bugünkü gibi.
+    expect(split("Efes'te")).toBe("E-fes'-te");
+    expect(split("İstanbul'da")).toBe("İs-tan-bul'-da");
+    expect(split("Kapadokya'ya")).toBe("Ka-pa-dok-ya'-ya");
+    expect(split("Ankara'ı")).toBe("An-ka-ra'-ı");
+    // Kök ünlüsüz kalacaksa taşınmaz.
+    expect(split("TBMM'e")).toBe("TBMM'e");
+    for (const word of ["Efes'e", "Van'a", "Türk'e", "İZMİR'E", "TBMM'e"]) {
+      expect(syllabify(word).join('')).toBe(word);
+    }
   });
 
   it('ünlüsüz parça tek hece olarak kalır', () => {
