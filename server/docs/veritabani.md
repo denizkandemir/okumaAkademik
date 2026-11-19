@@ -50,6 +50,10 @@ erDiagram
     reading_sessions |o--o{ lesson_completions : "ilk okuma"
     users ||--o{ lokum_entries : "kazanır"
     lessons |o--o{ lokum_entries : "ödülü"
+    texts ||--o{ exercise_items : "egzersizleri"
+    users ||--o{ exercise_sessions : "yapar"
+    exercise_items ||--o{ exercise_sessions : "yapılır"
+    exercise_sessions |o--o| lokum_entries : "ödülü"
 
     users {
         text id PK
@@ -185,7 +189,34 @@ erDiagram
         lokum_reason reason
         text lesson_id FK "boş olabilir"
         int level "LEVEL_UP'ta"
+        text exercise_session_id FK,UK "EXERCISE'ta"
         timestamptz created_at
+    }
+    exercise_items {
+        text id PK "slug"
+        exercise_type type "E1-E11"
+        grade_band grade_band
+        text text_id FK "boş olabilir"
+        jsonb params
+        jsonb data
+        content_status status
+        content_source source
+        timestamptz created_at
+        timestamptz updated_at
+    }
+    exercise_sessions {
+        text id PK
+        text user_id FK
+        text item_id FK
+        jsonb params_used
+        timestamptz started_at
+        timestamptz finished_at "bitmediyse boş"
+        int duration_seconds
+        float wpm_first
+        float wpm_last
+        float comprehension "0-1"
+        float score
+        jsonb details
     }
 ```
 
@@ -485,8 +516,62 @@ tamamlanışı aynı işlemde (transaction) şu satırları yazar: ders (`LESSON
 (`CHEST`), kazanılan her seviye için `LEVEL_UP` (`level` = ulaşılan seviye) ve yeni şehir açıldıysa
 `CITY_UNLOCK`. Hepsinde `lesson_id` ödülü doğuran derstir.
 
+Egzersiz (`EXERCISE`) satırı egzersizin ilk bitişinde yazılır: +3 lokum, Türkiye günü başına en fazla
+3 egzersiz; `exercise_session_id` ödülü doğuran egzersizdir (tekil: bir egzersize bir ödül).
+Egzersizler seviyeyi ve şehri hiçbir zaman değiştirmez.
+
 Kısıtlar: `lokum_entries_amount_positive_check` (> 0), `lokum_entries_level_check` (`level`
-yalnızca `LEVEL_UP`'ta, 2-30).
+yalnızca `LEVEL_UP`'ta, 2-30), `lokum_entries_exercise_session_check` (egzersiz yalnızca
+`EXERCISE`'ta).
+
+### `exercise_items` — egzersiz örnekleri (A1a)
+
+Bir egzersizin içeriği: türü (`exercise_type`, E1-E11; [katalog](../../docs/yapay-zeka/02-egzersiz-katalogu.md)),
+sınıf grubu, dayandığı metin, ayarları (`params`) ve türüne özel verisi (`data`). `params` ve
+`data` biçimleri türe göre zod ile doğrulanır ([`src/modules/exercises/types/`](../src/modules/exercises/types/)).
+Çocuğa yalnızca `status = APPROVED` örnekler gösterilir.
+
+- Kimlik okunabilir slug: `<kod>-<grup>-<ders>`, ör. `e1-g2-istanbul-01-vapurda-simit`.
+- Seed örnekleri (`source = SEED`) mevcut metinlerden belirlenimci üretilir
+  ([`prisma/seed-data/exercises.ts`](../prisma/seed-data/exercises.ts)): E1 her grupta 2 (60-200
+  kelime; G4 sürümleri uzun olduğu için G4'e G3 metinleri), E4 G1-G3'te 2 (öbekler
+  [`src/lib/chunker.ts`](../src/lib/chunker.ts)), E5 G1-G2'de 2 (sözlük ve 3+ heceli kelimeler,
+  çeldiriciler grubun başka metinlerinden), E6 G2-G4'te 2, E11 yalnızca G1'de şehir başına 2 (G1
+  sürümleri, 40-100 kelime; heceler [`src/lib/syllables.ts`](../src/lib/syllables.ts) ile `data`'da,
+  uygulama bölme yapmaz). Seed artık üretilmeyen SEED örneklerini (oturumlarıyla) siler.
+- Kilitli derslerin metinlerine dayanan örnekler önerilmez ve başlatılamaz (403).
+
+Kısıtlar: `exercise_items_params_object_check`, `exercise_items_data_object_check` (JSON nesnesi).
+
+### `exercise_sessions` — egzersizler
+
+Kullanıcının bir egzersizi bir kez yapması. `POST /exercises/:itemId/sessions` başlatır (etkin
+ayarlar `params_used`'a yazılır), `POST /exercise-sessions/:id/answers` soru cevaplarını
+`details.answers`'a ekler (`question_attempts`'a yazılmaz), `PATCH /exercise-sessions/:id` bitirir.
+Sunucu süreyi okuma kayıtlarıyla aynı kırpar (geçen süre + 60 sn, en fazla 4 saat), hızı metnin
+kelime sayısından, anlamayı ilk cevaplardan hesaplar. Tekrar gelen PATCH aynı sonucu döner.
+
+| Kolon           | Açıklama                                                         |
+| --------------- | ---------------------------------------------------------------- |
+| `wpm_first`     | İlk okumadaki dakikadaki kelime                                  |
+| `wpm_last`      | Son okumadaki dakikadaki kelime (tek okumalı türde ilkiyle aynı) |
+| `comprehension` | İlk denemede doğru / soru sayısı (0-1)                           |
+| `score`         | Türe özel puan; E1'de ilk okumaya göre hız değişimi (yüzde)      |
+| `details`       | Okuma süreleri, cevaplar, soru sayısı, ilk denemede doğru        |
+
+- **Seriye ve günlük hedefe sayılır:** bitiş anının günü seri günüdür; süresi başladığı günün
+  okuma dakikalarına eklenir (`/me/progress`, `/me/stats`, `v_daily_reading`).
+- **Okuma ölçümlerine girmez:** `reading_metrics` satırı yazılmaz; `v_reading_metrics` ve
+  `v_student_*` yalnızca okumalardandır.
+- **Günlük antrenman:** `GET /me/training/today` 1-3 onaylı örnek seçer
+  ([`training-picker.ts`](../src/modules/exercises/training-picker.ts); A4 yalnızca bunu
+  değiştirir): G1'de E6 yok, E11 yalnızca G1, son 5 anlama ortalaması < 0,6 ise E6 yok, art arda
+  aynı tür yok, toplam ≈ 5-10 dakika. Plan bugünden önceki verilere bakar ve (kullanıcı, gün)
+  tohumuyla belirlenimcidir; bugün bitenler `done` döner. Şimdilik yalnızca uygulamanın
+  oynatabildiği türler (E1, E4) önerilir.
+
+Kısıtlar: `exercise_sessions_duration_check`, `exercise_sessions_wpm_check`,
+`exercise_sessions_comprehension_check`, `exercise_sessions_finished_at_check`.
 
 ## Oyun kuralları
 
@@ -507,8 +592,9 @@ Kaynak: [`docs/tasarim/README.md`](../../docs/tasarim/README.md) "Oyun kurallar�
   50, yeni şehir 100. Yalnızca dersin ilk tamamlanışında verilir. Yanıtı kaybolan tamamlama isteği
   aynı denemeyle yeniden gelirse (hikâyede aynı okuma, sandıkta 10 dakika içinde) yeni satır
   yazılmaz; yanıt ilk tamamlamada yazılan `lokum_entries` satırlarından kurulur.
-- **Seri:** Türkiye saatine göre art arda, en az bir okumanın **bitirildiği** gün sayısı (bitmiş
-  okumanın `COALESCE(ended_at, started_at)` anının günü; kitaplıktan okumalar da sayılır). Bugün
+- **Seri:** Türkiye saatine göre art arda, en az bir okumanın ya da egzersizin **bitirildiği** gün
+  sayısı (bitmiş okumanın `COALESCE(ended_at, started_at)` anının, egzersizin `finished_at`'inin
+  günü; kitaplıktan okumalar da sayılır). Bugün
   henüz okunmadıysa seri dünden sayılır ve "tehlikede"dir. Not: günlük hedef (`v_daily_reading`,
   `/me/progress`) ise okumanın **başladığı** güne sayılır.
 
@@ -533,12 +619,12 @@ Her kullanıcı için bir satır (hiç okumamış olanlar dahil).
 
 Kullanıcı başına, okuma yapılan her gün için bir satır (okuma yapılmayan günler listelenmez).
 
-| Kolon                | Açıklama                                                          |
-| -------------------- | ----------------------------------------------------------------- |
-| `reading_date`       | Gün (Türkiye saatine göre, okumanın başladığı gün)                |
-| `read_minutes`       | O gün okunan tam dakika; uygulamadaki günlük hedef ile aynı hesap |
-| `daily_goal_minutes` | Kullanıcının **şu anki** hedefi (geçmiş hedefler saklanmaz)       |
-| `goal_reached`       | `read_minutes >= daily_goal_minutes`                              |
+| Kolon                | Açıklama                                                                     |
+| -------------------- | ---------------------------------------------------------------------------- |
+| `reading_date`       | Gün (Türkiye saatine göre, okumanın başladığı gün)                           |
+| `read_minutes`       | O gün okunan tam dakika (okumalar ve egzersizler); günlük hedefle aynı hesap |
+| `daily_goal_minutes` | Kullanıcının **şu anki** hedefi (geçmiş hedefler saklanmaz)                  |
+| `goal_reached`       | `read_minutes >= daily_goal_minutes`                                         |
 
 ### `v_reading_history` — okuma geçmişi
 
@@ -567,6 +653,11 @@ Her kullanıcı için bir satır. Değerler koddakiyle aynı kurallarla SQL'de t
 | `lokum_balance`             | Lokum bakiyesi                                       |
 | `current_streak`            | Şu anki seri (gün); bugün okunmadıysa dünden sayılır |
 | `last_read_at`              | Son okuma zamanı (Türkiye saati)                     |
+
+### `v_exercise_sessions` — egzersizler
+
+Her egzersiz için bir satır, en yeniden eskiye: kullanıcı adı, gün, tür, örnek, metin başlığı,
+süre, `wpm_first`, `wpm_last`, `comprehension`, `score` ve kazanılan lokum.
 
 ### `v_reading_metrics` — ölçülen okumalar
 
@@ -755,6 +846,10 @@ hesaplanır. Yanlış ilk cevaplar çoğunlukla zayıf türe düşer; yıldız v
 Her biten okumanın `reading_metrics` satırı vardır. Her demo kullanıcının, geçmişin başlangıcından
 bir gün önce yapılmış bir seviye belirleme sonucu vardır (hız 6 hafta önceki eğrinin biraz altında,
 anlama 0,67 ya da 0,83); bu yüzden uygulamada onlara seviye belirleme önerilmez.
+
+**Egzersizler (A1a):** her demo kullanıcının serisinin geçmiş günlerinden üçünde birer egzersizi
+(E1, E4, E1; G4'te yalnız E1) ölçüleri ve +3 lokumuyla vardır. Bugün egzersiz yoktur, böylece
+"Bugünün antrenmanı" kartı taze görünür; seri değişmez.
 
 Örnek kullanıcıların (`elif` 2. sınıf, `kerem` 5. sınıf, `zeynep` 7. sınıf) biten okumalarında
 yalnızca hız ölçümü vardır (soru yok). Süreleri sınıfa uygun hızdan hesaplanır: `elif` ≈ 50-63,

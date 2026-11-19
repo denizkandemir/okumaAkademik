@@ -7,13 +7,13 @@ import { toApiLevel } from '../../lib/reading-level.js';
 import { startOfDayInTimeZone } from '../../lib/time.js';
 import { parse } from '../../lib/validation.js';
 import { requireAuth } from '../../plugins/auth.js';
-import { loadJourneyState, lockedTextIds } from '../journey/journey-state.js';
+import { loadJourneyState, lockedTextIds, readSecondsSince } from '../journey/journey-state.js';
 import { writeReadingMetric } from './reading-metrics.js';
 
 /** İstemcinin bildirdiği süre, oturum başlangıcından bu yana geçen süreyi en fazla bu kadar aşabilir. */
-const DURATION_SLACK_SECONDS = 60;
+export const DURATION_SLACK_SECONDS = 60;
 /** Tek bir okuma oturumu için üst sınır (4 saat). */
-const MAX_DURATION_SECONDS = 4 * 60 * 60;
+export const MAX_DURATION_SECONDS = 4 * 60 * 60;
 /** "Okumaya devam et" için bakılacak son oturum sayısı. */
 const RECENT_SESSIONS_LIMIT = 20;
 
@@ -107,11 +107,9 @@ export async function progressRoutes(app: FastifyInstance) {
     const { user } = requireAuth(request);
     const dayStart = startOfDayInTimeZone(new Date());
 
-    const [today, recent] = await Promise.all([
-      prisma.readingSession.aggregate({
-        where: { userId: user.id, startedAt: { gte: dayStart } },
-        _sum: { durationSeconds: true },
-      }),
+    const [todaySeconds, recent] = await Promise.all([
+      // Günlük hedefe okumalar ve egzersizler birlikte sayılır.
+      readSecondsSince(prisma, user.id, dayStart),
       // Yarım kalan seviye belirleme okuması kitaplıktan "devam et" ile açılmaz.
       prisma.readingSession.findMany({
         where: { userId: user.id, text: { placementText: { is: null } } },
@@ -146,7 +144,7 @@ export async function progressRoutes(app: FastifyInstance) {
     return {
       dailyGoal: {
         goalMinutes: user.dailyGoalMinutes,
-        readMinutes: Math.floor((today._sum.durationSeconds ?? 0) / 60),
+        readMinutes: Math.floor(todaySeconds / 60),
       },
       continueReading,
     };

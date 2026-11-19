@@ -92,6 +92,8 @@ model User {
   lokumEntries      LokumEntry[]
   /// Kullanıcının seviye belirleme sonuçları (başlangıç ölçümleri)
   baselines         UserBaseline[]
+  /// Kullanıcının egzersizleri
+  exerciseSessions  ExerciseSession[]
 
   @@map("users")
 }
@@ -173,6 +175,8 @@ model Text {
   questions         Question[]
   /// Metindeki kelimelerin anlamları
   glossaryEntries   GlossaryEntry[]
+  /// Bu metne dayanan egzersiz örnekleri
+  exerciseItems     ExerciseItem[]
 
   @@map("texts")
 }
@@ -323,6 +327,8 @@ enum LokumReason {
   LEVEL_UP
   /// Yeni şehir açıldı (100)
   CITY_UNLOCK
+  /// Egzersiz bitti (3; günde en fazla 3 egzersiz ödüllendirilir)
+  EXERCISE
 
   @@map("lokum_reason")
 }
@@ -539,24 +545,150 @@ model LessonCompletion {
 /// tablosunda bakiye kolonu yoktur).
 model LokumEntry {
   /// Birincil anahtar (cuid)
-  id        String      @id @default(cuid())
+  id                String           @id @default(cuid())
   /// Lokumu kazanan kullanıcı (users.id)
-  userId    String      @map("user_id")
+  userId            String           @map("user_id")
   /// Lokumu kazanan kullanıcı
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   /// Kazanılan lokum (> 0), ör. 20
-  amount    Int
+  amount            Int
   /// Kazanma sebebi, ör. LESSON
-  reason    LokumReason
+  reason            LokumReason
   /// Kazancı doğuran ders (lessons.id); ders silinirse boş kalır
-  lessonId  String?     @map("lesson_id")
+  lessonId          String?          @map("lesson_id")
   /// Kazancı doğuran ders
-  lesson    Lesson?     @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  lesson            Lesson?          @relation(fields: [lessonId], references: [id], onDelete: SetNull)
   /// LEVEL_UP satırlarında ulaşılan seviye (2-30); diğerlerinde boş
-  level     Int?
+  level             Int?
+  /// EXERCISE satırlarında ödülü doğuran egzersiz (exercise_sessions.id); diğerlerinde boş
+  exerciseSessionId String?          @unique @map("exercise_session_id")
+  /// Ödülü doğuran egzersiz
+  exerciseSession   ExerciseSession? @relation(fields: [exerciseSessionId], references: [id], onDelete: SetNull)
   /// Kazanç zamanı
-  createdAt DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdAt         DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
 
   @@index([userId])
   @@map("lokum_entries")
+}
+
+/// Egzersiz türü (docs/yapay-zeka/02-egzersiz-katalogu.md, E1-E11).
+enum ExerciseType {
+  /// E1 Tekrarlı okuma ve hedef grafiği
+  TEKRARLI_OKUMA
+  /// E2 Dinle, sonra oku
+  DINLE_SONRA_OKU
+  /// E3 Dinlerken oku (karaoke vurgulu)
+  DINLERKEN_OKU
+  /// E4 Öbek öbek oku
+  OBEK_OKUMA
+  /// E5 Hızlı kelime ve öbek tanıma
+  HIZLI_KELIME
+  /// E6 Pırıl'ın ışığı (hızlandırılmış okuma)
+  PIRIL_ISIGI
+  /// E7 Kök ve ek ustası
+  KOK_EK
+  /// E8 Anlama stratejileri
+  ANLAMA_STRATEJI
+  /// E9 LGS tarzı paragraf ve sözel mantık
+  LGS_PARAGRAF
+  /// E10 Görsel okuma (grafik, tablo, infografik)
+  GORSEL_OKUMA
+  /// E11 Hece hece oku (zıplayan top)
+  HECE_TOPU
+
+  @@map("exercise_type")
+}
+
+/// İçeriğin onay durumu. Çocuklara yalnızca APPROVED içerik gösterilir.
+enum ContentStatus {
+  /// Taslak
+  DRAFT
+  /// İncelemede
+  REVIEW
+  /// Onaylandı (seed içeriği doğrudan onaylıdır)
+  APPROVED
+  /// Reddedildi
+  REJECTED
+
+  @@map("content_status")
+}
+
+/// İçeriğin kaynağı.
+enum ContentSource {
+  /// Mevcut metinlerden seed ile üretildi
+  SEED
+  /// Yapay zekâ üretti
+  AI
+
+  @@map("content_source")
+}
+
+/// Bir egzersiz örneği (içerik): türü, sınıf grubu, ayarları ve türüne özel verisi. Ayar ve veri
+/// biçimleri türe göre zod ile doğrulanır (src/modules/exercises/types/).
+model ExerciseItem {
+  /// Okunabilir kimlik (slug), ör. "e1-g2-minik-serce"
+  id        String            @id
+  /// Egzersiz türü, ör. TEKRARLI_OKUMA
+  type      ExerciseType
+  /// Sınıf grubu, ör. G2
+  gradeBand GradeBand         @map("grade_band")
+  /// Egzersizin dayandığı metin (texts.id); metinsiz egzersizde boş
+  textId    String?           @map("text_id")
+  /// Egzersizin dayandığı metin
+  text      Text?             @relation(fields: [textId], references: [id], onDelete: Cascade)
+  /// Türe özel ayarlar (jsonb), ör. {"repeatCount": 3, "goalPercent": 15}
+  params    Json
+  /// Türe özel veri (jsonb), ör. öbekler, heceler, kelime listesi
+  data      Json
+  /// Onay durumu; seed içeriği APPROVED
+  status    ContentStatus     @default(DRAFT)
+  /// Kaynak: SEED ya da AI
+  source    ContentSource
+  /// Kaydın oluşturulma zamanı
+  createdAt DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  /// Kaydın son güncellenme zamanı (uygulama tarafından otomatik)
+  updatedAt DateTime          @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
+  /// Bu örnekle yapılan egzersizler
+  sessions  ExerciseSession[]
+
+  @@index([type, gradeBand, status])
+  @@map("exercise_items")
+}
+
+/// Bir kullanıcının bir egzersizi bir kez yapması. Başlarken oluşur, bitince ölçülerle güncellenir.
+/// Ölçüler sunucuda yeniden doğrulanır; egzersiz okuma ölçümlerine (reading_metrics) girmez.
+model ExerciseSession {
+  /// Birincil anahtar (cuid)
+  id              String       @id @default(cuid())
+  /// Egzersizi yapan kullanıcı (users.id)
+  userId          String       @map("user_id")
+  /// Egzersizi yapan kullanıcı
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// Yapılan egzersiz örneği (exercise_items.id)
+  itemId          String       @map("item_id")
+  /// Yapılan egzersiz örneği
+  item            ExerciseItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  /// Bu oturumda kullanılan (etkin) ayarlar (jsonb)
+  paramsUsed      Json         @map("params_used")
+  /// Egzersizin başladığı zaman; günlük hedef bu zamanın günüyle (Türkiye saati) hesaplanır
+  startedAt       DateTime     @default(now()) @map("started_at") @db.Timestamptz(3)
+  /// Egzersizin bittiği zaman; bitmediyse boş. Seri bu zamanın gününe sayılır
+  finishedAt      DateTime?    @map("finished_at") @db.Timestamptz(3)
+  /// Toplam süre (saniye), ör. 240
+  durationSeconds Int          @default(0) @map("duration_seconds")
+  /// İlk okumadaki dakikadaki kelime (1 ondalık), ör. 72.4
+  wpmFirst        Float?       @map("wpm_first")
+  /// Son okumadaki dakikadaki kelime (1 ondalık), ör. 85.1
+  wpmLast         Float?       @map("wpm_last")
+  /// Anlama oranı, ilk denemeye göre (0-1, 2 ondalık), ör. 0.67
+  comprehension   Float?
+  /// Türe özel puan (E1: ilk okumaya göre hız değişimi, yüzde), ör. 18
+  score           Float?
+  /// Türe özel ayrıntılar (jsonb): cevaplar, okuma süreleri vb.
+  details         Json         @default("{}")
+  /// Bu egzersizin lokum ödülü (varsa)
+  lokumEntry      LokumEntry?
+
+  @@index([userId, startedAt])
+  @@map("exercise_sessions")
 }

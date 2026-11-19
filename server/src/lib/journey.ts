@@ -29,7 +29,20 @@ export const LOKUM = {
   LEVEL_UP: 50,
   /** Yeni şehir açılınca */
   CITY_UNLOCK: 100,
+  /** Biten her egzersiz (günde en fazla `EXERCISE_LOKUM_DAILY_LIMIT` egzersiz) */
+  EXERCISE: 3,
 } as const;
+
+/** Günde lokum kazandıran en fazla egzersiz sayısı (Türkiye günü). */
+export const EXERCISE_LOKUM_DAILY_LIMIT = 3;
+
+/**
+ * Egzersiz lokumu: bugün daha önce `rewardedToday` egzersiz ödüllendirildiyse. Egzersizler seviyeyi
+ * ve şehir ilerlemesini hiçbir zaman değiştirmez; yalnızca lokum verir ve seriye sayılır.
+ */
+export function exerciseLokum(rewardedToday: number): number {
+  return rewardedToday < EXERCISE_LOKUM_DAILY_LIMIT ? LOKUM.EXERCISE : 0;
+}
 
 /** Seviye = 1 + ⌊tamamlanan ders / 2⌋, en fazla 30. */
 export function levelFromCompleted(completedLessons: number): number {
@@ -86,8 +99,8 @@ export function firstTryCorrectCount(
 export type StreakInfo = { streak: number; readToday: boolean; streakAtRisk: boolean };
 
 /**
- * Seri: Türkiye saatine göre art arda, en az bir okumanın bitirildiği gün sayısı. `dates`
- * bitirilen okumaların anlarıdır. Bugün henüz okunmadıysa seri dünden sayılır ve "tehlikede"dir.
+ * Seri: Türkiye saatine göre art arda, en az bir okumanın ya da egzersizin bitirildiği gün sayısı.
+ * `dates` bitirilen okumaların ve egzersizlerin anlarıdır. Bugün henüz okunmadıysa seri dünden sayılır ve "tehlikede"dir.
  */
 export function streakFrom(dates: readonly Date[], today: Date): StreakInfo {
   const days = new Set(dates.map((date) => dayNumberInTimeZone(date)));

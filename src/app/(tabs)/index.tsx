@@ -17,6 +17,7 @@ import { AppHeader } from '@/design/components/app-header';
 import { AppText } from '@/design/components/app-text';
 import { StateView } from '@/design/components/state-view';
 import { colors, radius, size } from '@/design/tokens';
+import { TrainingCard } from '@/features/exercises/training-card';
 import { ChapterBar } from '@/features/game/home/chapter-bar';
 import { CityPreviewSheet } from '@/features/game/home/city-preview-sheet';
 import { JourneyMap, focusIndex, type PirilMessage } from '@/features/game/home/journey-map';
@@ -57,6 +58,8 @@ export default function HomeScreen() {
   }, [tip]);
 
   const [preview, setPreview] = useState<CityId | null>(null);
+  // Bugünün antrenmanı kartı, harita kullanıcı tarafından kaydırılınca hapa küçülür.
+  const [trainingCollapsed, setTrainingCollapsed] = useState(false);
 
   // Açılışta (ve şehir ya da şu anki ders değişince) şu anki düğüm görünür alanın üst üçte
   // birine gelsin.
@@ -126,12 +129,16 @@ export default function HomeScreen() {
           </AppText>
         </Pressable>
       ) : null}
+      {viewingOther ? null : (
+        <TrainingCard collapsed={trainingCollapsed} onExpand={() => setTrainingCollapsed(false)} />
+      )}
 
       <ScrollView
         ref={scrollRef}
         style={styles.scroll}
         contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + size.tabBar }]}
         onLayout={onLayout}
+        onScrollBeginDrag={() => setTrainingCollapsed(true)}
         onContentSizeChange={onContentSizeChange}>
         {data && nextStop ? (
           <JourneyMap

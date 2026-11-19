@@ -3,6 +3,7 @@ import Fastify, { type FastifyInstance, type FastifyServerOptions } from 'fastif
 import type { Config } from './config.js';
 import type { PrismaClient } from './db.js';
 import { authRoutes } from './modules/auth/auth.routes.js';
+import { exercisesRoutes } from './modules/exercises/exercises.routes.js';
 import { journeyRoutes } from './modules/journey/journey.routes.js';
 import { lessonsRoutes } from './modules/journey/lessons.routes.js';
 import { metricsRoutes } from './modules/metrics/metrics.routes.js';
@@ -56,6 +57,7 @@ export async function buildApp({
   await app.register(lessonsRoutes);
   await app.register(metricsRoutes);
   await app.register(placementRoutes);
+  await app.register(exercisesRoutes);
 
   return app;
 }

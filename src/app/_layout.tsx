@@ -63,6 +63,12 @@ function RootNavigator({ fontsReady }: { fontsReady: boolean }) {
               sheetCornerRadius: radius.sheet,
             }}
           />
+          {/* Egzersiz: tam ekran; okuma ve sorular sürerken kaydırarak kapanmaz (kapat düğmesi
+              onay sorar). */}
+          <Stack.Screen
+            name="exercise/[itemId]"
+            options={{ presentation: 'fullScreenModal', gestureEnabled: false }}
+          />
           {/* Ders akışı: soru sırasında kaydırarak geri dönülmez (kapat düğmesi onay sorar). */}
           <Stack.Screen name="lesson/[id]/quiz" options={{ gestureEnabled: false }} />
           {/* Ödül ekranları: başlıksız tam ekran modallar; akış DEVAM ET ile ilerler. */}

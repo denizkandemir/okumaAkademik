@@ -1,11 +1,13 @@
 import 'dotenv/config';
 
 import { createPrismaClient } from '../src/db.js';
+import { ContentSource } from '../src/generated/prisma/enums.js';
 import { gradeBandOf } from '../src/lib/grade-band.js';
 import { startOfDayInTimeZone } from '../src/lib/time.js';
 import { hashPassword } from '../src/modules/auth/password.js';
 import { writeReadingMetric } from '../src/modules/progress/reading-metrics.js';
 import {
+  seedExerciseItemRows,
   seedGlossaryRows,
   seedLessonRows,
   seedLessonTextRows,
@@ -243,6 +245,19 @@ async function syncContent() {
       update: { meaning },
     });
   }
+
+  // Egzersiz örnekleri: artık üretilmeyen SEED örnekleri (oturumlarıyla) silinir, diğerleri
+  // eşitlenir. Yapay zekânın ürettiği örneklere dokunulmaz.
+  await prisma.exerciseItem.deleteMany({
+    where: {
+      source: ContentSource.SEED,
+      id: { notIn: seedExerciseItemRows.map(({ id }) => id) },
+    },
+  });
+  for (const item of seedExerciseItemRows) {
+    const { id, ...data } = item;
+    await prisma.exerciseItem.upsert({ where: { id }, create: item, update: data });
+  }
 }
 
 /** Test, örnek ve demo kullanıcılar: şifreleri sıfırlanır, okumaları ve oyun verileri yeniden yazılır. */
@@ -336,7 +351,7 @@ try {
   await syncContent();
   const contentSummary =
     `${seedLessonRows.length} ders, ${seedTexts.length} metin, ${seedQuestionRows.length} soru, ` +
-    `${seedPlacementTexts.length} seviye belirleme metni`;
+    `${seedPlacementTexts.length} seviye belirleme metni, ${seedExerciseItemRows.length} egzersiz örneği`;
 
   if (sampleUsersAllowed(databaseUrl, process.env)) {
     await seedUsers(contentSummary);

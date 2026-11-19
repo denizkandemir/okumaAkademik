@@ -23,6 +23,8 @@ const TABLES = [
   'reading_metrics',
   'placement_texts',
   'user_baselines',
+  'exercise_items',
+  'exercise_sessions',
 ];
 const VIEWS = [
   'v_user_summary',
@@ -34,6 +36,7 @@ const VIEWS = [
   'v_student_daily',
   'v_student_weekly',
   'v_student_monthly',
+  'v_exercise_sessions',
 ];
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -164,6 +167,66 @@ describe('veritabanı şeması', () => {
       current_city: 'İzmir',
       lokum: 70,
       streak: 2,
+    });
+  });
+});
+
+describe('egzersizler (görünümler)', () => {
+  it('günlük okumaya ve seriye sayılır; öğrenci özetlerine girmez', async () => {
+    const { user } = await registerUser(ctx.app, { username: 'ayse' });
+    const now = Date.now();
+    const today = startOfDayInTimeZone(new Date(now)).getTime();
+    // Dün biten bir okuma ve bugün biten bir egzersiz: seri 2.
+    const yesterday = new Date(today - DAY + 12 * 60 * 60 * 1000);
+    await ctx.prisma.readingSession.create({
+      data: {
+        userId: user.id,
+        textId: 'vapurda-simit',
+        startedAt: new Date(yesterday.getTime() - 60_000),
+        endedAt: yesterday,
+        durationSeconds: 60,
+        progress: 1,
+        completed: true,
+      },
+    });
+    const startedAt = new Date(Math.max(today, now - 6 * 60 * 1000));
+    await ctx.prisma.exerciseSession.create({
+      data: {
+        userId: user.id,
+        itemId: 'e1-g2-istanbul-01-vapurda-simit',
+        paramsUsed: { repeatCount: 3, goalPercent: 15 },
+        startedAt,
+        finishedAt: new Date(startedAt.getTime() + 5 * 60 * 1000),
+        durationSeconds: 300,
+        wpmFirst: 80,
+        wpmLast: 92,
+        comprehension: 1,
+        score: 15,
+      },
+    });
+
+    const [daily] = await ctx.prisma.$queryRaw<{ read_minutes: number }[]>`
+      SELECT read_minutes FROM v_daily_reading
+      WHERE reading_date = (now() AT TIME ZONE 'Europe/Istanbul')::date`;
+    expect(daily).toEqual({ read_minutes: 5 });
+
+    const [journey] = await ctx.prisma.$queryRaw<{ current_streak: number }[]>`
+      SELECT current_streak FROM v_user_journey`;
+    expect(journey).toEqual({ current_streak: 2 });
+
+    const students = await ctx.prisma.$queryRaw<unknown[]>`SELECT * FROM v_student_daily`;
+    expect(students).toEqual([]);
+
+    const [exercise] = await ctx.prisma.$queryRaw<Record<string, unknown>[]>`
+      SELECT username, exercise_type::text AS type, text_title, wpm_first, comprehension, lokum
+      FROM v_exercise_sessions`;
+    expect(exercise).toEqual({
+      username: 'ayse',
+      type: 'TEKRARLI_OKUMA',
+      text_title: 'Vapurda Simit',
+      wpm_first: 80,
+      comprehension: 1,
+      lokum: 0,
     });
   });
 });

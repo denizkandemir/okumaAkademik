@@ -21,6 +21,11 @@ export const StorageKeys = {
    * cihazda bir kez önerilir. Çıkışta silinmez.
    */
   placementOfferedTo: 'okumatik.placement-offered-to',
+  /**
+   * Pırıl'ın talimatını ilk kullanımda okuduğu egzersiz türleri (JSON dizi, ör. ["TEKRARLI_OKUMA"]);
+   * yalnızca bu cihazda.
+   */
+  exerciseIntroSeen: 'okumatik.exercise-intro-seen',
 } as const;
 
 export type StorageKey = (typeof StorageKeys)[keyof typeof StorageKeys];

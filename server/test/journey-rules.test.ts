@@ -8,6 +8,8 @@ import {
   cityForLevel,
   cityLevelRange,
   cityStatus,
+  EXERCISE_LOKUM_DAILY_LIMIT,
+  exerciseLokum,
   firstTryCorrectCount,
   lessonLokum,
   lessonStatuses,
@@ -74,6 +76,11 @@ describe('yıldız ve lokum', () => {
         { questionId: 'c', correct: true },
       ]),
     ).toBe(2);
+  });
+
+  it('egzersiz +3 lokum, günde en fazla 3 egzersiz', () => {
+    expect(EXERCISE_LOKUM_DAILY_LIMIT).toBe(3);
+    expect([0, 1, 2, 3, 4].map(exerciseLokum)).toEqual([3, 3, 3, 0, 0]);
   });
 });
 
@@ -172,6 +179,16 @@ describe('seri (Türkiye saati)', () => {
   it('bugün okunmadıysa seri dünden sayılır ve tehlikededir', () => {
     const dates = [tr('2026-10-14T19:00:00'), tr('2026-10-13T10:00:00')];
     expect(streakFrom(dates, today)).toEqual({ streak: 2, readToday: false, streakAtRisk: true });
+  });
+
+  it('biten egzersizler de seri günüdür (okumalarla birlikte verilir)', () => {
+    const readings = [tr('2026-10-13T10:00:00')];
+    const exercises = [tr('2026-10-15T09:00:00'), tr('2026-10-14T18:00:00')];
+    expect(streakFrom([...readings, ...exercises], today)).toEqual({
+      streak: 3,
+      readToday: true,
+      streakAtRisk: false,
+    });
   });
 
   it('dün de okunmadıysa seri 0dır (tehlikede değil, kaybedilecek seri yok)', () => {

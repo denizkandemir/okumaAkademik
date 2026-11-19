@@ -37,10 +37,14 @@ export type QuizQuestion = LessonDetailResponse['questions'][number];
 
 type QuizViewProps = {
   questions: QuizQuestion[];
-  readingSessionId: string;
+  /** Ders ve seviye belirlemede okuma kaydı; egzersizde yok (oturum `answerPath`'tedir). */
+  readingSessionId?: string;
   /** "Metne bak" alt sayfası için. */
   text: { title: string; paragraphs: string[] };
-  /** Şık dokunuşunun gönderildiği uç (POST /lessons/:id/answers ya da /placement/answers). */
+  /**
+   * Şık dokunuşunun gönderildiği uç (POST /lessons/:id/answers, /placement/answers ya da
+   * /exercise-sessions/:id/answers).
+   */
   answerPath: string;
   /**
    * Son soru doğru cevaplanıp DEVAM ET'e basılınca. Hata fırlatırsa mesajı düğmenin üstünde
@@ -114,8 +118,8 @@ export function QuizView({
     setChecking(true);
     setCheckError(null);
     try {
-      const body: AnswerRequest = {
-        readingSessionId,
+      const body: Omit<AnswerRequest, 'readingSessionId'> & { readingSessionId?: string } = {
+        ...(readingSessionId ? { readingSessionId } : {}),
         questionId: question.id,
         choiceIndex: selected,
       };
