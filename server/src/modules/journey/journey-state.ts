@@ -134,13 +134,43 @@ export function citiesOf(state: JourneyState) {
   });
 }
 
-/** Bitirilen okumaların anları (seri bu anların Türkiye saatindeki günleriyle hesaplanır). */
+/**
+ * Bitirilen okumaların ve egzersizlerin anları (seri bu anların Türkiye saatindeki günleriyle
+ * hesaplanır).
+ */
 export async function loadReadingDates(db: Db, userId: string): Promise<Date[]> {
-  const sessions = await db.readingSession.findMany({
-    where: { userId, completed: true },
-    select: { startedAt: true, endedAt: true },
-  });
-  return sessions.map((session) => session.endedAt ?? session.startedAt);
+  const [sessions, exercises] = await Promise.all([
+    db.readingSession.findMany({
+      where: { userId, completed: true },
+      select: { startedAt: true, endedAt: true },
+    }),
+    db.exerciseSession.findMany({
+      where: { userId, finishedAt: { not: null } },
+      select: { finishedAt: true },
+    }),
+  ]);
+  return [
+    ...sessions.map((session) => session.endedAt ?? session.startedAt),
+    ...exercises.flatMap((exercise) => (exercise.finishedAt ? [exercise.finishedAt] : [])),
+  ];
+}
+
+/**
+ * `since` anından (ör. bugünün başı) bu yana başlayan okumaların ve egzersizlerin toplam süresi
+ * (saniye). Günlük hedef bununla hesaplanır; egzersizler okuma ölçümlerine girmez.
+ */
+export async function readSecondsSince(db: Db, userId: string, since: Date): Promise<number> {
+  const [readings, exercises] = await Promise.all([
+    db.readingSession.aggregate({
+      where: { userId, startedAt: { gte: since } },
+      _sum: { durationSeconds: true },
+    }),
+    db.exerciseSession.aggregate({
+      where: { userId, startedAt: { gte: since } },
+      _sum: { durationSeconds: true },
+    }),
+  ]);
+  return (readings._sum.durationSeconds ?? 0) + (exercises._sum.durationSeconds ?? 0);
 }
 
 /** Lokum bakiyesi: defterdeki satırların toplamı. */

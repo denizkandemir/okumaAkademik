@@ -4,7 +4,16 @@ import { describe, expect, it } from 'vitest';
 
 import { readingMinutes, wordCount } from '../prisma/seed-data/build.js';
 import {
+  E1_WORDS,
+  E11_WORDS,
+  E5_MAX_LENGTH_GAP,
+  E5_MIN_SIMILARITY,
+  letterSimilarity,
+  looksSimilar,
+} from '../prisma/seed-data/exercises.js';
+import {
   seedCities,
+  seedExerciseItemRows,
   seedLessonRows,
   seedLessonTextRows,
   seedPlacementQuestionRows,
@@ -17,6 +26,7 @@ import {
 import {
   City,
   CognitiveLevel,
+  ExerciseType,
   GradeBand,
   LessonKind,
   QuestionType,
@@ -27,6 +37,7 @@ import { toApiCity } from '../src/lib/city.js';
 import { ATESMAN_TARGET, gradeBandOf } from '../src/lib/grade-band.js';
 import { textMetrics } from '../src/lib/readability.js';
 import { CHEST_POSITIONS, LESSONS_PER_CITY, TOTAL_LESSONS } from '../src/lib/journey.js';
+import { EXERCISE_MODULES } from '../src/modules/exercises/types/index.js';
 
 /**
  * Seed içeriğinin doğrulaması (48 hikâye ve 144 soru; docs/tasarim/README.md, karar 9). İçerik
@@ -419,5 +430,112 @@ describe('seed içeriği: seviye belirleme', () => {
       expect(question.explanation.trim().length).toBeGreaterThan(0);
     }
     expect(new Set(questions.map((q) => q.correctIndex)).size).toBeGreaterThan(1);
+  });
+});
+
+describe('egzersiz örnekleri (seed)', () => {
+  const textById = new Map([...seedTexts].map((text) => [text.id, text]));
+
+  it('her örnek türünün ayar ve veri şemasından geçer; kimlikler tekil', () => {
+    expect(new Set(seedExerciseItemRows.map((item) => item.id)).size).toBe(
+      seedExerciseItemRows.length,
+    );
+    for (const item of seedExerciseItemRows) {
+      const module = EXERCISE_MODULES[item.type];
+      expect(module, item.id).toBeDefined();
+      expect(module?.paramsSchema.safeParse(item.params).success, item.id).toBe(true);
+      expect(module?.dataSchema.safeParse(item.data).success, item.id).toBe(true);
+      expect(textById.has(item.textId), item.id).toBe(true);
+    }
+  });
+
+  it('türler katalogdaki gruplarda; E1 ve E4 her grupta 2', () => {
+    const count = (type: ExerciseType, band: GradeBand) =>
+      seedExerciseItemRows.filter((item) => item.type === type && item.gradeBand === band).length;
+    for (const band of [GradeBand.G1, GradeBand.G2, GradeBand.G3, GradeBand.G4]) {
+      expect(count(ExerciseType.TEKRARLI_OKUMA, band)).toBe(2);
+      expect(count(ExerciseType.OBEK_OKUMA, band)).toBe(band === GradeBand.G4 ? 0 : 2);
+      expect(count(ExerciseType.HIZLI_KELIME, band)).toBe(
+        band === GradeBand.G1 || band === GradeBand.G2 ? 2 : 0,
+      );
+      expect(count(ExerciseType.PIRIL_ISIGI, band)).toBe(band === GradeBand.G1 ? 0 : 2);
+      expect(count(ExerciseType.HECE_TOPU, band)).toBe(band === GradeBand.G1 ? 12 : 0);
+    }
+  });
+
+  it('E1 metni 60-200 kelime', () => {
+    for (const item of seedExerciseItemRows.filter((i) => i.type === ExerciseType.TEKRARLI_OKUMA)) {
+      const words = textById.get(item.textId)?.wordCount ?? 0;
+      expect(words, item.id).toBeGreaterThanOrEqual(E1_WORDS.min);
+      expect(words, item.id).toBeLessThanOrEqual(E1_WORDS.max);
+    }
+  });
+
+  it('E4 öbekleri birleşince metnin aynısı', () => {
+    for (const item of seedExerciseItemRows.filter((i) => i.type === ExerciseType.OBEK_OKUMA)) {
+      const chunks = (item.data as { chunks: string[][] }).chunks;
+      expect(
+        chunks.map((paragraph) => paragraph.join(' ')),
+        item.id,
+      ).toEqual(textById.get(item.textId)?.paragraphs);
+    }
+  });
+
+  it('E5 benzerliği: ilk iki harf aynı, yakın uzunluk, harflerin en az %60’ı ortak', () => {
+    expect(letterSimilarity('kuşlar', 'kuşkular')).toBeCloseTo(6 / 8);
+    expect(looksSimilar('martılar', 'martıyı')).toBe(true);
+    expect(looksSimilar('İskele', 'iskelede')).toBe(true); // tr-TR küçük harf: İ → i
+    expect(looksSimilar('martılar', 'artılar')).toBe(false); // ilk harf farklı
+    expect(looksSimilar('martılar', 'merakla')).toBe(false); // ikinci harf farklı
+    expect(looksSimilar('kalemler', 'kalıbı')).toBe(false); // ortak harf %60'ın altında
+    expect(looksSimilar('kapı', 'kapılarımız')).toBe(false); // uzunluk farkı büyük
+    expect(looksSimilar('kalem', 'kuzgun')).toBe(false); // ortak harf az
+    expect(looksSimilar('İskele', 'iskele')).toBe(false); // aynı kelime
+  });
+
+  it('E5 kelimeleri metinde geçer; çeldiriciler görsel olarak benzer ve farklı', () => {
+    for (const item of seedExerciseItemRows.filter((i) => i.type === ExerciseType.HIZLI_KELIME)) {
+      const text = textById.get(item.textId)?.paragraphs.join(' ') ?? '';
+      const words = (item.data as { words: { word: string; distractors: string[] }[] }).words;
+      expect(words.length, item.id).toBeGreaterThanOrEqual(3);
+      for (const { word, distractors } of words) {
+        expect(text, item.id).toContain(word);
+        expect(new Set(distractors).size).toBe(distractors.length);
+        for (const distractor of distractors) {
+          expect(distractor).not.toBe(word.toLocaleLowerCase('tr-TR'));
+          expect(Array.from(distractor).slice(0, 2).join(''), `${word}/${distractor}`).toBe(
+            Array.from(word.toLocaleLowerCase('tr-TR')).slice(0, 2).join(''),
+          );
+          expect(Math.abs(distractor.length - word.length)).toBeLessThanOrEqual(E5_MAX_LENGTH_GAP);
+          expect(letterSimilarity(word, distractor)).toBeGreaterThanOrEqual(E5_MIN_SIMILARITY);
+        }
+      }
+    }
+  });
+
+  it('E11: 6 şehrin her birinde 2 örnek, G1 sürümünden, 40-100 kelime, heceler metnin aynısı', () => {
+    const e11 = seedExerciseItemRows.filter((i) => i.type === ExerciseType.HECE_TOPU);
+    const lessonOfText = new Map(seedLessonTextRows.map((row) => [row.textId, row]));
+    for (const { city } of seedCities) {
+      const inCity = e11.filter(
+        (item) =>
+          seedLessonRows.find((lesson) => lesson.id === lessonOfText.get(item.textId)?.lessonId)
+            ?.city === city,
+      );
+      expect(inCity.length, city).toBe(2);
+    }
+    for (const item of e11) {
+      expect(lessonOfText.get(item.textId)?.gradeBand, item.id).toBe(GradeBand.G1);
+      const text = textById.get(item.textId);
+      expect(text?.wordCount ?? 0).toBeGreaterThanOrEqual(E11_WORDS.min);
+      expect(text?.wordCount ?? 0).toBeLessThanOrEqual(E11_WORDS.max);
+      const words = (item.data as { words: string[][][]; questionPositions: number[] }).words;
+      expect(words.map((paragraph) => paragraph.map((w) => w.join('')).join(' '))).toEqual(
+        text?.paragraphs,
+      );
+      const positions = (item.data as { questionPositions: number[] }).questionPositions;
+      expect(positions.length).toBeGreaterThanOrEqual(1);
+      expect(positions.length).toBeLessThanOrEqual(2);
+    }
   });
 });

@@ -17,7 +17,13 @@ import { toApiTheme } from '../../lib/text-theme.js';
 import { startOfDayInTimeZone } from '../../lib/time.js';
 import { parse } from '../../lib/validation.js';
 import { requireAuth } from '../../plugins/auth.js';
-import { citiesOf, loadJourneyState, loadReadingDates, lokumBalance } from './journey-state.js';
+import {
+  citiesOf,
+  loadJourneyState,
+  loadReadingDates,
+  lokumBalance,
+  readSecondsSince,
+} from './journey-state.js';
 
 const journeyQuerySchema = z.object({
   city: z.enum(API_CITY_IDS, { error: 'Böyle bir şehir yok.' }).optional(),
@@ -92,14 +98,12 @@ export async function journeyRoutes(app: FastifyInstance) {
     const { user } = requireAuth(request);
     const now = new Date();
 
-    const [state, dates, lokum, today, total, lastSession] = await Promise.all([
+    const [state, dates, lokum, todaySeconds, total, lastSession] = await Promise.all([
       loadJourneyState(prisma, user.id, gradeBandOf(user.grade)),
       loadReadingDates(prisma, user.id),
       lokumBalance(prisma, user.id),
-      prisma.readingSession.aggregate({
-        where: { userId: user.id, startedAt: { gte: startOfDayInTimeZone(now) } },
-        _sum: { durationSeconds: true },
-      }),
+      // Günlük hedefe okumalar ve egzersizler birlikte sayılır.
+      readSecondsSince(prisma, user.id, startOfDayInTimeZone(now)),
       prisma.readingSession.aggregate({
         where: { userId: user.id },
         _sum: { durationSeconds: true },
@@ -120,7 +124,7 @@ export async function journeyRoutes(app: FastifyInstance) {
       lokum,
       ...streakFrom(dates, now),
       bestStreak,
-      todayMinutes: Math.floor((today._sum.durationSeconds ?? 0) / 60),
+      todayMinutes: Math.floor(todaySeconds / 60),
       dailyGoalMinutes: user.dailyGoalMinutes,
       storiesDone,
       minutesTotal: Math.floor((total._sum.durationSeconds ?? 0) / 60),

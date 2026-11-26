@@ -4,6 +4,7 @@ import type { FastifyInstance } from 'fastify';
 import { afterAll, beforeAll, beforeEach } from 'vitest';
 
 import {
+  seedExerciseItemRows,
   seedGlossaryRows,
   seedLessonRows,
   seedLessonTextRows,
@@ -48,7 +49,8 @@ export function useTestContext(): TestContext {
   beforeEach(async () => {
     await prisma.$executeRawUnsafe(
       'TRUNCATE TABLE lokum_entries, lesson_completions, question_attempts, glossary_entries, ' +
-        'questions, lessons, reading_sessions, auth_sessions, users, texts CASCADE',
+        'questions, lessons, reading_sessions, exercise_sessions, exercise_items, auth_sessions, ' +
+        'users, texts CASCADE',
     );
     await prisma.text.createMany({ data: [...seedTexts, ...seedPlacementTexts] });
     await prisma.lesson.createMany({ data: seedLessonRows });
@@ -56,6 +58,7 @@ export function useTestContext(): TestContext {
     await prisma.placementText.createMany({ data: seedPlacementRows });
     await prisma.question.createMany({ data: [...seedQuestionRows, ...seedPlacementQuestionRows] });
     await prisma.glossaryEntry.createMany({ data: seedGlossaryRows });
+    await prisma.exerciseItem.createMany({ data: seedExerciseItemRows });
     await context.app?.close();
     context.app = await buildApp({ config, prisma, logger: false });
   });

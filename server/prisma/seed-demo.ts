@@ -1,5 +1,12 @@
 import type { PrismaClient } from '../src/db.js';
-import { LessonKind, LokumReason, QuestionType } from '../src/generated/prisma/enums.js';
+import type { Prisma } from '../src/generated/prisma/client.js';
+import {
+  ExerciseType,
+  GradeBand,
+  LessonKind,
+  LokumReason,
+  QuestionType,
+} from '../src/generated/prisma/enums.js';
 import { CITY_NAMES } from '../src/lib/city.js';
 import { DEFAULT_GRADE_BAND, gradeBandOf, RUSHED_WPM_CEILING } from '../src/lib/grade-band.js';
 import {
@@ -13,7 +20,13 @@ import {
 import { readingMetricValues } from '../src/lib/reading-metrics.js';
 import { startOfDayInTimeZone } from '../src/lib/time.js';
 import { hashPassword } from '../src/modules/auth/password.js';
-import { seedLessonRows, seedLessonTextRows, seedTexts } from './seed-data/index.js';
+import { exerciseModule } from '../src/modules/exercises/types/index.js';
+import {
+  seedExerciseItemRows,
+  seedLessonRows,
+  seedLessonTextRows,
+  seedTexts,
+} from './seed-data/index.js';
 
 /**
  * Yolculuğun farklı noktalarındaki demo kullanıcılar (yalnızca geliştirme). Her seed çalışmasında
@@ -27,6 +40,10 @@ import { seedLessonRows, seedLessonTextRows, seedTexts } from './seed-data/index
  * yanlış ilk cevaplar çoğunlukla kullanıcının zayıf türündeki sorulara düşer. Her biten okumanın
  * reading_metrics satırı API ile aynı kuralla (readingMetricValues) yazılır. Her demo kullanıcının bir
  * seviye belirleme sonucu (user_baselines) vardır; uygulamada seviye belirleme önerilmez.
+ *
+ * Egzersizler (A1a): serinin geçmiş günlerinden üçünde birer egzersiz (G1: E1, E11, E5; diğerleri:
+ * E1, E6, E4), ölçüleri API'deki tür hesabıyla ve +3 lokumuyla. Zaten okunan günlere düştüğü için seri değişmez; bugün egzersiz yoktur, böylece
+ * "Bugünün antrenmanı" kartı taze görünür.
  */
 
 export const DEMO_PASSWORD = 'okuma123';
@@ -149,7 +166,8 @@ const DEMO_USERS: DemoUser[] = [
     streakDays: 12,
     readToday: true,
     weakType: QuestionType.DUYGU_KARAKTER,
-    wpm: { from: 48, to: 68 },
+    // 1-2. sınıfa uygun: seviye belirleme ≈ 52, geçmiş ≈ 50-64 kelime/dk (E11 ≈ 2 hece/sn).
+    wpm: { from: 53, to: 60 },
   },
   {
     username: 'demo.g3',
@@ -289,6 +307,7 @@ export async function seedDemoUsers(prisma: PrismaClient, now: Date): Promise<De
     await prisma.lokumEntry.deleteMany({ where: { userId } });
     await prisma.lessonCompletion.deleteMany({ where: { userId } });
     await prisma.readingSession.deleteMany({ where: { userId } });
+    await prisma.exerciseSession.deleteMany({ where: { userId } });
 
     const lessons = seedLessonRows.slice(0, demo.completed);
     const lastDaysAgo = demo.awayDays ?? (demo.readToday ? 0 : 1);
@@ -306,6 +325,9 @@ export async function seedDemoUsers(prisma: PrismaClient, now: Date): Promise<De
       const trend = demo.wpm.from + (demo.wpm.to - demo.wpm.from) * progress;
       return trend * (0.92 + 0.16 * noise(demo.username, 'wpm', key));
     };
+    /** Seviye belirleme hızı: 6 hafta önceki eğrinin biraz altında (aşağıda user_baselines). */
+    const baselineWpm =
+      Math.round(demo.wpm.from * (0.9 + 0.08 * noise(demo.username, 'baseline')) * 10) / 10;
 
     const sessions: {
       id: string;
@@ -485,6 +507,152 @@ export async function seedDemoUsers(prisma: PrismaClient, now: Date): Promise<De
     await prisma.lessonCompletion.createMany({ data: completions });
     await prisma.lokumEntry.createMany({ data: lokum });
 
+    // Egzersizler: serinin geçmiş günlerinden üçü (en yakını dün ya da son okunan gün), E1 ve E4
+    // sırayla. Örnek, metni açık (bitmiş ya da sıradaki) bir derse dayanır.
+    const openLessons = new Set(seedLessonRows.slice(0, demo.completed + 1).map(({ id }) => id));
+    const lessonOfText = new Map(seedLessonTextRows.map((row) => [row.textId, row.lessonId]));
+    const itemsOf = (type: ExerciseType) =>
+      seedExerciseItemRows.filter(
+        (item) =>
+          item.type === type &&
+          item.gradeBand === gradeBand &&
+          openLessons.has(lessonOfText.get(item.textId) ?? ''),
+      );
+    // G1: E1, E11, E5; diğer gruplar: E1, E6, E4 (yoksa E1). Böylece E6/E11'in bir sonraki hızı
+    // (details.nextSpeedFactor / nextSyllablesPerSecond) telefonda görünür.
+    const exerciseItems =
+      gradeBand === GradeBand.G1
+        ? [
+            itemsOf(ExerciseType.TEKRARLI_OKUMA)[0],
+            itemsOf(ExerciseType.HECE_TOPU)[0],
+            itemsOf(ExerciseType.HIZLI_KELIME)[0],
+          ]
+        : [
+            itemsOf(ExerciseType.TEKRARLI_OKUMA)[0],
+            itemsOf(ExerciseType.PIRIL_ISIGI)[0],
+            itemsOf(ExerciseType.OBEK_OKUMA)[0] ?? itemsOf(ExerciseType.TEKRARLI_OKUMA).at(-1),
+          ];
+    const exerciseDays = days
+      .filter((daysAgo) => daysAgo > 0 && daysAgo < lastDaysAgo + demo.streakDays)
+      .slice(-5)
+      .reverse()
+      .filter((_, index) => index % 2 === 0);
+    let exerciseLokumTotal = 0;
+    for (const [index, daysAgo] of exerciseDays.entries()) {
+      const exerciseItem = exerciseItems[index];
+      if (!exerciseItem) continue;
+      const wordCount = wordsOfText.get(exerciseItem.textId) ?? 0;
+      const wpm = wpmOn(daysAgo, 2000 + daysAgo);
+      const module = exerciseModule(exerciseItem.type);
+      const data = module.dataSchema.parse(exerciseItem.data);
+      const questionsTotal = module.questionPositions(data).length;
+      const firstTryCorrect =
+        noise(demo.username, 'exercise', daysAgo) < 0.7 || questionsTotal === 0
+          ? questionsTotal
+          : questionsTotal - 1;
+      const comprehension =
+        questionsTotal > 0 ? Math.round((firstTryCorrect / questionsTotal) * 100) / 100 : null;
+      const secondsAt = (words: number, speed: number) =>
+        Math.max(1, Math.round((words * 60) / speed));
+
+      // Etkin ayarlar API ile aynı kuralla (geçmiş yok; E11 hızı seviye belirleme hızından).
+      const params = module.effectiveParams
+        ? module.effectiveParams({
+            params: module.paramsSchema.parse(exerciseItem.params),
+            data,
+            gradeBand,
+            wordCount,
+            lastDetails: null,
+            baselineWpm,
+          })
+        : module.paramsSchema.parse(exerciseItem.params);
+      // Uygulamanın göndereceği bitirme gövdesi: E1 üç okuma (her biri biraz daha akıcı), E6 ilk
+      // bölüm + ışıklı bölüm, E5 kartlar + okuma, E4/E11 tek okuma.
+      const results: Partial<Record<ExerciseType, Record<string, unknown>>> = {
+        [ExerciseType.TEKRARLI_OKUMA]: {
+          reads: [wpm, wpm * 1.09, wpm * 1.17].map((speed) => ({
+            durationSeconds: secondsAt(wordCount, speed),
+          })),
+        },
+        [ExerciseType.OBEK_OKUMA]: { readSeconds: secondsAt(wordCount, wpm) },
+        [ExerciseType.PIRIL_ISIGI]: {
+          baselineWords: 30,
+          baselineSeconds: secondsAt(30, wpm),
+          lightSeconds: secondsAt(wordCount - 30, wpm * 1.08),
+          pauses: 1,
+        },
+        [ExerciseType.HIZLI_KELIME]: {
+          cards: ((data as { words?: { word: string }[] }).words ?? []).map((entry, card) => ({
+            word: entry.word,
+            correct: noise(demo.username, 'card', daysAgo, card) < 0.8,
+            flashMs: Math.max(500, 1200 - card * 120),
+          })),
+          readSeconds: secondsAt(wordCount, wpm),
+        },
+        [ExerciseType.HECE_TOPU]: {
+          readSeconds: secondsAt(wordCount, wpm),
+          slowUsed: false,
+          restarts: 1,
+        },
+      };
+      const result = results[exerciseItem.type] ?? {};
+      const metrics = module.finish?.metrics({
+        params,
+        data,
+        result: module.finish.resultSchema.parse(result),
+        wordCount,
+        durationSeconds: 3600,
+        comprehension,
+      });
+      if (!metrics) continue;
+      const readTotal = [
+        ...((result as { reads?: { durationSeconds: number }[] }).reads ?? []).map(
+          (read) => read.durationSeconds,
+        ),
+        ...['readSeconds', 'baselineSeconds', 'lightSeconds'].map((key) =>
+          Number(result[key] ?? 0),
+        ),
+      ].reduce((sum, seconds) => sum + seconds, 0);
+      const durationSeconds = readTotal + 60;
+      const finishedAt = slotEnd(
+        now,
+        daysAgo,
+        (perDay.get(daysAgo) ?? 0) + 1,
+        (perDay.get(daysAgo) ?? 0) + 2,
+      );
+      const id = `seed-${demo.username}-ex-${String(index + 1).padStart(2, '0')}`;
+      await prisma.exerciseSession.create({
+        data: {
+          id,
+          userId,
+          itemId: exerciseItem.id,
+          paramsUsed: params as Prisma.InputJsonValue,
+          startedAt: new Date(finishedAt.getTime() - durationSeconds * SECOND),
+          finishedAt,
+          durationSeconds,
+          wpmFirst: metrics.wpmFirst,
+          wpmLast: metrics.wpmLast,
+          comprehension,
+          score: metrics.score,
+          details: {
+            ...metrics.details,
+            questionsTotal,
+            firstTryCorrect,
+          } as Prisma.InputJsonValue,
+        },
+      });
+      await prisma.lokumEntry.create({
+        data: {
+          userId,
+          amount: LOKUM.EXERCISE,
+          reason: LokumReason.EXERCISE,
+          exerciseSessionId: id,
+          createdAt: finishedAt,
+        },
+      });
+      exerciseLokumTotal += LOKUM.EXERCISE;
+    }
+
     // Seviye belirleme, geçmişin başlangıcından bir gün önce: hız 6 hafta önceki eğrinin biraz
     // altında, anlama 6 sorudan 4 ya da 5 doğru. Böylece raporlarda başlangıca göre gelişim görünür.
     await prisma.userBaseline.deleteMany({ where: { userId } });
@@ -493,8 +661,7 @@ export async function seedDemoUsers(prisma: PrismaClient, now: Date): Promise<De
         userId,
         grade,
         gradeBand,
-        wordsPerMinute:
-          Math.round(demo.wpm.from * (0.9 + 0.08 * noise(demo.username, 'baseline')) * 10) / 10,
+        wordsPerMinute: baselineWpm,
         comprehension: noise(demo.username, 'baseline-comprehension') < 0.5 ? 0.67 : 0.83,
         measuredAt: slotEnd(now, HISTORY_DAYS + 1, 0, 1),
       },
@@ -507,7 +674,7 @@ export async function seedDemoUsers(prisma: PrismaClient, now: Date): Promise<De
       completed: demo.completed,
       level,
       city: CITY_NAMES[cityForLevel(level)],
-      lokum: lokum.reduce((sum, row) => sum + row.amount, 0),
+      lokum: lokum.reduce((sum, row) => sum + row.amount, 0) + exerciseLokumTotal,
       streak: streakFrom(
         sessions.map((session) => session.endedAt),
         now,

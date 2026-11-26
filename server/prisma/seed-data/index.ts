@@ -1,6 +1,7 @@
 import { GradeBand, LessonKind } from '../../src/generated/prisma/enums.js';
 import { antalya } from './antalya.js';
 import { efes } from './efes.js';
+import { buildExerciseItems } from './exercises.js';
 import { istanbul } from './istanbul.js';
 import { izmir } from './izmir.js';
 import { kapadokya } from './kapadokya.js';
@@ -77,3 +78,6 @@ export const seedPlacementRows = placementReadings.map(({ gradeBand, position, t
 export const seedPlacementQuestionRows = placementReadings.flatMap(({ text, questions }) =>
   questions.map((question, index) => ({ textId: text.id, position: index + 1, ...question })),
 );
+
+/** Mevcut metinlerden üretilen egzersiz örnekleri (ayrıntı exercises.ts). */
+export const seedExerciseItemRows = buildExerciseItems(seedCities);
